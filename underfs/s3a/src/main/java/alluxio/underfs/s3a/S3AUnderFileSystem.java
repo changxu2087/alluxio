@@ -188,7 +188,7 @@ public class S3AUnderFileSystem extends ObjectUnderFileSystem {
     TransferManager transferManager = new TransferManager(amazonS3Client, service);
 
     TransferManagerConfiguration transferConf = new TransferManagerConfiguration();
-    transferConf.setMultipartCopyThreshold(MULTIPART_COPY_THRESHOLD);
+//    transferConf.setMultipartCopyThreshold(MULTIPART_COPY_THRESHOLD);
     transferManager.setConfiguration(transferConf);
 
     // Default to readable and writable by the user.
