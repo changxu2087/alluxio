@@ -19,6 +19,7 @@ import alluxio.annotation.PublicApi;
 import alluxio.client.AlluxioStorageType;
 import alluxio.client.BoundedStream;
 import alluxio.client.PositionedReadable;
+import alluxio.client.WriteType;
 import alluxio.client.block.AlluxioBlockStore;
 import alluxio.client.block.stream.BlockInStream;
 import alluxio.client.block.stream.BlockOutStream;
@@ -141,7 +142,10 @@ public class FileInStream extends InputStream implements BoundedStream, Seekable
       Preconditions.checkNotNull(options.getCacheLocationPolicy(),
           PreconditionMessage.FILE_WRITE_LOCATION_POLICY_UNSPECIFIED);
     }
-
+    String writeTypeStr = Configuration.sPathWritetype.inMap(status.getPath());
+    if (!writeTypeStr.isEmpty() && !writeTypeStr.equals("")) {
+      mOutStreamOptions.setWriteType(Enum.valueOf(WriteType.class, writeTypeStr));
+    }
     int seekBufferSizeBytes = Math.max((int) options.getSeekBufferSizeBytes(), 1);
     mSeekBuffer = new byte[seekBufferSizeBytes];
     mBlockStore = AlluxioBlockStore.create(context);

@@ -11,6 +11,7 @@
 
 package alluxio;
 
+import alluxio.collections.PrefixMap;
 import alluxio.exception.ExceptionMessage;
 import alluxio.exception.PreconditionMessage;
 import alluxio.network.ChannelType;
@@ -78,6 +79,10 @@ public final class Configuration {
     init();
   }
 
+
+  /** Map of paths to writetype */
+  public static final PrefixMap sPathWritetype =
+          new PrefixMap(Configuration.getList(PropertyKey.USER_FILE_WRITE_TYPE_PATH, ","), ":");
   /**
    * Initializes the default {@link Configuration}.
    *

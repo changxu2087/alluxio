@@ -518,6 +518,8 @@ public class PropertyKey {
       create(Name.USER_FILE_WRITE_AVOID_EVICTION_POLICY_RESERVED_BYTES, "0MB");
   public static final PropertyKey USER_FILE_WRITE_TYPE_DEFAULT =
       create(Name.USER_FILE_WRITE_TYPE_DEFAULT, "MUST_CACHE");
+  public static final PropertyKey USER_FILE_WRITE_TYPE_PATH =
+      create(Name.USER_FILE_WRITE_TYPE_PATH, "");
   public static final PropertyKey USER_FILE_WRITE_TIER_DEFAULT =
       create(Name.USER_FILE_WRITE_TIER_DEFAULT, Constants.FIRST_TIER);
   public static final PropertyKey USER_HEARTBEAT_INTERVAL_MS =
@@ -1040,6 +1042,7 @@ public class PropertyKey {
     public static final String USER_FILE_WRITE_AVOID_EVICTION_POLICY_RESERVED_BYTES =
         "alluxio.user.file.write.avoid.eviction.policy.reserved.size.bytes";
     public static final String USER_FILE_WRITE_TYPE_DEFAULT = "alluxio.user.file.writetype.default";
+    public static final String USER_FILE_WRITE_TYPE_PATH = "alluxio.user.file.writetype.path";
     public static final String USER_FILE_WRITE_TIER_DEFAULT =
         "alluxio.user.file.write.tier.default";
     public static final String USER_HEARTBEAT_INTERVAL_MS = "alluxio.user.heartbeat.interval.ms";
