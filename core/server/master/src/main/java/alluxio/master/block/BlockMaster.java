@@ -161,4 +161,11 @@ public interface BlockMaster extends Master, ContainerIdGenerable {
    * @param blockIds the ids of the lost blocks
    */
   void reportLostBlocks(List<Long> blockIds);
+
+  /**
+   * Sets the to be persisted block size of the worker in bytes.
+   * @param increase if true increase, otherwise decrease.
+   * @param workerBlockCounts the Bytes size of change.
+   */
+  void updateWorkersToBePersistedBytes(boolean increase, Map<Long, Integer> workerBlockCounts);
 }

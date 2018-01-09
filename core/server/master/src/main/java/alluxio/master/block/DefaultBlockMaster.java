@@ -49,6 +49,7 @@ import alluxio.wire.BlockInfo;
 import alluxio.wire.BlockLocation;
 import alluxio.wire.WorkerInfo;
 import alluxio.wire.WorkerNetAddress;
+import alluxio.worker.Worker;
 
 import com.codahale.metrics.Gauge;
 import com.google.common.collect.ImmutableSet;
@@ -636,6 +637,15 @@ public final class DefaultBlockMaster extends AbstractMaster implements BlockMas
         return new Command(CommandType.Nothing, new ArrayList<Long>());
       }
       return new Command(CommandType.Free, toRemoveBlocks);
+    }
+  }
+
+  public void updateWorkersToBePersistedBytes(boolean increase, Map<Long, Integer> workerBlockCounts) {
+    long blockSize = Configuration.getBytes(PropertyKey.USER_BLOCK_SIZE_BYTES_DEFAULT);
+    for (MasterWorkerInfo workerInfo : mWorkers) {
+      if (workerBlockCounts.containsKey(workerInfo.getId())){
+        workerInfo.updateToBePersistedBytes(increase, workerBlockCounts.get(workerInfo.getId()) * blockSize);
+      }
     }
   }
 

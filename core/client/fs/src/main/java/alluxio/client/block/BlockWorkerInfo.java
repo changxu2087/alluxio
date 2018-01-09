@@ -27,6 +27,7 @@ public final class BlockWorkerInfo {
   private final WorkerNetAddress mNetAddress;
   private final long mCapacityBytes;
   private final long mUsedBytes;
+  private final long mToBePersistedBytes;
 
   /**
    * Constructs the block worker information.
@@ -35,10 +36,11 @@ public final class BlockWorkerInfo {
    * @param capacityBytes the capacity of the worker in bytes
    * @param usedBytes the used bytes of the worker
    */
-  public BlockWorkerInfo(WorkerNetAddress netAddress, long capacityBytes, long usedBytes) {
+  public BlockWorkerInfo(WorkerNetAddress netAddress, long capacityBytes, long usedBytes, long toBePersistedBytes) {
     mNetAddress = Preconditions.checkNotNull(netAddress, "netAddress");
     mCapacityBytes = capacityBytes;
     mUsedBytes = usedBytes;
+    mToBePersistedBytes = toBePersistedBytes;
   }
 
   /**
@@ -60,5 +62,12 @@ public final class BlockWorkerInfo {
    */
   public long getUsedBytes() {
     return mUsedBytes;
+  }
+
+  /**
+   * @return the to be persisted bytes of the worker
+   */
+  public long getToBePersistedBytes() {
+    return mToBePersistedBytes;
   }
 }

@@ -110,7 +110,7 @@ public final class AlluxioBlockStore {
         mContext.acquireBlockMasterClientResource()) {
       for (WorkerInfo workerInfo : masterClientResource.get().getWorkerInfoList()) {
         infoList.add(new BlockWorkerInfo(workerInfo.getAddress(), workerInfo.getCapacityBytes(),
-            workerInfo.getUsedBytes()));
+            workerInfo.getUsedBytes(), workerInfo.getToBePersistBytes()));
       }
       return infoList;
     }
@@ -215,7 +215,23 @@ public final class AlluxioBlockStore {
     FileWriteLocationPolicy locationPolicy = Preconditions.checkNotNull(options.getLocationPolicy(),
         PreconditionMessage.FILE_WRITE_LOCATION_POLICY_UNSPECIFIED);
     address = locationPolicy.getWorkerForNextBlock(getWorkerInfoList(), blockSize);
-    return getOutStream(blockId, blockSize, address, options);
+    if (checkCouldAsync(address, blockSize)) {
+      return getOutStream(blockId, blockSize, address, options);
+    } else {
+      return null;
+    }
+  }
+
+  private boolean checkCouldAsync (WorkerNetAddress address, long len) throws IOException {
+    for (BlockWorkerInfo blockWorkerInfo : getWorkerInfoList()) {
+      if (!blockWorkerInfo.getNetAddress().getHost().equals(address.getHost())) {
+        continue;
+      }
+      if ((blockWorkerInfo.getCapacityBytes() - blockWorkerInfo.getToBePersistedBytes()) >= len) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

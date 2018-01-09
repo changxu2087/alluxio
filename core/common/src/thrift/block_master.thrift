@@ -11,6 +11,7 @@ struct WorkerInfo {
   5: i64 capacityBytes
   6: i64 usedBytes
   7: i64 startTimeMs
+  8: i64 toBePersistBytes
 }
 
 struct GetBlockInfoTOptions {}

@@ -45,6 +45,7 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
   private static final org.apache.thrift.protocol.TField CAPACITY_BYTES_FIELD_DESC = new org.apache.thrift.protocol.TField("capacityBytes", org.apache.thrift.protocol.TType.I64, (short)5);
   private static final org.apache.thrift.protocol.TField USED_BYTES_FIELD_DESC = new org.apache.thrift.protocol.TField("usedBytes", org.apache.thrift.protocol.TType.I64, (short)6);
   private static final org.apache.thrift.protocol.TField START_TIME_MS_FIELD_DESC = new org.apache.thrift.protocol.TField("startTimeMs", org.apache.thrift.protocol.TType.I64, (short)7);
+  private static final org.apache.thrift.protocol.TField TO_BE_PERSIST_BYTES_FIELD_DESC = new org.apache.thrift.protocol.TField("toBePersistBytes", org.apache.thrift.protocol.TType.I64, (short)8);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -59,6 +60,7 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
   private long capacityBytes; // required
   private long usedBytes; // required
   private long startTimeMs; // required
+  private long toBePersistBytes; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -68,7 +70,8 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
     STATE((short)4, "state"),
     CAPACITY_BYTES((short)5, "capacityBytes"),
     USED_BYTES((short)6, "usedBytes"),
-    START_TIME_MS((short)7, "startTimeMs");
+    START_TIME_MS((short)7, "startTimeMs"),
+    TO_BE_PERSIST_BYTES((short)8, "toBePersistBytes");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -97,6 +100,8 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
           return USED_BYTES;
         case 7: // START_TIME_MS
           return START_TIME_MS;
+        case 8: // TO_BE_PERSIST_BYTES
+          return TO_BE_PERSIST_BYTES;
         default:
           return null;
       }
@@ -142,6 +147,7 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
   private static final int __CAPACITYBYTES_ISSET_ID = 2;
   private static final int __USEDBYTES_ISSET_ID = 3;
   private static final int __STARTTIMEMS_ISSET_ID = 4;
+  private static final int __TOBEPERSISTBYTES_ISSET_ID = 5;
   private byte __isset_bitfield = 0;
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
@@ -160,6 +166,8 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
     tmpMap.put(_Fields.START_TIME_MS, new org.apache.thrift.meta_data.FieldMetaData("startTimeMs", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
+    tmpMap.put(_Fields.TO_BE_PERSIST_BYTES, new org.apache.thrift.meta_data.FieldMetaData("toBePersistBytes", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(WorkerInfo.class, metaDataMap);
   }
@@ -174,7 +182,8 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
     String state,
     long capacityBytes,
     long usedBytes,
-    long startTimeMs)
+    long startTimeMs,
+    long toBePersistBytes)
   {
     this();
     this.id = id;
@@ -189,6 +198,8 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
     setUsedBytesIsSet(true);
     this.startTimeMs = startTimeMs;
     setStartTimeMsIsSet(true);
+    this.toBePersistBytes = toBePersistBytes;
+    setToBePersistBytesIsSet(true);
   }
 
   /**
@@ -207,6 +218,7 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
     this.capacityBytes = other.capacityBytes;
     this.usedBytes = other.usedBytes;
     this.startTimeMs = other.startTimeMs;
+    this.toBePersistBytes = other.toBePersistBytes;
   }
 
   public WorkerInfo deepCopy() {
@@ -227,6 +239,8 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
     this.usedBytes = 0;
     setStartTimeMsIsSet(false);
     this.startTimeMs = 0;
+    setToBePersistBytesIsSet(false);
+    this.toBePersistBytes = 0;
   }
 
   public long getId() {
@@ -392,6 +406,29 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
     __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __STARTTIMEMS_ISSET_ID, value);
   }
 
+  public long getToBePersistBytes() {
+    return this.toBePersistBytes;
+  }
+
+  public WorkerInfo setToBePersistBytes(long toBePersistBytes) {
+    this.toBePersistBytes = toBePersistBytes;
+    setToBePersistBytesIsSet(true);
+    return this;
+  }
+
+  public void unsetToBePersistBytes() {
+    __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __TOBEPERSISTBYTES_ISSET_ID);
+  }
+
+  /** Returns true if field toBePersistBytes is set (has been assigned a value) and false otherwise */
+  public boolean isSetToBePersistBytes() {
+    return EncodingUtils.testBit(__isset_bitfield, __TOBEPERSISTBYTES_ISSET_ID);
+  }
+
+  public void setToBePersistBytesIsSet(boolean value) {
+    __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __TOBEPERSISTBYTES_ISSET_ID, value);
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case ID:
@@ -450,6 +487,14 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
       }
       break;
 
+    case TO_BE_PERSIST_BYTES:
+      if (value == null) {
+        unsetToBePersistBytes();
+      } else {
+        setToBePersistBytes((Long)value);
+      }
+      break;
+
     }
   }
 
@@ -476,6 +521,9 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
     case START_TIME_MS:
       return getStartTimeMs();
 
+    case TO_BE_PERSIST_BYTES:
+      return getToBePersistBytes();
+
     }
     throw new IllegalStateException();
   }
@@ -501,6 +549,8 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
       return isSetUsedBytes();
     case START_TIME_MS:
       return isSetStartTimeMs();
+    case TO_BE_PERSIST_BYTES:
+      return isSetToBePersistBytes();
     }
     throw new IllegalStateException();
   }
@@ -581,6 +631,15 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
         return false;
     }
 
+    boolean this_present_toBePersistBytes = true;
+    boolean that_present_toBePersistBytes = true;
+    if (this_present_toBePersistBytes || that_present_toBePersistBytes) {
+      if (!(this_present_toBePersistBytes && that_present_toBePersistBytes))
+        return false;
+      if (this.toBePersistBytes != that.toBePersistBytes)
+        return false;
+    }
+
     return true;
   }
 
@@ -622,6 +681,11 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
     list.add(present_startTimeMs);
     if (present_startTimeMs)
       list.add(startTimeMs);
+
+    boolean present_toBePersistBytes = true;
+    list.add(present_toBePersistBytes);
+    if (present_toBePersistBytes)
+      list.add(toBePersistBytes);
 
     return list.hashCode();
   }
@@ -704,6 +768,16 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
         return lastComparison;
       }
     }
+    lastComparison = Boolean.valueOf(isSetToBePersistBytes()).compareTo(other.isSetToBePersistBytes());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetToBePersistBytes()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.toBePersistBytes, other.toBePersistBytes);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     return 0;
   }
 
@@ -758,6 +832,10 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
     if (!first) sb.append(", ");
     sb.append("startTimeMs:");
     sb.append(this.startTimeMs);
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("toBePersistBytes:");
+    sb.append(this.toBePersistBytes);
     first = false;
     sb.append(")");
     return sb.toString();
@@ -864,6 +942,14 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 8: // TO_BE_PERSIST_BYTES
+            if (schemeField.type == org.apache.thrift.protocol.TType.I64) {
+              struct.toBePersistBytes = iprot.readI64();
+              struct.setToBePersistBytesIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -904,6 +990,9 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
       oprot.writeFieldBegin(START_TIME_MS_FIELD_DESC);
       oprot.writeI64(struct.startTimeMs);
       oprot.writeFieldEnd();
+      oprot.writeFieldBegin(TO_BE_PERSIST_BYTES_FIELD_DESC);
+      oprot.writeI64(struct.toBePersistBytes);
+      oprot.writeFieldEnd();
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -943,7 +1032,10 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
       if (struct.isSetStartTimeMs()) {
         optionals.set(6);
       }
-      oprot.writeBitSet(optionals, 7);
+      if (struct.isSetToBePersistBytes()) {
+        optionals.set(7);
+      }
+      oprot.writeBitSet(optionals, 8);
       if (struct.isSetId()) {
         oprot.writeI64(struct.id);
       }
@@ -965,12 +1057,15 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
       if (struct.isSetStartTimeMs()) {
         oprot.writeI64(struct.startTimeMs);
       }
+      if (struct.isSetToBePersistBytes()) {
+        oprot.writeI64(struct.toBePersistBytes);
+      }
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, WorkerInfo struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      BitSet incoming = iprot.readBitSet(7);
+      BitSet incoming = iprot.readBitSet(8);
       if (incoming.get(0)) {
         struct.id = iprot.readI64();
         struct.setIdIsSet(true);
@@ -999,6 +1094,10 @@ public class WorkerInfo implements org.apache.thrift.TBase<WorkerInfo, WorkerInf
       if (incoming.get(6)) {
         struct.startTimeMs = iprot.readI64();
         struct.setStartTimeMsIsSet(true);
+      }
+      if (incoming.get(7)) {
+        struct.toBePersistBytes = iprot.readI64();
+        struct.setToBePersistBytesIsSet(true);
       }
     }
   }

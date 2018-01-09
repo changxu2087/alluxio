@@ -21,6 +21,7 @@ import alluxio.wire.WorkerNetAddress;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
+import com.sun.org.apache.regexp.internal.RE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +62,8 @@ public final class MasterWorkerInfo {
   private Map<String, Long> mTotalBytesOnTiers;
   /** Mapping from storage tier alias to used bytes. */
   private Map<String, Long> mUsedBytesOnTiers;
+  /** Worker's to be persisted blocks bytes. */
+  private long mToBePersistedBytes;
 
   /** ids of blocks the worker contains. */
   private Set<Long> mBlocks;
@@ -84,6 +87,7 @@ public final class MasterWorkerInfo {
     mUsedBytesOnTiers = new HashMap<>();
     mBlocks = new HashSet<>();
     mToRemoveBlocks = new HashSet<>();
+    mToBePersistedBytes = 0;
   }
 
   /**
@@ -181,7 +185,7 @@ public final class MasterWorkerInfo {
         .setLastContactSec(
             (int) ((CommonUtils.getCurrentMs() - mLastUpdatedTimeMs) / Constants.SECOND_MS))
         .setState("In Service").setCapacityBytes(mCapacityBytes).setUsedBytes(mUsedBytes)
-        .setStartTimeMs(mStartTimeMs);
+        .setStartTimeMs(mStartTimeMs).setToBePersistBytes(mToBePersistedBytes);
   }
 
   /**
@@ -287,11 +291,16 @@ public final class MasterWorkerInfo {
     return freeCapacityBytes;
   }
 
+  public long getToBePersistedBytes() {
+    return mToBePersistedBytes;
+  }
+
   @Override
   public String toString() {
     return Objects.toStringHelper(this).add("id", mId).add("workerAddress", mWorkerAddress)
         .add("capacityBytes", mCapacityBytes).add("usedBytes", mUsedBytes)
-        .add("lastUpdatedTimeMs", mLastUpdatedTimeMs).add("blocks", mBlocks).toString();
+        .add("lastUpdatedTimeMs", mLastUpdatedTimeMs).add("blocks", mBlocks)
+        .add("toBePersistedBytes", mToBePersistedBytes).toString();
   }
 
   /**
@@ -339,5 +348,22 @@ public final class MasterWorkerInfo {
   public void updateUsedBytes(String tierAlias, long usedBytesOnTier) {
     mUsedBytes += usedBytesOnTier - mUsedBytesOnTiers.get(tierAlias);
     mUsedBytesOnTiers.put(tierAlias, usedBytesOnTier);
+  }
+
+  /**
+   * Sets the to be persisted block size of the worker in bytes.
+   *
+   * @param increase if true increase, otherwise decrease.
+   * @param updateBytes the Bytes size of change.
+   */
+  public void updateToBePersistedBytes(boolean increase, long updateBytes) {
+    if (increase) {
+      mToBePersistedBytes += updateBytes;
+    } else {
+      mToBePersistedBytes -= updateBytes;
+      if (mToBePersistedBytes < 0) {
+        mToBePersistedBytes = 0;
+      }
+    }
   }
 }

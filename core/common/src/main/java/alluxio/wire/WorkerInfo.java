@@ -32,6 +32,7 @@ public final class WorkerInfo implements Serializable {
   private long mCapacityBytes;
   private long mUsedBytes;
   private long mStartTimeMs;
+  private long mToBePersistBytes;
 
   /**
    * Creates a new instance of {@link WorkerInfo}.
@@ -51,6 +52,7 @@ public final class WorkerInfo implements Serializable {
     mCapacityBytes = workerInfo.getCapacityBytes();
     mUsedBytes = workerInfo.getUsedBytes();
     mStartTimeMs = workerInfo.getStartTimeMs();
+    mToBePersistBytes = workerInfo.getToBePersistBytes();
   }
 
   /**
@@ -100,6 +102,13 @@ public final class WorkerInfo implements Serializable {
    */
   public long getStartTimeMs() {
     return mStartTimeMs;
+  }
+
+  /**
+   * @return the worker to be persist block size (in bytes)
+   */
+  public long getToBePersistBytes() {
+    return mToBePersistBytes;
   }
 
   /**
@@ -168,11 +177,20 @@ public final class WorkerInfo implements Serializable {
   }
 
   /**
+   * @param toBePersistBytes the worker to be persisted blocks size (in bytes)
+   * @return the worker information
+   */
+  public WorkerInfo setToBePersistBytes(long toBePersistBytes) {
+    mToBePersistBytes = toBePersistBytes;
+    return this;
+  }
+
+  /**
    * @return thrift representation of the worker information
    */
   protected alluxio.thrift.WorkerInfo toThrift() {
     return new alluxio.thrift.WorkerInfo(mId, mAddress.toThrift(), mLastContactSec, mState,
-        mCapacityBytes, mUsedBytes, mStartTimeMs);
+        mCapacityBytes, mUsedBytes, mStartTimeMs, mToBePersistBytes);
   }
 
   @Override
@@ -187,13 +205,13 @@ public final class WorkerInfo implements Serializable {
     return mId == that.mId && mAddress.equals(that.mAddress)
         && mLastContactSec == that.mLastContactSec && mState.equals(that.mState)
         && mCapacityBytes == that.mCapacityBytes && mUsedBytes == that.mUsedBytes
-        && mStartTimeMs == that.mStartTimeMs;
+        && mStartTimeMs == that.mStartTimeMs && mToBePersistBytes == that.mToBePersistBytes;
   }
 
   @Override
   public int hashCode() {
     return Objects.hashCode(mId, mAddress, mLastContactSec, mState, mCapacityBytes, mUsedBytes,
-        mStartTimeMs);
+        mStartTimeMs, mToBePersistBytes);
   }
 
   @Override
@@ -201,7 +219,7 @@ public final class WorkerInfo implements Serializable {
     return Objects.toStringHelper(this).add("id", mId).add("address", mAddress)
         .add("lastContactSec", mLastContactSec).add("state", mState)
         .add("capacityBytes", mCapacityBytes).add("usedBytes", mUsedBytes)
-        .add("startTimeMs", mStartTimeMs).toString();
+        .add("startTimeMs", mStartTimeMs).add("toBePersistBytes", mToBePersistBytes).toString();
   }
 
 }

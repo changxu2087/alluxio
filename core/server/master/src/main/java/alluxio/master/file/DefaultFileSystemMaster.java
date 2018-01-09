@@ -2639,6 +2639,7 @@ public final class DefaultFileSystemMaster extends AbstractMaster implements Fil
     try (JournalContext journalContext = createJournalContext();
         LockedInodePath inodePath = mInodeTree.lockFullInodePath(path, InodeTree.LockMode.WRITE)) {
       scheduleAsyncPersistenceAndJournal(inodePath, journalContext);
+      addToBePersistBlockNumber(inodePath);
     }
     // NOTE: persistence is asynchronous so there is no guarantee the path will still exist
     mAsyncPersistHandler.scheduleAsyncPersistence(path);
@@ -2678,6 +2679,7 @@ public final class DefaultFileSystemMaster extends AbstractMaster implements Fil
       try {
         // Permission checking for each file is performed inside setAttribute
         setAttribute(getPath(fileId), SetAttributeOptions.defaults().setPersisted(true));
+        removeToBePersistBlockNumber(fileId);
       } catch (FileDoesNotExistException | AccessControlException | InvalidPathException e) {
         LOG.error("Failed to set file {} as persisted, because {}", fileId, e);
       }
@@ -2732,6 +2734,9 @@ public final class DefaultFileSystemMaster extends AbstractMaster implements Fil
           .checkArgument(options.getPersisted(), PreconditionMessage.ERR_SET_STATE_UNPERSIST);
       if (!file.isPersisted()) {
         file.setPersistenceState(PersistenceState.PERSISTED);
+        if (!file.isPinned()) {
+          mInodeTree.removePinned(file);
+        }
         persistedInodes = propagatePersistedInternal(inodePath, false);
         file.setLastModificationTimeMs(opTimeMs);
         Metrics.FILES_PERSISTED.inc();
@@ -2825,6 +2830,56 @@ public final class DefaultFileSystemMaster extends AbstractMaster implements Fil
     return mBlockMaster.getWorkerInfoList();
   }
 
+  private void removeToBePersistBlockNumber(long fileId) throws AccessControlException {
+    List<FileBlockInfo> blockInfoList;
+    Map<Long, Integer> workerBlockCounts = new HashMap<>();
+    try {
+      if (getPersistenceState(fileId) == PersistenceState.TO_BE_PERSISTED)
+        return;
+      blockInfoList = getFileBlockInfoList(getPath(fileId));
+      for (FileBlockInfo fileBlockInfo : blockInfoList) {
+        for (BlockLocation blockLocation : fileBlockInfo.getBlockInfo().getLocations()) {
+          if (workerBlockCounts.containsKey(blockLocation.getWorkerId())) {
+            workerBlockCounts.put(blockLocation.getWorkerId(),
+                    workerBlockCounts.get(blockLocation.getWorkerId()) + 1);
+          } else {
+            workerBlockCounts.put(blockLocation.getWorkerId(), 1);
+          }
+        }
+      }
+      mBlockMaster.updateWorkersToBePersistedBytes(false, workerBlockCounts);
+    } catch (FileDoesNotExistException e) {
+      LOG.error("The file {} to persist does not exist");
+    } catch (InvalidPathException e) {
+      LOG.error("The file {} to persist is invalid");
+    }
+  }
+
+
+  private void addToBePersistBlockNumber(LockedInodePath inodePath) {
+    List<FileBlockInfo> blockInfoList;
+    Map<Long, Integer> workerBlockCounts = new HashMap<>();
+    try {
+      if (inodePath.getInodeFile().getPersistenceState() != PersistenceState.TO_BE_PERSISTED)
+        return;
+      blockInfoList = getFileBlockInfoListInternal(inodePath);
+      for (FileBlockInfo fileBlockInfo : blockInfoList) {
+        for (BlockLocation blockLocation : fileBlockInfo.getBlockInfo().getLocations()) {
+          if (workerBlockCounts.containsKey(blockLocation.getWorkerId())) {
+            workerBlockCounts.put(blockLocation.getWorkerId(),
+                    workerBlockCounts.get(blockLocation.getWorkerId()) + 1);
+          } else {
+            workerBlockCounts.put(blockLocation.getWorkerId(), 1);
+          }
+        }
+      }
+      mBlockMaster.updateWorkersToBePersistedBytes(true, workerBlockCounts);
+    } catch (FileDoesNotExistException e) {
+      LOG.error("The file {} to persist does not exist", inodePath.getUri());
+    } catch (InvalidPathException e) {
+      LOG.error("The file {} to persist is invalid", inodePath.getUri());
+    }
+  }
   /**
    * Class that contains metrics for FileSystemMaster.
    * This class is public because the counter names are referenced in

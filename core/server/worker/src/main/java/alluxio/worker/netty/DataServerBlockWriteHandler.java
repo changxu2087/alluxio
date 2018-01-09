@@ -13,6 +13,7 @@ package alluxio.worker.netty;
 
 import alluxio.Configuration;
 import alluxio.PropertyKey;
+import alluxio.Sessions;
 import alluxio.StorageTierAssoc;
 import alluxio.WorkerStorageTierAssoc;
 import alluxio.metrics.MetricsSystem;
@@ -64,6 +65,7 @@ public final class DataServerBlockWriteHandler extends DataServerWriteHandler {
       mBlockWriter.close();
       try {
         mWorker.commitBlock(mSessionId, mId);
+//        mWorker.lockBlock(Sessions.CHECKPOINT_SESSION_ID, mId);
       } catch (Exception e) {
         throw CommonUtils.castToIOException(e);
       }

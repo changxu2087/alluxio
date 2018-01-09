@@ -198,6 +198,13 @@ public abstract class Inode<T> implements JournalEntryRepresentable {
   }
 
   /**
+   * @return true if the file to be persisted, false otherwise
+   */
+  public boolean isToBePersisted() {
+    return mPersistenceState == PersistenceState.TO_BE_PERSISTED;
+  }
+
+  /**
    * @param creationTimeMs the creation time to use (in milliseconds)
    * @return the updated object
    */

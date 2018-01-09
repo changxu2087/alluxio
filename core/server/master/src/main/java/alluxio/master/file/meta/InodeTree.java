@@ -678,7 +678,7 @@ public class InodeTree implements JournalEntryIterable {
         }
 
         if (lastInode instanceof InodeFile) {
-          if (currentInodeDirectory.isPinned()) {
+          if (currentInodeDirectory.isPinned() || !currentInodeDirectory.isPersisted()) {
             // Update set of pinned file ids.
             mPinnedInodeFileIds.add(lastInode.getId());
           }
@@ -821,7 +821,7 @@ public class InodeTree implements JournalEntryIterable {
 
     if (inode.isFile()) {
       InodeFile inodeFile = (InodeFile) inode;
-      if (inodeFile.isPinned()) {
+      if (inodeFile.isPinned() || !inodeFile.isPersisted()) {
         mPinnedInodeFileIds.add(inodeFile.getId());
       } else {
         mPinnedInodeFileIds.remove(inodeFile.getId());
@@ -858,6 +858,12 @@ public class InodeTree implements JournalEntryIterable {
   public void setPinned(LockedInodePath inodePath, boolean pinned)
       throws FileDoesNotExistException {
     setPinned(inodePath, pinned, System.currentTimeMillis());
+  }
+
+  public void removePinned(InodeFile inodeFile) throws FileDoesNotExistException {
+    if (!inodeFile.isPinned() && inodeFile.isPersisted()) {
+      mPinnedInodeFileIds.remove(inodeFile.getId());
+    }
   }
 
   /**
@@ -975,7 +981,7 @@ public class InodeTree implements JournalEntryIterable {
       inode.setMode(Constants.DEFAULT_FILE_SYSTEM_MODE);
     }
     // Update indexes.
-    if (inode.isFile() && inode.isPinned()) {
+    if (inode.isFile() && (inode.isPinned() || !inode.isPersisted())) {
       mPinnedInodeFileIds.add(inode.getId());
     }
   }
