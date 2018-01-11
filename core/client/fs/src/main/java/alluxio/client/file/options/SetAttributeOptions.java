@@ -40,6 +40,7 @@ public final class SetAttributeOptions {
   private String mGroup;
   private Mode mMode;
   private boolean mRecursive;
+  private boolean mForAsyncWrite;
 
   /**
    * @return the default {@link SetAttributeOptions}
@@ -57,6 +58,7 @@ public final class SetAttributeOptions {
     mGroup = null;
     mMode = null;
     mRecursive = false;
+    mForAsyncWrite = false;
   }
 
   /**
@@ -118,6 +120,22 @@ public final class SetAttributeOptions {
    */
   public boolean isRecursive() {
     return mRecursive;
+  }
+
+  /**
+   * @return whether for async_write
+   */
+  public boolean isForAsyncWrite() {
+    return mForAsyncWrite;
+  }
+
+  /**
+   * @param mForAsyncWrite the whether if for async write.
+   * @return the updated options object
+   */
+  public SetAttributeOptions setForAsyncWrite(boolean mForAsyncWrite) {
+    this.mForAsyncWrite = mForAsyncWrite;
+    return this;
   }
 
   /**
@@ -235,6 +253,7 @@ public final class SetAttributeOptions {
       options.setMode(mMode.toShort());
     }
     options.setRecursive(mRecursive);
+    options.setForAsyncWrite(mForAsyncWrite);
     return options;
   }
 
@@ -247,33 +266,24 @@ public final class SetAttributeOptions {
       return false;
     }
     SetAttributeOptions that = (SetAttributeOptions) o;
-    return Objects.equal(mPinned, that.mPinned)
-        && Objects.equal(mTtl, that.mTtl)
-        && Objects.equal(mTtlAction, that.mTtlAction)
-        && Objects.equal(mPersisted, that.mPersisted)
-        && Objects.equal(mOwner, that.mOwner)
-        && Objects.equal(mGroup, that.mGroup)
-        && Objects.equal(mMode, that.mMode)
-        && Objects.equal(mRecursive, that.mRecursive);
+    return Objects.equal(mPinned, that.mPinned) && Objects.equal(mTtl, that.mTtl)
+        && Objects.equal(mTtlAction, that.mTtlAction) && Objects.equal(mPersisted, that.mPersisted)
+        && Objects.equal(mOwner, that.mOwner) && Objects.equal(mGroup, that.mGroup)
+        && Objects.equal(mMode, that.mMode) && Objects.equal(mRecursive, that.mRecursive)
+        && Objects.equal(mForAsyncWrite, that.mForAsyncWrite);
   }
 
   @Override
   public int hashCode() {
     return Objects.hashCode(mPinned, mTtl, mTtlAction, mPersisted, mOwner,
-        mGroup, mMode, mRecursive);
+        mGroup, mMode, mRecursive,  mForAsyncWrite);
   }
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this)
-        .add("pinned", mPinned)
-        .add("ttl", mTtl)
-        .add("ttlAction", mTtlAction)
-        .add("persisted", mPersisted)
-        .add("owner", mOwner)
-        .add("group", mGroup)
-        .add("mode", mMode)
-        .add("recursive", mRecursive)
-        .toString();
+    return Objects.toStringHelper(this).add("pinned", mPinned).add("ttl", mTtl)
+        .add("ttlAction", mTtlAction).add("persisted", mPersisted).add("owner", mOwner)
+        .add("group", mGroup).add("mode", mMode).add("recursive", mRecursive)
+        .add("forAsyncWrite", mForAsyncWrite).toString();
   }
 }

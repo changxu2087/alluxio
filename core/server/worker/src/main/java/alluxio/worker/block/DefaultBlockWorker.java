@@ -451,6 +451,11 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
   }
 
   @Override
+  public void addBlockPinList(long blockId) {
+    mBlockStore.addPinnedBlock(blockId);
+  }
+
+    @Override
   public FileInfo getFileInfo(long fileId) throws IOException {
     return mFileSystemMasterClient.getFileInfo(fileId);
   }

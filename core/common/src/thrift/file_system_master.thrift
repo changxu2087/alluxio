@@ -153,6 +153,7 @@ struct SetAttributeTOptions {
   6: optional i16 mode
   7: optional bool recursive
   8: optional common.TTtlAction ttlAction
+  9: optional bool forAsyncWrite
 }
 struct SetAttributeTResponse {}
 

@@ -921,6 +921,7 @@ public final class DefaultFileSystemMaster extends AbstractMaster implements Fil
     InodeFile fileInode = (InodeFile) inode;
     List<Long> blockIdList = fileInode.getBlockIds();
     List<BlockInfo> blockInfoList = mBlockMaster.getBlockInfoList(blockIdList);
+//    就在这，在改为同步写的时候，要改一下fileInode
     if (!fileInode.isPersisted() && blockInfoList.size() != blockIdList.size()) {
       throw new BlockInfoException("Cannot complete a file without all the blocks committed");
     }
@@ -2726,8 +2727,11 @@ public final class DefaultFileSystemMaster extends AbstractMaster implements Fil
     }
     if (options.getPersisted() != null) {
       Preconditions.checkArgument(inode.isFile(), PreconditionMessage.PERSIST_ONLY_FOR_FILE);
-      Preconditions.checkArgument(((InodeFile) inode).isCompleted(),
-          PreconditionMessage.FILE_TO_PERSIST_MUST_BE_COMPLETE);
+      if (!options.isForAsyncWrite()) {
+        Preconditions.checkArgument(((InodeFile) inode).isCompleted(),
+                PreconditionMessage.FILE_TO_PERSIST_MUST_BE_COMPLETE);
+      }
+
       InodeFile file = (InodeFile) inode;
       // TODO(manugoyal) figure out valid behavior in the un-persist case
       Preconditions

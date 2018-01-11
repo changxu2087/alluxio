@@ -351,6 +351,8 @@ public interface BlockWorker extends Worker, SessionCleanable {
    */
   void updatePinList(Set<Long> pinnedInodes);
 
+  void addBlockPinList(long blockId);
+
   /**
    * Gets the file information.
    *

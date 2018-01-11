@@ -259,7 +259,9 @@ public class BlockOutStream extends OutputStream implements BoundedStream, Cance
    */
   private void releaseCurrentPacket() {
     if (mCurrentPacket != null) {
-      mCurrentPacket.release();
+      if (mCurrentPacket.refCnt() > 0) {
+        mCurrentPacket.release();
+      }
       mCurrentPacket = null;
     }
   }

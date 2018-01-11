@@ -548,6 +548,10 @@ public class InodeTree implements JournalEntryIterable {
       for (Inode inode : traversalResult.getNonPersisted()) {
         syncPersistDirectory((InodeDirectory) inode, journalContext);
       }
+    } else {
+      for (Inode inode : traversalResult.getNonPersisted()) {
+        mPinnedInodeFileIds.add(inode.getId());
+      }
     }
     if (pathIndex < (pathComponents.length - 1) || currentInodeDirectory.getChild(name) == null) {
       // (1) There are components in parent paths that need to be created. Or
@@ -678,7 +682,7 @@ public class InodeTree implements JournalEntryIterable {
         }
 
         if (lastInode instanceof InodeFile) {
-          if (currentInodeDirectory.isPinned() || !currentInodeDirectory.isPersisted()) {
+          if (currentInodeDirectory.isPinned()) {
             // Update set of pinned file ids.
             mPinnedInodeFileIds.add(lastInode.getId());
           }

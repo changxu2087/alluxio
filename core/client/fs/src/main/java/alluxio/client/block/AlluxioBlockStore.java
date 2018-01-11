@@ -215,11 +215,12 @@ public final class AlluxioBlockStore {
     FileWriteLocationPolicy locationPolicy = Preconditions.checkNotNull(options.getLocationPolicy(),
         PreconditionMessage.FILE_WRITE_LOCATION_POLICY_UNSPECIFIED);
     address = locationPolicy.getWorkerForNextBlock(getWorkerInfoList(), blockSize);
-    if (checkCouldAsync(address, blockSize)) {
-      return getOutStream(blockId, blockSize, address, options);
-    } else {
-      return null;
-    }
+//    if (checkCouldAsync(address, blockSize)) {
+//      return getOutStream(blockId, blockSize, address, options);
+//    } else {
+//      return null;
+//    }
+    return getOutStream(blockId, blockSize, address, options);
   }
 
   private boolean checkCouldAsync (WorkerNetAddress address, long len) throws IOException {

@@ -136,7 +136,8 @@
 
   <properties>
     <apache.curator.version>2.1.0-incubating</apache.curator.version>
-    <aws.amazonaws.version>1.11.7</aws.amazonaws.version>
+    <aws.amazonaws.version>1.11.20</aws.amazonaws.version>
+    <!--<aws.amazonaws.version>1.11.7</aws.amazonaws.version>-->
     <build.path>build</build.path>
     <checkstyle.path>build/checkstyle/</checkstyle.path>
     <cxf.version>2.7.0</cxf.version>
@@ -334,7 +335,8 @@
       <dependency>
         <groupId>net.java.dev.jets3t</groupId>
         <artifactId>jets3t</artifactId>
-        <version>0.8.1</version>
+        <!--<version>0.9.4</version>-->
+        <version>0.9.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>

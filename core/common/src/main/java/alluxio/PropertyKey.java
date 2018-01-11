@@ -1,7 +1,7 @@
 /*
- * The Alluxio Open Foundation licenses this work under the Apache License, version 2.0
- * (the "License"). You may not use this work except in compliance with the License, which is
- * available at www.apache.org/licenses/LICENSE-2.0
+ * The Alluxio Open Foundation licenses this work under the Apache License, version 2.0 (the
+ * "License"). You may not use this work except in compliance with the License, which is available
+ * at www.apache.org/licenses/LICENSE-2.0
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied, as more fully set forth in the License.
@@ -188,8 +188,7 @@ public class PropertyKey {
   public static final PropertyKey MASTER_MOUNT_TABLE_ROOT_SHARED =
       create(Template.MASTER_MOUNT_TABLE_SHARED, true, "root");
   public static final PropertyKey MASTER_MOUNT_TABLE_ROOT_UFS =
-      create(Template.MASTER_MOUNT_TABLE_UFS,
-          String.format("${%s}", Name.UNDERFS_ADDRESS), "root");
+      create(Template.MASTER_MOUNT_TABLE_UFS, String.format("${%s}", Name.UNDERFS_ADDRESS), "root");
 
   /**
    * Master related properties.
@@ -219,9 +218,8 @@ public class PropertyKey {
    * @deprecated since 1.5.0 and will be removed in 2.0.
    */
   @Deprecated
-  public static final PropertyKey MASTER_JOURNAL_FORMATTER_CLASS =
-      create(Name.MASTER_JOURNAL_FORMATTER_CLASS,
-          "alluxio.master.journalv0.ProtoBufJournalFormatter");
+  public static final PropertyKey MASTER_JOURNAL_FORMATTER_CLASS = create(
+      Name.MASTER_JOURNAL_FORMATTER_CLASS, "alluxio.master.journalv0.ProtoBufJournalFormatter");
   public static final PropertyKey MASTER_JOURNAL_LOG_SIZE_BYTES_MAX =
       create(Name.MASTER_JOURNAL_LOG_SIZE_BYTES_MAX, "10MB");
   public static final PropertyKey MASTER_JOURNAL_TAILER_SHUTDOWN_QUIET_WAIT_TIME_MS =
@@ -245,13 +243,12 @@ public class PropertyKey {
       create(Name.MASTER_LINEAGE_CHECKPOINT_INTERVAL_MS, 300000);
   public static final PropertyKey MASTER_LINEAGE_RECOMPUTE_INTERVAL_MS =
       create(Name.MASTER_LINEAGE_RECOMPUTE_INTERVAL_MS, 300000);
-  public static final PropertyKey MASTER_LINEAGE_RECOMPUTE_LOG_PATH =
-      create(Name.MASTER_LINEAGE_RECOMPUTE_LOG_PATH,
-          String.format("${%s}/recompute.log", Name.LOGS_DIR));
+  public static final PropertyKey MASTER_LINEAGE_RECOMPUTE_LOG_PATH = create(
+      Name.MASTER_LINEAGE_RECOMPUTE_LOG_PATH, String.format("${%s}/recompute.log", Name.LOGS_DIR));
   public static final PropertyKey MASTER_PRINCIPAL = create(Name.MASTER_PRINCIPAL, null);
   /**
-   * @deprecated since version 1.4 and will be removed in version 2.0,
-   * use USER_RPC_RETRY_MAX_NUM_RETRY instead.
+   * @deprecated since version 1.4 and will be removed in version 2.0, use
+   *             USER_RPC_RETRY_MAX_NUM_RETRY instead.
    */
   @Deprecated
   public static final PropertyKey MASTER_RETRY =
@@ -384,9 +381,9 @@ public class PropertyKey {
   public static final PropertyKey WORKER_TIERED_STORE_LEVEL0_DIRS_QUOTA =
       create(Template.WORKER_TIERED_STORE_LEVEL_DIRS_QUOTA, "${alluxio.worker.memory.size}", 0);
   /**
-   * @deprecated It will be removed in 2.0.0.
-   * Use {@link #WORKER_TIERED_STORE_LEVEL0_HIGH_WATERMARK_RATIO} and
-   * {@link #WORKER_TIERED_STORE_LEVEL0_LOW_WATERMARK_RATIO} instead.
+   * @deprecated It will be removed in 2.0.0. Use
+   *             {@link #WORKER_TIERED_STORE_LEVEL0_HIGH_WATERMARK_RATIO} and
+   *             {@link #WORKER_TIERED_STORE_LEVEL0_LOW_WATERMARK_RATIO} instead.
    */
   @Deprecated
   public static final PropertyKey WORKER_TIERED_STORE_LEVEL0_RESERVED_RATIO =
@@ -402,9 +399,9 @@ public class PropertyKey {
   public static final PropertyKey WORKER_TIERED_STORE_LEVEL1_DIRS_QUOTA =
       create(Template.WORKER_TIERED_STORE_LEVEL_DIRS_QUOTA, null, 1);
   /**
-   * @deprecated It will be removed in 2.0.0.
-   * Use {@link #WORKER_TIERED_STORE_LEVEL1_HIGH_WATERMARK_RATIO} and
-   * {@link #WORKER_TIERED_STORE_LEVEL1_LOW_WATERMARK_RATIO} instead.
+   * @deprecated It will be removed in 2.0.0. Use
+   *             {@link #WORKER_TIERED_STORE_LEVEL1_HIGH_WATERMARK_RATIO} and
+   *             {@link #WORKER_TIERED_STORE_LEVEL1_LOW_WATERMARK_RATIO} instead.
    */
   @Deprecated
   public static final PropertyKey WORKER_TIERED_STORE_LEVEL1_RESERVED_RATIO =
@@ -420,9 +417,9 @@ public class PropertyKey {
   public static final PropertyKey WORKER_TIERED_STORE_LEVEL2_DIRS_QUOTA =
       create(Template.WORKER_TIERED_STORE_LEVEL_DIRS_QUOTA, null, 2);
   /**
-   * @deprecated It will be removed in 2.0.0.
-   * Use {@link #WORKER_TIERED_STORE_LEVEL2_HIGH_WATERMARK_RATIO} and
-   * {@link #WORKER_TIERED_STORE_LEVEL2_LOW_WATERMARK_RATIO} instead.
+   * @deprecated It will be removed in 2.0.0. Use
+   *             {@link #WORKER_TIERED_STORE_LEVEL2_HIGH_WATERMARK_RATIO} and
+   *             {@link #WORKER_TIERED_STORE_LEVEL2_LOW_WATERMARK_RATIO} instead.
    */
   @Deprecated
   public static final PropertyKey WORKER_TIERED_STORE_LEVEL2_RESERVED_RATIO =
@@ -581,19 +578,16 @@ public class PropertyKey {
    * @deprecated It will be removed in 2.0.0.
    */
   @Deprecated
-  public static final PropertyKey USER_UFS_FILE_READER_CLASS =
-      create(Name.USER_UFS_FILE_READER_CLASS,
-          "alluxio.client.netty.NettyUnderFileSystemFileReader");
+  public static final PropertyKey USER_UFS_FILE_READER_CLASS = create(
+      Name.USER_UFS_FILE_READER_CLASS, "alluxio.client.netty.NettyUnderFileSystemFileReader");
   /**
    * @deprecated It will be removed in 2.0.0.
    */
   @Deprecated
-  public static final PropertyKey USER_UFS_FILE_WRITER_CLASS =
-      create(Name.USER_UFS_FILE_WRITER_CLASS,
-          "alluxio.client.netty.NettyUnderFileSystemFileWriter");
-  public static final PropertyKey USER_UFS_BLOCK_READ_LOCATION_POLICY =
-      create(Name.USER_UFS_BLOCK_READ_LOCATION_POLICY,
-          "alluxio.client.file.policy.LocalFirstPolicy");
+  public static final PropertyKey USER_UFS_FILE_WRITER_CLASS = create(
+      Name.USER_UFS_FILE_WRITER_CLASS, "alluxio.client.netty.NettyUnderFileSystemFileWriter");
+  public static final PropertyKey USER_UFS_BLOCK_READ_LOCATION_POLICY = create(
+      Name.USER_UFS_BLOCK_READ_LOCATION_POLICY, "alluxio.client.file.policy.LocalFirstPolicy");
   public static final PropertyKey USER_UFS_BLOCK_READ_LOCATION_POLICY_DETERMINISTIC_HASH_SHARDS =
       create(Name.USER_UFS_BLOCK_READ_LOCATION_POLICY_DETERMINISTIC_HASH_SHARDS, 1);
   public static final PropertyKey USER_UFS_BLOCK_READ_CONCURRENCY_MAX =
@@ -615,8 +609,8 @@ public class PropertyKey {
   public static final PropertyKey FUSE_FS_NAME = create(Name.FUSE_FS_NAME, "alluxio-fuse");
   public static final PropertyKey FUSE_FS_ROOT = create(Name.FUSE_FS_ROOT, "/");
   /**
-   * Passed to fuse-mount, maximum granularity of write operations:
-   * Capped by the kernel to 128KB max (as of Linux 3.16.0),.
+   * Passed to fuse-mount, maximum granularity of write operations: Capped by the kernel to 128KB
+   * max (as of Linux 3.16.0),.
    */
   public static final PropertyKey FUSE_MAXWRITE_BYTES = create(Name.FUSE_MAXWRITE_BYTES, 131072);
   public static final PropertyKey FUSE_MOUNT_DEFAULT =
@@ -653,9 +647,10 @@ public class PropertyKey {
   public static final PropertyKey INTEGRATION_MASTER_RESOURCE_MEM =
       create(Name.INTEGRATION_MASTER_RESOURCE_MEM, "1024MB");
   public static final PropertyKey INTEGRATION_MESOS_ALLUXIO_JAR_URL =
-      create(Name.INTEGRATION_MESOS_ALLUXIO_JAR_URL, String.format(
-          "http://downloads.alluxio.org/downloads/files/${%s}/" + "alluxio-${%s}-bin.tar.gz",
-          Name.VERSION, Name.VERSION));
+      create(Name.INTEGRATION_MESOS_ALLUXIO_JAR_URL,
+          String.format(
+              "http://downloads.alluxio.org/downloads/files/${%s}/" + "alluxio-${%s}-bin.tar.gz",
+              Name.VERSION, Name.VERSION));
   public static final PropertyKey INTEGRATION_MESOS_ALLUXIO_MASTER_NAME =
       create(Name.INTEGRATION_MESOS_ALLUXIO_MASTER_NAME, "AlluxioMaster");
   public static final PropertyKey INTEGRATION_MESOS_ALLUXIO_MASTER_NODE_COUNT =
@@ -680,8 +675,8 @@ public class PropertyKey {
       create(Name.INTEGRATION_YARN_WORKERS_PER_HOST_MAX, 1);
 
   /**
-   * A nested class to hold named string constants for their corresponding properties.
-   * Used for setting configuration in integration tests.
+   * A nested class to hold named string constants for their corresponding properties. Used for
+   * setting configuration in integration tests.
    */
   @ThreadSafe
   public static final class Name {
@@ -976,8 +971,8 @@ public class PropertyKey {
     public static final String WORKER_TIERED_STORE_RESERVER_INTERVAL_MS =
         "alluxio.worker.tieredstore.reserver.interval.ms";
     public static final String WORKER_TIERED_STORE_RETRY = "alluxio.worker.tieredstore.retry";
-    public static final String WORKER_TIERED_STORE_FREE_SPACE_RATIO
-        = "alluxio.worker.tieredstore.free.space.ratio";
+    public static final String WORKER_TIERED_STORE_FREE_SPACE_RATIO =
+        "alluxio.worker.tieredstore.free.space.ratio";
     public static final String WORKER_WEB_BIND_HOST = "alluxio.worker.web.bind.host";
     public static final String WORKER_WEB_HOSTNAME = "alluxio.worker.web.hostname";
     public static final String WORKER_WEB_PORT = "alluxio.worker.web.port";
@@ -1018,8 +1013,7 @@ public class PropertyKey {
     public static final String USER_FILE_BUFFER_BYTES = "alluxio.user.file.buffer.bytes";
     public static final String USER_FILE_CACHE_PARTIALLY_READ_BLOCK =
         "alluxio.user.file.cache.partially.read.block";
-    public static final String USER_FILE_DELETE_UNCHECKED =
-        "alluxio.user.file.delete.unchecked";
+    public static final String USER_FILE_DELETE_UNCHECKED = "alluxio.user.file.delete.unchecked";
     public static final String USER_FILE_MASTER_CLIENT_THREADS =
         "alluxio.user.file.master.client.threads";
     public static final String USER_FILE_METADATA_LOAD_TYPE =
@@ -1134,42 +1128,39 @@ public class PropertyKey {
   }
 
   /**
-   * A set of templates to generate the names of parameterized properties given
-   * different parameters. E.g., * {@code Template.MASTER_TIERED_STORE_GLOBAL_LEVEL_ALIAS.format(0)}
+   * A set of templates to generate the names of parameterized properties given different
+   * parameters. E.g., * {@code Template.MASTER_TIERED_STORE_GLOBAL_LEVEL_ALIAS.format(0)}
    */
   @ThreadSafe
   public enum Template {
     MASTER_MOUNT_TABLE_ALLUXIO("alluxio.master.mount.table.%s.alluxio",
-        "alluxio\\.master\\.mount\\.table.(\\w+)\\.alluxio"),
-    MASTER_MOUNT_TABLE_OPTION("alluxio.master.mount.table.%s.option",
-        "alluxio\\.master\\.mount\\.table\\.(\\w+)\\.option"),
-    MASTER_MOUNT_TABLE_OPTION_PROPERTY("alluxio.master.mount.table.%s.option.%s",
-        "alluxio\\.master\\.mount\\.table\\.(\\w+)\\.option(\\.\\w+)++"),
-    MASTER_MOUNT_TABLE_READONLY("alluxio.master.mount.table.%s.readonly",
-        "alluxio\\.master\\.mount\\.table\\.(\\w+)\\.readonly"),
-    MASTER_MOUNT_TABLE_SHARED("alluxio.master.mount.table.%s.shared",
-        "alluxio\\.master\\.mount\\.table\\.(\\w+)\\.shared"),
-    MASTER_MOUNT_TABLE_UFS("alluxio.master.mount.table.%s.ufs",
-        "alluxio\\.master\\.mount\\.table\\.(\\w+)\\.ufs"),
-    MASTER_MOUNT_TABLE_ROOT_OPTION_PROPERTY("alluxio.master.mount.table.root.option.%s",
-        "alluxio\\.master\\.mount\\.table\\.root\\.option(\\.\\w+)++"),
-    MASTER_TIERED_STORE_GLOBAL_LEVEL_ALIAS("alluxio.master.tieredstore.global.level%d.alias",
-        "alluxio\\.master\\.tieredstore\\.global\\.level(\\d+)\\.alias"),
-    WORKER_TIERED_STORE_LEVEL_ALIAS("alluxio.worker.tieredstore.level%d.alias",
-        "alluxio\\.worker\\.tieredstore\\.level(\\d+)\\.alias"),
-    WORKER_TIERED_STORE_LEVEL_DIRS_PATH("alluxio.worker.tieredstore.level%d.dirs.path",
-        "alluxio\\.worker\\.tieredstore\\.level(\\d+)\\.dirs\\.path"),
-    WORKER_TIERED_STORE_LEVEL_DIRS_QUOTA("alluxio.worker.tieredstore.level%d.dirs.quota",
-        "alluxio\\.worker\\.tieredstore\\.level(\\d+)\\.dirs\\.quota"),
-    WORKER_TIERED_STORE_LEVEL_RESERVED_RATIO("alluxio.worker.tieredstore.level%d.reserved.ratio",
-        "alluxio\\.worker\\.tieredstore\\.level(\\d+)\\.reserved\\.ratio"),
-    WORKER_TIERED_STORE_LEVEL_HIGH_WATERMARK_RATIO(
-        "alluxio.worker.tieredstore.level%d.watermark.high.ratio",
-        "alluxio\\.worker\\.tieredstore\\.level(\\d+)\\.watermark\\.high\\.ratio"),
-    WORKER_TIERED_STORE_LEVEL_LOW_WATERMARK_RATIO(
-        "alluxio.worker.tieredstore.level%d.watermark.low.ratio",
-        "alluxio\\.worker\\.tieredstore\\.level(\\d+)\\.watermark\\.low\\.ratio"),
-    ;
+        "alluxio\\.master\\.mount\\.table.(\\w+)\\.alluxio"), MASTER_MOUNT_TABLE_OPTION(
+            "alluxio.master.mount.table.%s.option",
+            "alluxio\\.master\\.mount\\.table\\.(\\w+)\\.option"), MASTER_MOUNT_TABLE_OPTION_PROPERTY(
+                "alluxio.master.mount.table.%s.option.%s",
+                "alluxio\\.master\\.mount\\.table\\.(\\w+)\\.option(\\.\\w+)++"), MASTER_MOUNT_TABLE_READONLY(
+                    "alluxio.master.mount.table.%s.readonly",
+                    "alluxio\\.master\\.mount\\.table\\.(\\w+)\\.readonly"), MASTER_MOUNT_TABLE_SHARED(
+                        "alluxio.master.mount.table.%s.shared",
+                        "alluxio\\.master\\.mount\\.table\\.(\\w+)\\.shared"), MASTER_MOUNT_TABLE_UFS(
+                            "alluxio.master.mount.table.%s.ufs",
+                            "alluxio\\.master\\.mount\\.table\\.(\\w+)\\.ufs"), MASTER_MOUNT_TABLE_ROOT_OPTION_PROPERTY(
+                                "alluxio.master.mount.table.root.option.%s",
+                                "alluxio\\.master\\.mount\\.table\\.root\\.option(\\.\\w+)++"), MASTER_TIERED_STORE_GLOBAL_LEVEL_ALIAS(
+                                    "alluxio.master.tieredstore.global.level%d.alias",
+                                    "alluxio\\.master\\.tieredstore\\.global\\.level(\\d+)\\.alias"), WORKER_TIERED_STORE_LEVEL_ALIAS(
+                                        "alluxio.worker.tieredstore.level%d.alias",
+                                        "alluxio\\.worker\\.tieredstore\\.level(\\d+)\\.alias"), WORKER_TIERED_STORE_LEVEL_DIRS_PATH(
+                                            "alluxio.worker.tieredstore.level%d.dirs.path",
+                                            "alluxio\\.worker\\.tieredstore\\.level(\\d+)\\.dirs\\.path"), WORKER_TIERED_STORE_LEVEL_DIRS_QUOTA(
+                                                "alluxio.worker.tieredstore.level%d.dirs.quota",
+                                                "alluxio\\.worker\\.tieredstore\\.level(\\d+)\\.dirs\\.quota"), WORKER_TIERED_STORE_LEVEL_RESERVED_RATIO(
+                                                    "alluxio.worker.tieredstore.level%d.reserved.ratio",
+                                                    "alluxio\\.worker\\.tieredstore\\.level(\\d+)\\.reserved\\.ratio"), WORKER_TIERED_STORE_LEVEL_HIGH_WATERMARK_RATIO(
+                                                        "alluxio.worker.tieredstore.level%d.watermark.high.ratio",
+                                                        "alluxio\\.worker\\.tieredstore\\.level(\\d+)\\.watermark\\.high\\.ratio"), WORKER_TIERED_STORE_LEVEL_LOW_WATERMARK_RATIO(
+                                                            "alluxio.worker.tieredstore.level%d.watermark.low.ratio",
+                                                            "alluxio\\.worker\\.tieredstore\\.level(\\d+)\\.watermark\\.low\\.ratio"),;
 
     private final String mFormat;
     private final Pattern mPattern;
@@ -1192,8 +1183,8 @@ public class PropertyKey {
     }
 
     /**
-     * Converts a property key template (e.g.,
-     * {@link #WORKER_TIERED_STORE_LEVEL_RESERVED_RATIO}) to a {@link PropertyKey} instance.
+     * Converts a property key template (e.g., {@link #WORKER_TIERED_STORE_LEVEL_RESERVED_RATIO}) to
+     * a {@link PropertyKey} instance.
      *
      * @param params ordinal
      * @return corresponding property

@@ -46,6 +46,7 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
   private static final org.apache.thrift.protocol.TField MODE_FIELD_DESC = new org.apache.thrift.protocol.TField("mode", org.apache.thrift.protocol.TType.I16, (short)6);
   private static final org.apache.thrift.protocol.TField RECURSIVE_FIELD_DESC = new org.apache.thrift.protocol.TField("recursive", org.apache.thrift.protocol.TType.BOOL, (short)7);
   private static final org.apache.thrift.protocol.TField TTL_ACTION_FIELD_DESC = new org.apache.thrift.protocol.TField("ttlAction", org.apache.thrift.protocol.TType.I32, (short)8);
+  private static final org.apache.thrift.protocol.TField FOR_ASYNC_WRITE_FIELD_DESC = new org.apache.thrift.protocol.TField("forAsyncWrite", org.apache.thrift.protocol.TType.BOOL, (short)9);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -61,6 +62,7 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
   private short mode; // optional
   private boolean recursive; // optional
   private alluxio.thrift.TTtlAction ttlAction; // optional
+  private boolean forAsyncWrite; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -75,7 +77,8 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
      * 
      * @see alluxio.thrift.TTtlAction
      */
-    TTL_ACTION((short)8, "ttlAction");
+    TTL_ACTION((short)8, "ttlAction"),
+    FOR_ASYNC_WRITE((short)9, "forAsyncWrite");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -106,6 +109,8 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
           return RECURSIVE;
         case 8: // TTL_ACTION
           return TTL_ACTION;
+        case 9: // FOR_ASYNC_WRITE
+          return FOR_ASYNC_WRITE;
         default:
           return null;
       }
@@ -151,8 +156,9 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
   private static final int __PERSISTED_ISSET_ID = 2;
   private static final int __MODE_ISSET_ID = 3;
   private static final int __RECURSIVE_ISSET_ID = 4;
+  private static final int __FORASYNCWRITE_ISSET_ID = 5;
   private byte __isset_bitfield = 0;
-  private static final _Fields optionals[] = {_Fields.PINNED,_Fields.TTL,_Fields.PERSISTED,_Fields.OWNER,_Fields.GROUP,_Fields.MODE,_Fields.RECURSIVE,_Fields.TTL_ACTION};
+  private static final _Fields optionals[] = {_Fields.PINNED,_Fields.TTL,_Fields.PERSISTED,_Fields.OWNER,_Fields.GROUP,_Fields.MODE,_Fields.RECURSIVE,_Fields.TTL_ACTION,_Fields.FOR_ASYNC_WRITE};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -172,6 +178,8 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
     tmpMap.put(_Fields.TTL_ACTION, new org.apache.thrift.meta_data.FieldMetaData("ttlAction", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.EnumMetaData(org.apache.thrift.protocol.TType.ENUM, alluxio.thrift.TTtlAction.class)));
+    tmpMap.put(_Fields.FOR_ASYNC_WRITE, new org.apache.thrift.meta_data.FieldMetaData("forAsyncWrite", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(SetAttributeTOptions.class, metaDataMap);
   }
@@ -198,6 +206,7 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
     if (other.isSetTtlAction()) {
       this.ttlAction = other.ttlAction;
     }
+    this.forAsyncWrite = other.forAsyncWrite;
   }
 
   public SetAttributeTOptions deepCopy() {
@@ -219,6 +228,8 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
     setRecursiveIsSet(false);
     this.recursive = false;
     this.ttlAction = null;
+    setForAsyncWriteIsSet(false);
+    this.forAsyncWrite = false;
   }
 
   public boolean isPinned() {
@@ -416,6 +427,29 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
     }
   }
 
+  public boolean isForAsyncWrite() {
+    return this.forAsyncWrite;
+  }
+
+  public SetAttributeTOptions setForAsyncWrite(boolean forAsyncWrite) {
+    this.forAsyncWrite = forAsyncWrite;
+    setForAsyncWriteIsSet(true);
+    return this;
+  }
+
+  public void unsetForAsyncWrite() {
+    __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __FORASYNCWRITE_ISSET_ID);
+  }
+
+  /** Returns true if field forAsyncWrite is set (has been assigned a value) and false otherwise */
+  public boolean isSetForAsyncWrite() {
+    return EncodingUtils.testBit(__isset_bitfield, __FORASYNCWRITE_ISSET_ID);
+  }
+
+  public void setForAsyncWriteIsSet(boolean value) {
+    __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __FORASYNCWRITE_ISSET_ID, value);
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case PINNED:
@@ -482,6 +516,14 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
       }
       break;
 
+    case FOR_ASYNC_WRITE:
+      if (value == null) {
+        unsetForAsyncWrite();
+      } else {
+        setForAsyncWrite((Boolean)value);
+      }
+      break;
+
     }
   }
 
@@ -511,6 +553,9 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
     case TTL_ACTION:
       return getTtlAction();
 
+    case FOR_ASYNC_WRITE:
+      return isForAsyncWrite();
+
     }
     throw new IllegalStateException();
   }
@@ -538,6 +583,8 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
       return isSetRecursive();
     case TTL_ACTION:
       return isSetTtlAction();
+    case FOR_ASYNC_WRITE:
+      return isSetForAsyncWrite();
     }
     throw new IllegalStateException();
   }
@@ -627,6 +674,15 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
         return false;
     }
 
+    boolean this_present_forAsyncWrite = true && this.isSetForAsyncWrite();
+    boolean that_present_forAsyncWrite = true && that.isSetForAsyncWrite();
+    if (this_present_forAsyncWrite || that_present_forAsyncWrite) {
+      if (!(this_present_forAsyncWrite && that_present_forAsyncWrite))
+        return false;
+      if (this.forAsyncWrite != that.forAsyncWrite)
+        return false;
+    }
+
     return true;
   }
 
@@ -673,6 +729,11 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
     list.add(present_ttlAction);
     if (present_ttlAction)
       list.add(ttlAction.getValue());
+
+    boolean present_forAsyncWrite = true && (isSetForAsyncWrite());
+    list.add(present_forAsyncWrite);
+    if (present_forAsyncWrite)
+      list.add(forAsyncWrite);
 
     return list.hashCode();
   }
@@ -765,6 +826,16 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
         return lastComparison;
       }
     }
+    lastComparison = Boolean.valueOf(isSetForAsyncWrite()).compareTo(other.isSetForAsyncWrite());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetForAsyncWrite()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.forAsyncWrite, other.forAsyncWrite);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     return 0;
   }
 
@@ -842,6 +913,12 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
       } else {
         sb.append(this.ttlAction);
       }
+      first = false;
+    }
+    if (isSetForAsyncWrite()) {
+      if (!first) sb.append(", ");
+      sb.append("forAsyncWrite:");
+      sb.append(this.forAsyncWrite);
       first = false;
     }
     sb.append(")");
@@ -953,6 +1030,14 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 9: // FOR_ASYNC_WRITE
+            if (schemeField.type == org.apache.thrift.protocol.TType.BOOL) {
+              struct.forAsyncWrite = iprot.readBool();
+              struct.setForAsyncWriteIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -1014,6 +1099,11 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
           oprot.writeFieldEnd();
         }
       }
+      if (struct.isSetForAsyncWrite()) {
+        oprot.writeFieldBegin(FOR_ASYNC_WRITE_FIELD_DESC);
+        oprot.writeBool(struct.forAsyncWrite);
+        oprot.writeFieldEnd();
+      }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -1056,7 +1146,10 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
       if (struct.isSetTtlAction()) {
         optionals.set(7);
       }
-      oprot.writeBitSet(optionals, 8);
+      if (struct.isSetForAsyncWrite()) {
+        optionals.set(8);
+      }
+      oprot.writeBitSet(optionals, 9);
       if (struct.isSetPinned()) {
         oprot.writeBool(struct.pinned);
       }
@@ -1081,12 +1174,15 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
       if (struct.isSetTtlAction()) {
         oprot.writeI32(struct.ttlAction.getValue());
       }
+      if (struct.isSetForAsyncWrite()) {
+        oprot.writeBool(struct.forAsyncWrite);
+      }
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, SetAttributeTOptions struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      BitSet incoming = iprot.readBitSet(8);
+      BitSet incoming = iprot.readBitSet(9);
       if (incoming.get(0)) {
         struct.pinned = iprot.readBool();
         struct.setPinnedIsSet(true);
@@ -1118,6 +1214,10 @@ public class SetAttributeTOptions implements org.apache.thrift.TBase<SetAttribut
       if (incoming.get(7)) {
         struct.ttlAction = alluxio.thrift.TTtlAction.findByValue(iprot.readI32());
         struct.setTtlActionIsSet(true);
+      }
+      if (incoming.get(8)) {
+        struct.forAsyncWrite = iprot.readBool();
+        struct.setForAsyncWriteIsSet(true);
       }
     }
   }

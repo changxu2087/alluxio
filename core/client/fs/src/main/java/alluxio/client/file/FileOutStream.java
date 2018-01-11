@@ -23,8 +23,10 @@ import alluxio.client.block.stream.BlockOutStream;
 import alluxio.client.block.stream.UnderFileSystemFileOutStream;
 import alluxio.client.file.options.CompleteFileOptions;
 import alluxio.client.file.options.OutStreamOptions;
+import alluxio.client.file.options.SetAttributeOptions;
 import alluxio.exception.ExceptionMessage;
 import alluxio.exception.PreconditionMessage;
+import alluxio.exception.status.UnavailableException;
 import alluxio.metrics.MetricsSystem;
 import alluxio.resource.CloseableResource;
 import alluxio.util.CommonUtils;
@@ -86,11 +88,11 @@ public class FileOutStream extends AbstractOutStream {
     mCloser = Closer.create();
     mUri = Preconditions.checkNotNull(path, "path");
     mBlockSize = options.getBlockSizeBytes();
-    mContext = context;
-    mBlockStore = AlluxioBlockStore.create(mContext);
     mAlluxioStorageType = options.getAlluxioStorageType();
     mUnderStorageType = options.getUnderStorageType();
     mOptions = options;
+    mContext = context;
+    mBlockStore = AlluxioBlockStore.create(mContext);
     mPreviousBlockOutStreams = new LinkedList<>();
     mClosed = false;
     mCanceled = false;
@@ -212,9 +214,10 @@ public class FileOutStream extends AbstractOutStream {
 //            }
 //          }
         }
-        if (mCurrentBlockOutStream != null) {
-          mCurrentBlockOutStream.write(b);
-        }
+//        if (mCurrentBlockOutStream != null) {
+//          mCurrentBlockOutStream.write(b);
+//        }
+        mCurrentBlockOutStream.write(b);
       } catch (IOException e) {
         handleCacheWriteException(e);
       }
@@ -309,21 +312,37 @@ public class FileOutStream extends AbstractOutStream {
     }
   }
 
+  private void setFilePersisted(AlluxioURI path) throws IOException {
+    try (CloseableResource<FileSystemMasterClient> masterClient = mContext.acquireMasterClientResource()) {
+      masterClient.get().setAttribute(path, SetAttributeOptions.defaults().setPersisted(true).setForAsyncWrite(true));
+    }
+  }
+
   private void handleCacheWriteException(Exception e) throws IOException {
     LOG.warn("Failed to write into AlluxioStore, canceling write attempt.", e);
-    if (!mUnderStorageType.isSyncPersist()) {
+    if (!mUnderStorageType.isSyncPersist() && !mUnderStorageType.isAsyncPersist()) {
       throw new IOException(ExceptionMessage.FAILED_CACHE.getMessage(e.getMessage()), e);
     }
-
-    if (mCurrentBlockOutStream != null) {
-      mShouldCacheCurrentBlock = false;
-      mCurrentBlockOutStream.cancel();
+    try {
+      if (mCurrentBlockOutStream != null) {
+        mShouldCacheCurrentBlock = false;
+        mCurrentBlockOutStream.cancel();
+      }
+    } catch (UnavailableException exception) {
     }
-
-    if (!mUnderStorageType.isAsyncPersist()) {
+    if (mUnderStorageType.isAsyncPersist()) {
       mOptions.setWriteType(WriteType.THROUGH);
       mAlluxioStorageType = mOptions.getAlluxioStorageType();
       mUnderStorageType = mOptions.getUnderStorageType();
+      setFilePersisted(mUri);
+      try {
+        WorkerNetAddress workerNetAddress = // not storing data to Alluxio, so block size is 0
+                mOptions.getLocationPolicy().getWorkerForNextBlock(mBlockStore.getWorkerInfoList(), 0);
+        mUnderStorageOutputStream = mCloser
+                .register(UnderFileSystemFileOutStream.create(mContext, workerNetAddress, mOptions));
+      } catch (Throwable t) {
+        throw CommonUtils.closeAndRethrow(mCloser, t);
+      }
     }
   }
 

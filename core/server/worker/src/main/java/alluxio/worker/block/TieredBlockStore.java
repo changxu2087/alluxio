@@ -21,6 +21,7 @@ import alluxio.exception.BlockDoesNotExistException;
 import alluxio.exception.ExceptionMessage;
 import alluxio.exception.InvalidWorkerStateException;
 import alluxio.exception.WorkerOutOfSpaceException;
+import alluxio.master.block.BlockId;
 import alluxio.resource.LockResource;
 import alluxio.util.io.FileUtils;
 import alluxio.worker.block.allocator.Allocator;
@@ -846,7 +847,14 @@ public final class TieredBlockStore implements BlockStore {
     }
   }
 
-  /**
+  @Override
+  public void addPinnedBlock(long blockId) {
+  mPinnedInodes.add(
+        BlockId.createBlockId(BlockId.getContainerId(blockId), BlockId.getMaxSequenceNumber()));
+    
+  }
+
+    /**
    * A wrapper on necessary info after a move block operation.
    */
   private static class MoveBlockResult {
