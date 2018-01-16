@@ -1838,8 +1838,9 @@ public final class DefaultFileSystemMaster extends AbstractMaster implements Fil
           success = ufs.renameDirectory(ufsSrcPath, ufsDstUri);
         }
         if (!success) {
-          throw new IOException(
-              ExceptionMessage.FAILED_UFS_RENAME.getMessage(ufsSrcPath, ufsDstUri));
+//          throw new IOException(
+//              ExceptionMessage.FAILED_UFS_RENAME.getMessage(ufsSrcPath, ufsDstUri));
+          LOG.error(ExceptionMessage.FAILED_UFS_RENAME.getMessage(ufsSrcPath, ufsDstUri));
         }
         // The destination was persisted in ufs.
         mUfsAbsentPathCache.processExisting(dstPath);
@@ -2737,11 +2738,15 @@ public final class DefaultFileSystemMaster extends AbstractMaster implements Fil
       Preconditions
           .checkArgument(options.getPersisted(), PreconditionMessage.ERR_SET_STATE_UNPERSIST);
       if (!file.isPersisted()) {
+//        boolean flag = file.getPersistenceState() == PersistenceState.TO_BE_PERSISTED;
         file.setPersistenceState(PersistenceState.PERSISTED);
         if (!file.isPinned()) {
           mInodeTree.removePinned(file);
         }
         persistedInodes = propagatePersistedInternal(inodePath, false);
+//        if (!flag) {
+//          file.setLastModificationTimeMs(opTimeMs);
+//        }
         file.setLastModificationTimeMs(opTimeMs);
         Metrics.FILES_PERSISTED.inc();
       }

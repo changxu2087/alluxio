@@ -515,10 +515,24 @@ public abstract class ObjectUnderFileSystem extends BaseUnderFileSystem {
 
   @Override
   public boolean renameFile(String src, String dst) throws IOException {
-    if (!isFile(src)) {
-      LOG.error("Unable to rename {} to {} because source does not exist or is a directory.",
-          src, dst);
-      return false;
+    int retries = 3;
+    for (int i = 0; i < retries; i++) {
+      if (!isFile(src)) {
+        LOG.error("Retrying to rename {} to {} because source does not exist or is a directory.",
+                src, dst);
+        if (i == retries - 1) {
+          LOG.error("Unable to rename {} to {} because source does not exist or is a directory.",
+                  src, dst);
+          return false;
+        }
+      } else {
+        break;
+      }
+      try {
+        Thread.sleep(500);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
     }
     if (exists(dst)) {
       LOG.error("Unable to rename {} to {} because destination already exists.", src, dst);

@@ -169,6 +169,17 @@ public class S3AUnderFileSystem extends ObjectUnderFileSystem {
     if (conf.containsKey(PropertyKey.UNDERFS_S3A_SIGNER_ALGORITHM)) {
       clientConf.setSignerOverride(conf.getValue(PropertyKey.UNDERFS_S3A_SIGNER_ALGORITHM));
     }
+//     AmazonS3ClientBuilder amazonS3ClientBuilder = AmazonS3ClientBuilder.standard();
+//     if (conf.containsKey(PropertyKey.UNDERFS_S3_ENDPOINT)) {
+//     amazonS3ClientBuilder.withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(
+//     conf.getValue(PropertyKey.UNDERFS_S3_ENDPOINT), Regions.CN_NORTH_1.getName()));
+//     }
+//     amazonS3ClientBuilder.withClientConfiguration(clientConf);
+//     amazonS3ClientBuilder.withCredentials(credentials);
+//     amazonS3ClientBuilder.withPayloadSigningEnabled(true);
+//     amazonS3ClientBuilder.withPathStyleAccessEnabled(true);
+//     AmazonS3Client amazonS3Client = (AmazonS3Client) amazonS3ClientBuilder.build();
+//     System.out.println("first");
 
     AmazonS3Client amazonS3Client = new AmazonS3Client(credentials, clientConf);
     // Set a custom endpoint.
@@ -188,7 +199,7 @@ public class S3AUnderFileSystem extends ObjectUnderFileSystem {
     TransferManager transferManager = new TransferManager(amazonS3Client, service);
 
     TransferManagerConfiguration transferConf = new TransferManagerConfiguration();
-//    transferConf.setMultipartCopyThreshold(MULTIPART_COPY_THRESHOLD);
+    // transferConf.setMultipartCopyThreshold(MULTIPART_COPY_THRESHOLD);
     transferManager.setConfiguration(transferConf);
 
     // Default to readable and writable by the user.
@@ -485,6 +496,7 @@ public class S3AUnderFileSystem extends ObjectUnderFileSystem {
       }
       return new ObjectStatus(key, meta.getContentLength(), meta.getLastModified().getTime());
     } catch (AmazonClientException e) {
+      LOG.error("Unable get object status for {}", e.getMessage());
       return null;
     }
   }

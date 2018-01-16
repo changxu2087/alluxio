@@ -1,0 +1,45 @@
+#
+# The Alluxio Open Foundation licenses this work under the Apache License, version 2.0
+# (the "License"). You may not use this work except in compliance with the License, which is
+# available at www.apache.org/licenses/LICENSE-2.0
+#
+# This software is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied, as more fully set forth in the License.
+#
+# See the NOTICE file distributed with this work for information regarding copyright ownership.
+#
+  alluxio.master.hostname=localhost
+#  alluxio.underfs.address=s3a://alluxio-test/test/
+  alluxio.underfs.address=oss://alluxio/test/
+  fs.oss.accessKeyId=LTAIbOtqwM2xlyaJ
+  fs.oss.accessKeySecret=G05ukLfitMSTN4IX6duQzPOsbOO0pV
+  fs.oss.endpoint=oss-cn-beijing.aliyuncs.com
+#  fs.s3a.awsAccessKeyId=AKIAPZL75E4B2QJ6NISQ
+#  fs.s3a.awsSecretAccessKey=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
+#  alluxio.underfs.s3a.signer.algorithm=AWS4-HMAC-SHA256
+#  alluxio.underfs.s3a.signer.algorithm=AWS4SignerType
+#  alluxio.underfs.s3.disable.dns.buckets=true
+#  alluxio.underfs.s3.endpoint=s3.cn-north-1.amazonaws.com.cn
+#  alluxio.underfs.s3.endpoint.http.port=80
+#  alluxio.underfs.s3.endpoint.https.port=443
+#  alluxio.underfs.s3.proxy.https.only=true
+# Site specific configuration properties for Alluxio
+# Details about all configuration properties http://www.alluxio.org/documentation/en/Configuration-Settings.html
+
+# Common properties
+# alluxio.master.hostname=localhost
+# alluxio.underfs.address=${alluxio.work.dir}/underFSStorage
+
+# Security properties
+# alluxio.security.authorization.permission.enabled=true
+# alluxio.security.authentication.type=SIMPLE
+
+# Worker properties
+# alluxio.worker.memory.size=1GB
+# alluxio.worker.tieredstore.levels=1
+# alluxio.worker.tieredstore.level0.alias=MEM
+# alluxio.worker.tieredstore.level0.dirs.path=/mnt/ramdisk
+
+# User properties
+# alluxio.user.file.readtype.default=CACHE_PROMOTE
+# alluxio.user.file.writetype.default=MUST_CACHE
