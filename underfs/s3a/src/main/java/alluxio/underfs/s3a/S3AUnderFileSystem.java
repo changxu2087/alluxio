@@ -496,7 +496,6 @@ public class S3AUnderFileSystem extends ObjectUnderFileSystem {
       }
       return new ObjectStatus(key, meta.getContentLength(), meta.getLastModified().getTime());
     } catch (AmazonClientException e) {
-      LOG.error("Unable get object status for {}", e.getMessage());
       return null;
     }
   }

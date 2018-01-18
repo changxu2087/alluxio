@@ -12,6 +12,8 @@
 package alluxio.client.file;
 
 import alluxio.AlluxioURI;
+import alluxio.Configuration;
+import alluxio.PropertyKey;
 import alluxio.annotation.PublicApi;
 import alluxio.client.AbstractOutStream;
 import alluxio.client.AlluxioStorageType;
@@ -194,10 +196,12 @@ public class FileOutStream extends AbstractOutStream {
   }
 
   private void writeInternal(int b) throws IOException {
+    int tieredstoreLevels = Configuration.getInt(PropertyKey.WORKER_TIERED_STORE_LEVELS);
     if (mShouldCacheCurrentBlock) {
-      try {
-        if (mCurrentBlockOutStream == null || mCurrentBlockOutStream.remaining() == 0) {
-          getNextBlock();
+      while (mOptions.getWriteTier() < tieredstoreLevels) {
+        try {
+          if (mCurrentBlockOutStream == null || mCurrentBlockOutStream.remaining() == 0) {
+            getNextBlock();
 //          if (mCurrentBlockOutStream == null) {
 //            mOptions.setWriteType(WriteType.THROUGH);
 //            mAlluxioStorageType = mOptions.getAlluxioStorageType();
@@ -213,13 +217,19 @@ public class FileOutStream extends AbstractOutStream {
 //              throw CommonUtils.closeAndRethrow(mCloser, t);
 //            }
 //          }
-        }
+          }
 //        if (mCurrentBlockOutStream != null) {
 //          mCurrentBlockOutStream.write(b);
 //        }
-        mCurrentBlockOutStream.write(b);
-      } catch (IOException e) {
-        handleCacheWriteException(e);
+          mCurrentBlockOutStream.write(b);
+          break;
+        } catch (IOException e) {
+          if (mOptions.getWriteTier() == tieredstoreLevels - 1) {
+            handleCacheWriteException(e);
+          }
+        }
+        mOptions.setWriteTier(mOptions.getWriteTier() + 1);
+        System.out.println("change to write the " + mOptions.getWriteTier() + "tier");
       }
     }
 
@@ -234,14 +244,15 @@ public class FileOutStream extends AbstractOutStream {
     Preconditions.checkArgument(b != null, PreconditionMessage.ERR_WRITE_BUFFER_NULL);
     Preconditions.checkArgument(off >= 0 && len >= 0 && len + off <= b.length,
         PreconditionMessage.ERR_BUFFER_STATE.toString(), b.length, off, len);
-
+    int tieredstoreLevels = Configuration.getInt(PropertyKey.WORKER_TIERED_STORE_LEVELS);
     if (mShouldCacheCurrentBlock) {
-      try {
-        int tLen = len;
-        int tOff = off;
-        while (tLen > 0) {
-          if (mCurrentBlockOutStream == null || mCurrentBlockOutStream.remaining() == 0) {
-            getNextBlock();
+      while (mOptions.getWriteTier() < tieredstoreLevels) {
+        try {
+          int tLen = len;
+          int tOff = off;
+          while (tLen > 0) {
+            if (mCurrentBlockOutStream == null || mCurrentBlockOutStream.remaining() == 0) {
+              getNextBlock();
 //            if (mCurrentBlockOutStream == null) {
 //              mOptions.setWriteType(WriteType.THROUGH);
 //              mAlluxioStorageType = mOptions.getAlluxioStorageType();
@@ -258,19 +269,25 @@ public class FileOutStream extends AbstractOutStream {
 //              }
 //              break;
 //            }
+            }
+            long currentBlockLeftBytes = mCurrentBlockOutStream.remaining();
+            if (currentBlockLeftBytes >= tLen) {
+              mCurrentBlockOutStream.write(b, tOff, tLen);
+              tLen = 0;
+            } else {
+              mCurrentBlockOutStream.write(b, tOff, (int) currentBlockLeftBytes);
+              tOff += currentBlockLeftBytes;
+              tLen -= currentBlockLeftBytes;
+            }
           }
-          long currentBlockLeftBytes = mCurrentBlockOutStream.remaining();
-          if (currentBlockLeftBytes >= tLen) {
-            mCurrentBlockOutStream.write(b, tOff, tLen);
-            tLen = 0;
-          } else {
-            mCurrentBlockOutStream.write(b, tOff, (int) currentBlockLeftBytes);
-            tOff += currentBlockLeftBytes;
-            tLen -= currentBlockLeftBytes;
+          break;
+        } catch (Exception e) {
+          if (mOptions.getWriteTier() == tieredstoreLevels - 1) {
+            handleCacheWriteException(e);
           }
         }
-      } catch (Exception e) {
-        handleCacheWriteException(e);
+        mOptions.setWriteTier(mOptions.getWriteTier() + 1);
+        System.out.println("change to write the " + mOptions.getWriteTier() + "tier");
       }
     }
 
