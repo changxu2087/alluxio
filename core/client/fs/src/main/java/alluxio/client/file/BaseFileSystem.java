@@ -13,8 +13,10 @@ package alluxio.client.file;
 
 import alluxio.AlluxioURI;
 import alluxio.Configuration;
+import alluxio.PropertyKey;
 import alluxio.annotation.PublicApi;
 import alluxio.client.WriteType;
+import alluxio.client.block.BlockMasterClient;
 import alluxio.client.file.options.CreateDirectoryOptions;
 import alluxio.client.file.options.CreateFileOptions;
 import alluxio.client.file.options.DeleteOptions;
@@ -42,6 +44,7 @@ import alluxio.exception.status.FailedPreconditionException;
 import alluxio.exception.status.InvalidArgumentException;
 import alluxio.exception.status.NotFoundException;
 import alluxio.exception.status.UnavailableException;
+import alluxio.resource.CloseableResource;
 import alluxio.wire.LoadMetadataType;
 
 import org.slf4j.Logger;
@@ -125,6 +128,21 @@ public class BaseFileSystem implements FileSystem {
     String writeTypeStr = Configuration.sPathWritetype.inMap(path.getPath());
     if (!writeTypeStr.isEmpty() && !writeTypeStr.equals("")) {
       options.setWriteType(Enum.valueOf(WriteType.class, writeTypeStr));
+    }
+    if (options.getWriteType() == WriteType.ASYNC_THROUGH) {
+      double factor = Configuration.getDouble(PropertyKey.USER_FILE_WRITE_THRESHOLD_FACTOR);
+      if (factor < 0.99) {
+        long capacityBytes;
+        long pinnedFileSize;
+        try (CloseableResource<BlockMasterClient> blockMasterClientResource =
+                     mFileSystemContext.acquireBlockMasterClientResource()) {
+          capacityBytes = blockMasterClientResource.get().getCapacityBytes();
+          pinnedFileSize = masterClient.getPinnedFileSizeBytes();
+          if (pinnedFileSize >= capacityBytes * factor) {
+            options.setWriteType(WriteType.THROUGH);
+          }
+        }
+      }
     }
     try {
       masterClient.createFile(path, options);

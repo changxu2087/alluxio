@@ -11,11 +11,14 @@
 
 package alluxio.client.block;
 
+import alluxio.Configuration;
+import alluxio.PropertyKey;
 import alluxio.client.block.policy.BlockLocationPolicy;
 import alluxio.client.block.policy.options.GetWorkerOptions;
 import alluxio.client.block.stream.BlockInStream;
 import alluxio.client.block.stream.BlockOutStream;
 import alluxio.client.file.FileSystemContext;
+import alluxio.client.file.FileSystemMasterClient;
 import alluxio.client.file.options.InStreamOptions;
 import alluxio.client.file.options.OutStreamOptions;
 import alluxio.client.file.policy.FileWriteLocationPolicy;
@@ -233,6 +236,27 @@ public final class AlluxioBlockStore {
       }
     }
     return false;
+  }
+
+//  public boolean checkWriteThreshold() throws IOException {
+//    double factor;
+//    factor = Configuration.getDouble(PropertyKey.USER_FILE_WRITE_THRESHOLD_FACTOR);
+//    if (factor >= 0.99) {
+//      return true;
+//    }
+//    long capacityBytes = getCapacityBytes();
+//    long pinnedFileSize = getPinnedFileSize();
+//    if (pinnedFileSize <= capacityBytes * factor) {
+//      return true;
+//    }
+//    return false;
+//  }
+
+  public long getPinnedFileSize() throws IOException {
+    try (CloseableResource<FileSystemMasterClient> masterClient = mContext
+            .acquireMasterClientResource()) {
+      return masterClient.get().getPinnedFileSizeBytes();
+    }
   }
 
   /**

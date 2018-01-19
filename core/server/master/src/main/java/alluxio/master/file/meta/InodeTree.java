@@ -114,6 +114,8 @@ public class InodeTree implements JournalEntryIterable {
   /** A set of inode ids representing pinned inode files. */
   private final Set<Long> mPinnedInodeFileIds = new ConcurrentHashSet<>(64, 0.90f, 64);
 
+  private long mPinnedFileSizeBytes = 0;
+
   /**
    * Inode id management. Inode ids are essentially block ids.
    *
@@ -184,6 +186,10 @@ public class InodeTree implements JournalEntryIterable {
    */
   public int getPinnedSize() {
     return mPinnedInodeFileIds.size();
+  }
+
+  public long getPinnedFileSizeBytes() {
+    return mPinnedFileSizeBytes;
   }
 
   /**
@@ -550,7 +556,10 @@ public class InodeTree implements JournalEntryIterable {
       }
     } else {
       for (Inode inode : traversalResult.getNonPersisted()) {
-        mPinnedInodeFileIds.add(inode.getId());
+        if (inode.isFile()) {
+          mPinnedInodeFileIds.add(inode.getId());
+          mPinnedFileSizeBytes += ((InodeFile) inode).getLength();
+        }
       }
     }
     if (pathIndex < (pathComponents.length - 1) || currentInodeDirectory.getChild(name) == null) {
@@ -685,6 +694,7 @@ public class InodeTree implements JournalEntryIterable {
           if (currentInodeDirectory.isPinned()) {
             // Update set of pinned file ids.
             mPinnedInodeFileIds.add(lastInode.getId());
+            mPinnedFileSizeBytes += ((InodeFile) lastInode).getLength();
           }
         }
 
@@ -805,6 +815,9 @@ public class InodeTree implements JournalEntryIterable {
 
     mInodes.remove(inode);
     mPinnedInodeFileIds.remove(inode.getId());
+    if (inode.isFile()) {
+      mPinnedFileSizeBytes -= ((InodeFile)inode).getLength();
+    }
     inode.setDeleted(true);
   }
 
@@ -827,8 +840,10 @@ public class InodeTree implements JournalEntryIterable {
       InodeFile inodeFile = (InodeFile) inode;
       if (inodeFile.isPinned() || !inodeFile.isPersisted()) {
         mPinnedInodeFileIds.add(inodeFile.getId());
+        mPinnedFileSizeBytes += inodeFile.getLength();
       } else {
         mPinnedInodeFileIds.remove(inodeFile.getId());
+        mPinnedFileSizeBytes -= inodeFile.getLength();
       }
     } else {
       assert inode instanceof InodeDirectory;
@@ -867,6 +882,7 @@ public class InodeTree implements JournalEntryIterable {
   public void removePinned(InodeFile inodeFile) throws FileDoesNotExistException {
     if (!inodeFile.isPinned() && inodeFile.isPersisted()) {
       mPinnedInodeFileIds.remove(inodeFile.getId());
+      mPinnedFileSizeBytes -= inodeFile.getLength();
     }
   }
 
@@ -950,6 +966,7 @@ public class InodeTree implements JournalEntryIterable {
       }
       mInodes.clear();
       mPinnedInodeFileIds.clear();
+      mPinnedFileSizeBytes = 0;
       mRoot = directory;
       // If journal entry has no security enabled, change the replayed inode permission to be 0777
       // for backwards-compatibility.
@@ -987,6 +1004,7 @@ public class InodeTree implements JournalEntryIterable {
     // Update indexes.
     if (inode.isFile() && (inode.isPinned() || !inode.isPersisted())) {
       mPinnedInodeFileIds.add(inode.getId());
+      mPinnedFileSizeBytes += ((InodeFile)inode).getLength();
     }
   }
 
@@ -1042,7 +1060,7 @@ public class InodeTree implements JournalEntryIterable {
   @Override
   public int hashCode() {
     return Objects.hashCode(mRoot, mInodes, mPinnedInodeFileIds, mContainerIdGenerator,
-        mDirectoryIdGenerator, mCachedInode);
+        mDirectoryIdGenerator, mCachedInode, mPinnedFileSizeBytes);
   }
 
   @Override
@@ -1059,7 +1077,8 @@ public class InodeTree implements JournalEntryIterable {
         && Objects.equal(mPinnedInodeFileIds, that.mPinnedInodeFileIds)
         && Objects.equal(mContainerIdGenerator, that.mContainerIdGenerator)
         && Objects.equal(mDirectoryIdGenerator, that.mDirectoryIdGenerator)
-        && Objects.equal(mCachedInode, that.mCachedInode);
+        && Objects.equal(mCachedInode, that.mCachedInode)
+            && Objects.equal(mPinnedFileSizeBytes, that.mPinnedFileSizeBytes);
   }
 
   /**

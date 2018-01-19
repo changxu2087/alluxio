@@ -28,6 +28,7 @@ import alluxio.client.file.options.SetAttributeOptions;
 import alluxio.thrift.AlluxioService;
 import alluxio.thrift.FileSystemMasterClientService;
 import alluxio.thrift.GetNewBlockIdForFileTOptions;
+import alluxio.thrift.GetPinnedFileSizeBytesTOptions;
 import alluxio.thrift.LoadMetadataTOptions;
 import alluxio.thrift.RenameTOptions;
 import alluxio.thrift.ScheduleAsyncPersistenceTOptions;
@@ -219,7 +220,17 @@ public final class RetryHandlingFileSystemMasterClient extends AbstractMasterCli
     });
   }
 
-  @Override
+    @Override
+    public synchronized long getPinnedFileSizeBytes() throws IOException {
+      return retryRPC(new RpcCallable<Long>() {
+        @Override
+        public Long call() throws TException {
+          return mClient.getPinnedFileSizeBytes(new GetPinnedFileSizeBytesTOptions()).getPinnedFileSizeByte();
+        }
+      });
+    }
+
+    @Override
   public synchronized void mount(final AlluxioURI alluxioPath, final AlluxioURI ufsPath,
       final MountOptions options) throws IOException {
     retryRPC(new RpcCallable<Void>() {

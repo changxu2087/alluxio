@@ -1156,6 +1156,11 @@ public final class DefaultFileSystemMaster extends AbstractMaster implements Fil
   }
 
   @Override
+  public long getPinnedFileSizeByte() {
+    return mInodeTree.getPinnedFileSizeBytes();
+  }
+
+  @Override
   public void delete(AlluxioURI path, DeleteOptions options) throws IOException,
       FileDoesNotExistException, DirectoryNotEmptyException, InvalidPathException,
       AccessControlException {

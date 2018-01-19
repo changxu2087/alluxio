@@ -78,6 +78,11 @@ struct LoadMetadataTResponse {
   1: i64 id
 }
 
+struct GetPinnedFileSizeBytesTOptions {}
+struct GetPinnedFileSizeBytesTResponse {
+  1: i64 pinnedFileSizeByte
+}
+
 /**
 * Contains the information of a block in a file. In addition to the BlockInfo, it includes the
 * offset in the file, and the under file system locations of the block replicas.
@@ -260,6 +265,13 @@ service FileSystemMasterClientService extends common.AlluxioService {
     /** the method options */ 3: LoadMetadataTOptions options,
     )
     throws (1: exception.AlluxioTException e)
+
+    /**
+     * Returns the pinned file size by byte.
+     */
+    GetPinnedFileSizeBytesTResponse getPinnedFileSizeBytes(
+      /** the method options */ 1: GetPinnedFileSizeBytesTOptions options,
+    ) throws (1: exception.AlluxioTException e)
 
   /**
    * Creates a new "mount point", mounts the given UFS path in the Alluxio namespace at the given

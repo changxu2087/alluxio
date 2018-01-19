@@ -154,6 +154,8 @@ public interface FileSystemMasterClient extends MasterClient {
   @Deprecated
   void loadMetadata(AlluxioURI path, LoadMetadataOptions options) throws IOException;
 
+  long getPinnedFileSizeBytes() throws IOException;
+
   /**
    * Mounts the given UFS path under the given Alluxio path.
    *

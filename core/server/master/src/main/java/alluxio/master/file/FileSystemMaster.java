@@ -227,6 +227,8 @@ public interface FileSystemMaster extends Master {
    */
   int getNumberOfPinnedFiles();
 
+  long getPinnedFileSizeByte();
+
   /**
    * Deletes a given path.
    * <p>

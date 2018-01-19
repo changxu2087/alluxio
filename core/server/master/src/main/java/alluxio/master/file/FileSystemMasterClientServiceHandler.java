@@ -46,6 +46,8 @@ import alluxio.thrift.FreeTOptions;
 import alluxio.thrift.FreeTResponse;
 import alluxio.thrift.GetNewBlockIdForFileTOptions;
 import alluxio.thrift.GetNewBlockIdForFileTResponse;
+import alluxio.thrift.GetPinnedFileSizeBytesTOptions;
+import alluxio.thrift.GetPinnedFileSizeBytesTResponse;
 import alluxio.thrift.GetServiceVersionTOptions;
 import alluxio.thrift.GetServiceVersionTResponse;
 import alluxio.thrift.GetStatusTOptions;
@@ -67,6 +69,7 @@ import alluxio.thrift.UnmountTResponse;
 import alluxio.wire.ThriftUtils;
 
 import com.google.common.base.Preconditions;
+import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -280,7 +283,22 @@ public final class FileSystemMasterClientServiceHandler implements
     });
   }
 
-  @Override
+    @Override
+    public GetPinnedFileSizeBytesTResponse getPinnedFileSizeBytes(GetPinnedFileSizeBytesTOptions options) throws AlluxioTException, TException {
+        return RpcUtils.callAndLog(LOG, new RpcCallableThrowsIOException<GetPinnedFileSizeBytesTResponse>() {
+          @Override
+          public GetPinnedFileSizeBytesTResponse call() throws AlluxioException, IOException {
+            return new GetPinnedFileSizeBytesTResponse(mFileSystemMaster.getPinnedFileSizeByte());
+          }
+
+          @Override
+          public String toString() {
+            return String.format("GetPinnedFileSizeBytes:");
+          }
+        });
+    }
+
+    @Override
   public MountTResponse mount(final String alluxioPath, final String ufsPath,
       final MountTOptions options) throws AlluxioTException {
     return RpcUtils.callAndLog(LOG, new RpcCallableThrowsIOException<MountTResponse>() {
