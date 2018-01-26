@@ -94,6 +94,7 @@ public abstract class AbstractEvictor extends AbstractBlockStoreEventListener im
         if (block != null) { // might not present in this view
           if (block.getBlockLocation().belongsTo(location)) {
             String tierAlias = block.getParentDir().getParentTier().getTierAlias();
+            LOG.info("tierAlias is {}", tierAlias);
             int dirIndex = block.getParentDir().getDirIndex();
             dirCandidates.add(mManagerView.getTierView(tierAlias).getDirView(dirIndex), blockId,
                 block.getBlockSize());

@@ -129,21 +129,6 @@ public class BaseFileSystem implements FileSystem {
     if (!writeTypeStr.isEmpty() && !writeTypeStr.equals("")) {
       options.setWriteType(Enum.valueOf(WriteType.class, writeTypeStr));
     }
-    if (options.getWriteType() == WriteType.ASYNC_THROUGH) {
-      double factor = Configuration.getDouble(PropertyKey.USER_FILE_WRITE_THRESHOLD_FACTOR);
-      if (factor < 0.99) {
-        long capacityBytes;
-        long pinnedFileSize;
-        try (CloseableResource<BlockMasterClient> blockMasterClientResource =
-                     mFileSystemContext.acquireBlockMasterClientResource()) {
-          capacityBytes = blockMasterClientResource.get().getCapacityBytes();
-          pinnedFileSize = masterClient.getPinnedFileSizeBytes();
-          if (pinnedFileSize >= capacityBytes * factor) {
-            options.setWriteType(WriteType.THROUGH);
-          }
-        }
-      }
-    }
     try {
       masterClient.createFile(path, options);
       status = masterClient.getStatus(path, GetStatusOptions.defaults().setLoadMetadataType(
@@ -159,6 +144,22 @@ public class BaseFileSystem implements FileSystem {
       throw e.toAlluxioException();
     } finally {
       mFileSystemContext.releaseMasterClient(masterClient);
+    }
+    if (options.getWriteType() == WriteType.ASYNC_THROUGH) {
+      double factor = Configuration.getDouble(PropertyKey.USER_FILE_WRITE_THRESHOLD_FACTOR);
+//      if (factor < 0.99) {
+      long capacityBytes;
+      long pinnedFileSize;
+      try (CloseableResource<BlockMasterClient> blockMasterClientResource =
+                   mFileSystemContext.acquireBlockMasterClientResource()) {
+        capacityBytes = blockMasterClientResource.get().getCapacityBytes();
+        pinnedFileSize = masterClient.getPinnedFileSizeBytes();
+        if (pinnedFileSize >= capacityBytes * factor || status.getLength() + pinnedFileSize >= capacityBytes) {
+          options.setWriteType(WriteType.THROUGH);
+        }
+
+      }
+//      }
     }
     OutStreamOptions outStreamOptions = options.toOutStreamOptions();
     outStreamOptions.setUfsPath(status.getUfsPath());

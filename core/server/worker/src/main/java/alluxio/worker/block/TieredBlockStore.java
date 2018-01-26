@@ -1,7 +1,7 @@
 /*
- * The Alluxio Open Foundation licenses this work under the Apache License, version 2.0
- * (the "License"). You may not use this work except in compliance with the License, which is
- * available at www.apache.org/licenses/LICENSE-2.0
+ * The Alluxio Open Foundation licenses this work under the Apache License, version 2.0 (the
+ * "License"). You may not use this work except in compliance with the License, which is available
+ * at www.apache.org/licenses/LICENSE-2.0
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied, as more fully set forth in the License.
@@ -73,8 +73,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * and guarded by {@link TieredBlockStore#mMetadataLock}. This is also a read/write lock and
  * coordinates different threads (clients) when accessing the shared data structure for metadata.
  * </li>
- * <li>Method {@link #createBlock} does not acquire the block lock, because it only creates a
- * temp block which is only visible to its writer before committed (thus no concurrent access).</li>
+ * <li>Method {@link #createBlock} does not acquire the block lock, because it only creates a temp
+ * block which is only visible to its writer before committed (thus no concurrent access).</li>
  * <li>Method {@link #abortBlock(long, long)} does not acquire the block lock, because only
  * temporary blocks can be aborted, and they are only visible to their writers (thus no concurrent
  * access).
@@ -87,7 +87,7 @@ public final class TieredBlockStore implements BlockStore {
   private static final Logger LOG = LoggerFactory.getLogger(TieredBlockStore.class);
 
   private static final int MAX_RETRIES =
-          Configuration.getInt(PropertyKey.WORKER_TIERED_STORE_RETRY);
+      Configuration.getInt(PropertyKey.WORKER_TIERED_STORE_RETRY);
 
   private final BlockMetadataManager mMetaManager;
   private final BlockLockManager mLockManager;
@@ -176,9 +176,8 @@ public final class TieredBlockStore implements BlockStore {
   }
 
   @Override
-  public BlockWriter getBlockWriter(long sessionId, long blockId)
-      throws BlockDoesNotExistException, BlockAlreadyExistsException, InvalidWorkerStateException,
-      IOException {
+  public BlockWriter getBlockWriter(long sessionId, long blockId) throws BlockDoesNotExistException,
+      BlockAlreadyExistsException, InvalidWorkerStateException, IOException {
     // NOTE: a temp block is supposed to only be visible by its own writer, unnecessary to acquire
     // block lock here since no sharing
     // TODO(bin): Handle the case where multiple writers compete for the same block.
@@ -202,7 +201,7 @@ public final class TieredBlockStore implements BlockStore {
   @Override
   public TempBlockMeta createBlock(long sessionId, long blockId, BlockStoreLocation location,
       long initialBlockSize)
-          throws BlockAlreadyExistsException, WorkerOutOfSpaceException, IOException {
+      throws BlockAlreadyExistsException, WorkerOutOfSpaceException, IOException {
     for (int i = 0; i < MAX_RETRIES + 1; i++) {
       TempBlockMeta tempBlockMeta =
           createBlockMetaInternal(sessionId, blockId, location, initialBlockSize, true);
@@ -296,8 +295,8 @@ public final class TieredBlockStore implements BlockStore {
   @Override
   public void moveBlock(long sessionId, long blockId, BlockStoreLocation oldLocation,
       BlockStoreLocation newLocation)
-          throws BlockDoesNotExistException, BlockAlreadyExistsException,
-          InvalidWorkerStateException, WorkerOutOfSpaceException, IOException {
+      throws BlockDoesNotExistException, BlockAlreadyExistsException, InvalidWorkerStateException,
+      WorkerOutOfSpaceException, IOException {
     for (int i = 0; i < MAX_RETRIES + 1; i++) {
       MoveBlockResult moveResult = moveBlockInternal(sessionId, blockId, oldLocation, newLocation);
       if (moveResult.getSuccess()) {
@@ -541,7 +540,7 @@ public final class TieredBlockStore implements BlockStore {
    */
   private TempBlockMeta createBlockMetaInternal(long sessionId, long blockId,
       BlockStoreLocation location, long initialBlockSize, boolean newBlock)
-          throws BlockAlreadyExistsException {
+      throws BlockAlreadyExistsException {
     // NOTE: a temp block is supposed to be visible for its own writer, unnecessary to acquire
     // block lock here since no sharing
     try (LockResource r = new LockResource(mMetadataWriteLock)) {
@@ -588,6 +587,8 @@ public final class TieredBlockStore implements BlockStore {
     try (LockResource r = new LockResource(mMetadataWriteLock)) {
       TempBlockMeta tempBlockMeta = mMetaManager.getTempBlockMeta(blockId);
       if (tempBlockMeta.getParentDir().getAvailableBytes() < additionalBytes) {
+        LOG.warn("the availablebytes are {} and need is {}",
+            tempBlockMeta.getParentDir().getAvailableBytes(), additionalBytes);
         return new Pair<>(false, tempBlockMeta.getBlockLocation());
       }
       // Increase the size of this temp block
@@ -613,6 +614,7 @@ public final class TieredBlockStore implements BlockStore {
   private void freeSpaceInternal(long sessionId, long availableBytes, BlockStoreLocation location)
       throws WorkerOutOfSpaceException, IOException {
     EvictionPlan plan;
+    LOG.warn("to evict in {}", location);
     try (LockResource r = new LockResource(mMetadataReadLock)) {
       plan = mEvictor.freeSpaceWithView(availableBytes, location, getUpdatedView());
       // Absent plan means failed to evict enough space.
@@ -714,8 +716,8 @@ public final class TieredBlockStore implements BlockStore {
    */
   private MoveBlockResult moveBlockInternal(long sessionId, long blockId,
       BlockStoreLocation oldLocation, BlockStoreLocation newLocation)
-          throws BlockDoesNotExistException, BlockAlreadyExistsException,
-          InvalidWorkerStateException, IOException {
+      throws BlockDoesNotExistException, BlockAlreadyExistsException, InvalidWorkerStateException,
+      IOException {
     long lockId = mLockManager.lockBlock(sessionId, blockId, BlockLockType.WRITE);
     try {
       long blockSize;
@@ -790,6 +792,7 @@ public final class TieredBlockStore implements BlockStore {
   private void removeBlockInternal(long sessionId, long blockId, BlockStoreLocation location)
       throws InvalidWorkerStateException, BlockDoesNotExistException, IOException {
     long lockId = mLockManager.lockBlock(sessionId, blockId, BlockLockType.WRITE);
+    LOG.warn("remove the block {} at {}", blockId, location);
     try {
       String filePath;
       BlockMeta blockMeta;
@@ -799,6 +802,7 @@ public final class TieredBlockStore implements BlockStore {
         }
         blockMeta = mMetaManager.getBlockMeta(blockId);
         filePath = blockMeta.getPath();
+        LOG.warn("file path is {}", filePath);
       }
 
       if (!blockMeta.getBlockLocation().belongsTo(location)) {
@@ -819,10 +823,10 @@ public final class TieredBlockStore implements BlockStore {
   }
 
   /**
-   * Creates a file to represent a block denoted by the given block path. This file will be owned
-   * by the Alluxio worker but have 777 permissions so processes under users different from the
-   * user that launched the Alluxio worker can read and write to the file. The tiered storage
-   * directory has the sticky bit so only the worker user can delete or rename files it creates.
+   * Creates a file to represent a block denoted by the given block path. This file will be owned by
+   * the Alluxio worker but have 777 permissions so processes under users different from the user
+   * that launched the Alluxio worker can read and write to the file. The tiered storage directory
+   * has the sticky bit so only the worker user can delete or rename files it creates.
    *
    * @param blockPath the block path to create
    */
@@ -849,12 +853,12 @@ public final class TieredBlockStore implements BlockStore {
 
   @Override
   public void addPinnedBlock(long blockId) {
-  mPinnedInodes.add(
+    mPinnedInodes.add(
         BlockId.createBlockId(BlockId.getContainerId(blockId), BlockId.getMaxSequenceNumber()));
-    
+
   }
 
-    /**
+  /**
    * A wrapper on necessary info after a move block operation.
    */
   private static class MoveBlockResult {

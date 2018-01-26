@@ -36,6 +36,7 @@ import alluxio.wire.WorkerInfo;
 import alluxio.wire.WorkerNetAddress;
 
 import com.google.common.base.Preconditions;
+import com.sun.org.apache.xpath.internal.SourceTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,6 +145,8 @@ public final class AlluxioBlockStore {
       BlockLocationPolicy blockLocationPolicy = Preconditions
           .checkNotNull(options.getUfsReadLocationPolicy(),
               PreconditionMessage.UFS_READ_LOCATION_POLICY_UNSPECIFIED);
+//      System.out.println("No HIT!" + blockId);
+//      LOG.warn("No HIT! {}", blockId);
       address = blockLocationPolicy.getWorker(
           GetWorkerOptions.defaults().setBlockWorkerInfos(getWorkerInfoList()).setBlockId(blockId)
               .setBlockSize(blockInfo.getLength()));
@@ -157,6 +160,8 @@ public final class AlluxioBlockStore {
     // TODO(cc): Check mContext.hasLocalWorker before finding for a local block when the TODO
     // for hasLocalWorker is fixed.
     for (BlockLocation location : blockInfo.getLocations()) {
+//      System.out.println("HIT!" + blockId);
+//      LOG.warn("HIT! {}", blockId);
       WorkerNetAddress workerNetAddress = location.getWorkerAddress();
       if (workerNetAddress.getHost().equals(mLocalHostName)) {
         address = workerNetAddress;
@@ -218,12 +223,12 @@ public final class AlluxioBlockStore {
     FileWriteLocationPolicy locationPolicy = Preconditions.checkNotNull(options.getLocationPolicy(),
         PreconditionMessage.FILE_WRITE_LOCATION_POLICY_UNSPECIFIED);
     address = locationPolicy.getWorkerForNextBlock(getWorkerInfoList(), blockSize);
-//    if (checkCouldAsync(address, blockSize)) {
-//      return getOutStream(blockId, blockSize, address, options);
-//    } else {
-//      return null;
-//    }
-    return getOutStream(blockId, blockSize, address, options);
+    if (checkCouldAsync(address, blockSize)) {
+      return getOutStream(blockId, blockSize, address, options);
+    } else {
+      return null;
+    }
+//    return getOutStream(blockId, blockSize, address, options);
   }
 
   private boolean checkCouldAsync (WorkerNetAddress address, long len) throws IOException {

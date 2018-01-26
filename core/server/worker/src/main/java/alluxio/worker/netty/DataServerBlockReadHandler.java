@@ -183,7 +183,7 @@ final class DataServerBlockReadHandler extends DataServerReadHandler {
         LOG.warn("Failed to promote block {}: {}", request.mId, e.getMessage());
       }
     }
-
+//    LOG.warn("go to read the block {}", request.mId);
     do {
       long lockId;
       if (request.isPersisted()) {
@@ -193,6 +193,7 @@ final class DataServerBlockReadHandler extends DataServerReadHandler {
       }
       if (lockId != BlockLockManager.INVALID_LOCK_ID) {
         try {
+//          LOG.warn("Yeah! You can read the block {} from the cache", request.mId);
           request.mBlockReader = mWorker.readBlockRemote(request.mSessionId, request.mId, lockId);
           mWorker.accessBlock(request.mSessionId, request.mId);
           ((FileChannel) request.mBlockReader.getChannel()).position(request.mStart);
@@ -205,6 +206,7 @@ final class DataServerBlockReadHandler extends DataServerReadHandler {
 
       // When the block does not exist in Alluxio but exists in UFS, try to open the UFS block.
       if (mWorker.openUfsBlock(request.mSessionId, request.mId, request.mOpenUfsBlockOptions)) {
+//        LOG.warn("Oh No! You have to read the block {} from the UFS", request.mId);
         try {
           request.mBlockReader = mWorker
               .readUfsBlock(request.mSessionId, request.mId, request.mStart);

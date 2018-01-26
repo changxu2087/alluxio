@@ -82,6 +82,9 @@ public final class PrefixMap {
         String value = "";
         if (!Strings.isNullOrEmpty(path)) {
             for (String prefix : mInnerMap.keySet()) {
+                if (path.matches(prefix)) {
+                    value = mInnerMap.get(prefix);
+                }
                 if (path.startsWith(prefix)) {
                     value = mInnerMap.get(prefix);
                 }

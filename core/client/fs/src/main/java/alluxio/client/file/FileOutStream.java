@@ -198,30 +198,47 @@ public class FileOutStream extends AbstractOutStream {
   private void writeInternal(int b) throws IOException {
     int tieredstoreLevels = Configuration.getInt(PropertyKey.WORKER_TIERED_STORE_LEVELS);
     if (mShouldCacheCurrentBlock) {
-      while (mOptions.getWriteTier() < tieredstoreLevels) {
+      do {
         try {
           if (mCurrentBlockOutStream == null || mCurrentBlockOutStream.remaining() == 0) {
             getNextBlock();
-//          if (mCurrentBlockOutStream == null) {
-//            mOptions.setWriteType(WriteType.THROUGH);
-//            mAlluxioStorageType = mOptions.getAlluxioStorageType();
-//            mUnderStorageType = mOptions.getUnderStorageType();
-//            try {
-//              WorkerNetAddress workerNetAddress = // not storing data to Alluxio, so block size is
-//                      // 0
-//                      mOptions.getLocationPolicy()
-//                              .getWorkerForNextBlock(mBlockStore.getWorkerInfoList(), 0);
-//              mUnderStorageOutputStream = mCloser.register(
-//                      UnderFileSystemFileOutStream.create(mContext, workerNetAddress, mOptions));
-//            } catch (Throwable t) {
-//              throw CommonUtils.closeAndRethrow(mCloser, t);
-//            }
-//          }
+            if (mCurrentBlockOutStream == null) {
+              if (mUnderStorageType.isAsyncPersist()) {
+                mOptions.setWriteType(WriteType.THROUGH);
+                mAlluxioStorageType = mOptions.getAlluxioStorageType();
+                mUnderStorageType = mOptions.getUnderStorageType();
+                setFilePersisted(mUri);
+                try {
+                  WorkerNetAddress workerNetAddress = // not storing data to Alluxio, so block size
+                                                      // is 0
+                      mOptions.getLocationPolicy()
+                          .getWorkerForNextBlock(mBlockStore.getWorkerInfoList(), 0);
+                  mUnderStorageOutputStream = mCloser.register(
+                      UnderFileSystemFileOutStream.create(mContext, workerNetAddress, mOptions));
+                } catch (Throwable t) {
+                  throw CommonUtils.closeAndRethrow(mCloser, t);
+                }
+              }
+              // mOptions.setWriteType(WriteType.THROUGH);
+              // mAlluxioStorageType = mOptions.getAlluxioStorageType();
+              // mUnderStorageType = mOptions.getUnderStorageType();
+              // try {
+              // WorkerNetAddress workerNetAddress = // not storing data to Alluxio, so block size
+              // is
+              // // 0
+              // mOptions.getLocationPolicy()
+              // .getWorkerForNextBlock(mBlockStore.getWorkerInfoList(), 0);
+              // mUnderStorageOutputStream = mCloser.register(
+              // UnderFileSystemFileOutStream.create(mContext, workerNetAddress, mOptions));
+              // } catch (Throwable t) {
+              // throw CommonUtils.closeAndRethrow(mCloser, t);
+              // }
+            }
           }
-//        if (mCurrentBlockOutStream != null) {
+          if (mCurrentBlockOutStream != null) {
+            mCurrentBlockOutStream.write(b);
+          }
 //          mCurrentBlockOutStream.write(b);
-//        }
-          mCurrentBlockOutStream.write(b);
           break;
         } catch (IOException e) {
           if (mOptions.getWriteTier() == tieredstoreLevels - 1) {
@@ -230,7 +247,7 @@ public class FileOutStream extends AbstractOutStream {
         }
         mOptions.setWriteTier(mOptions.getWriteTier() + 1);
         System.out.println("change to write the " + mOptions.getWriteTier() + "tier");
-      }
+      } while (mOptions.getWriteTier() < tieredstoreLevels);
     }
 
     if (mUnderStorageType.isSyncPersist()) {
@@ -246,29 +263,46 @@ public class FileOutStream extends AbstractOutStream {
         PreconditionMessage.ERR_BUFFER_STATE.toString(), b.length, off, len);
     int tieredstoreLevels = Configuration.getInt(PropertyKey.WORKER_TIERED_STORE_LEVELS);
     if (mShouldCacheCurrentBlock) {
-      while (mOptions.getWriteTier() < tieredstoreLevels) {
+      do {
         try {
           int tLen = len;
           int tOff = off;
           while (tLen > 0) {
             if (mCurrentBlockOutStream == null || mCurrentBlockOutStream.remaining() == 0) {
               getNextBlock();
-//            if (mCurrentBlockOutStream == null) {
-//              mOptions.setWriteType(WriteType.THROUGH);
-//              mAlluxioStorageType = mOptions.getAlluxioStorageType();
-//              mUnderStorageType = mOptions.getUnderStorageType();
-//              try {
-//                WorkerNetAddress workerNetAddress = // not storing data to Alluxio, so block size is
-//                                                    // 0
-//                    mOptions.getLocationPolicy()
-//                        .getWorkerForNextBlock(mBlockStore.getWorkerInfoList(), 0);
-//                mUnderStorageOutputStream = mCloser.register(
-//                    UnderFileSystemFileOutStream.create(mContext, workerNetAddress, mOptions));
-//              } catch (Throwable t) {
-//                throw CommonUtils.closeAndRethrow(mCloser, t);
-//              }
-//              break;
-//            }
+              if (mCurrentBlockOutStream == null) {
+                if (mUnderStorageType.isAsyncPersist()) {
+                  mOptions.setWriteType(WriteType.THROUGH);
+                  mAlluxioStorageType = mOptions.getAlluxioStorageType();
+                  mUnderStorageType = mOptions.getUnderStorageType();
+                  setFilePersisted(mUri);
+                  try {
+                    WorkerNetAddress workerNetAddress = // not storing data to Alluxio, so block
+                                                        // size is 0
+                        mOptions.getLocationPolicy()
+                            .getWorkerForNextBlock(mBlockStore.getWorkerInfoList(), 0);
+                    mUnderStorageOutputStream = mCloser.register(
+                        UnderFileSystemFileOutStream.create(mContext, workerNetAddress, mOptions));
+                  } catch (Throwable t) {
+                    throw CommonUtils.closeAndRethrow(mCloser, t);
+                  }
+                }
+                // mOptions.setWriteType(WriteType.THROUGH);
+                // mAlluxioStorageType = mOptions.getAlluxioStorageType();
+                // mUnderStorageType = mOptions.getUnderStorageType();
+                // try {
+                // WorkerNetAddress workerNetAddress = // not storing data to Alluxio, so block size
+                // is
+                // // 0
+                // mOptions.getLocationPolicy()
+                // .getWorkerForNextBlock(mBlockStore.getWorkerInfoList(), 0);
+                // mUnderStorageOutputStream = mCloser.register(
+                // UnderFileSystemFileOutStream.create(mContext, workerNetAddress, mOptions));
+                // } catch (Throwable t) {
+                // throw CommonUtils.closeAndRethrow(mCloser, t);
+                // }
+                 break;
+              }
             }
             long currentBlockLeftBytes = mCurrentBlockOutStream.remaining();
             if (currentBlockLeftBytes >= tLen) {
@@ -288,7 +322,7 @@ public class FileOutStream extends AbstractOutStream {
         }
         mOptions.setWriteTier(mOptions.getWriteTier() + 1);
         System.out.println("change to write the " + mOptions.getWriteTier() + "tier");
-      }
+      } while (mOptions.getWriteTier() < tieredstoreLevels);
     }
 
     if (mUnderStorageType.isSyncPersist()) {

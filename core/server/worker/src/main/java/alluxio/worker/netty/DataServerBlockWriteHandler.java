@@ -65,7 +65,7 @@ public final class DataServerBlockWriteHandler extends DataServerWriteHandler {
       mBlockWriter.close();
       try {
         mWorker.commitBlock(mSessionId, mId);
-        mWorker.addBlockPinList(mId);
+//        mWorker.addBlockPinList(mId);
 //        mWorker.lockBlock(Sessions.CHECKPOINT_SESSION_ID, mId);
       } catch (Exception e) {
         throw CommonUtils.castToIOException(e);
