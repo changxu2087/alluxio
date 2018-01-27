@@ -11,8 +11,6 @@
 
 package alluxio.client.block;
 
-import alluxio.Configuration;
-import alluxio.PropertyKey;
 import alluxio.client.block.policy.BlockLocationPolicy;
 import alluxio.client.block.policy.options.GetWorkerOptions;
 import alluxio.client.block.stream.BlockInStream;
