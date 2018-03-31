@@ -517,10 +517,13 @@ public class PropertyKey {
       create(Name.USER_FILE_WRITE_TYPE_DEFAULT, "MUST_CACHE");
   public static final PropertyKey USER_FILE_WRITE_TYPE_PATH =
       create(Name.USER_FILE_WRITE_TYPE_PATH, "");
+  public static final PropertyKey USER_FILE_WRITE_TYPE_LIMIT = create(Name.USER_FILE_WRITE_TYPE_LIMIT, "0MB");
   public static final PropertyKey USER_FILE_WRITE_THRESHOLD_FACTOR =
       create(Name.USER_FILE_WRITE_THRESHOLD_FACTOR, 1);
   public static final PropertyKey USER_FILE_WRITE_TIER_DEFAULT =
       create(Name.USER_FILE_WRITE_TIER_DEFAULT, Constants.FIRST_TIER);
+  public static final PropertyKey USER_FILE_WRITE_FROM_UFS_TIER_DEFAULT =
+      create(Name.USER_FILE_WRITE_FROM_UFS_TIER_DEFAULT, Constants.FIRST_TIER);
   public static final PropertyKey USER_HEARTBEAT_INTERVAL_MS =
       create(Name.USER_HEARTBEAT_INTERVAL_MS, 1000);
   public static final PropertyKey USER_HOSTNAME = create(Name.USER_HOSTNAME, null);
@@ -1039,10 +1042,13 @@ public class PropertyKey {
         "alluxio.user.file.write.avoid.eviction.policy.reserved.size.bytes";
     public static final String USER_FILE_WRITE_TYPE_DEFAULT = "alluxio.user.file.writetype.default";
     public static final String USER_FILE_WRITE_TYPE_PATH = "alluxio.user.file.writetype.path";
+    public static final String USER_FILE_WRITE_TYPE_LIMIT = "alluxio.user.file.writetype.limit";
     public static final String USER_FILE_WRITE_THRESHOLD_FACTOR =
         "alluxio.user.write.threshold.factor";
     public static final String USER_FILE_WRITE_TIER_DEFAULT =
         "alluxio.user.file.write.tier.default";
+    public static final String USER_FILE_WRITE_FROM_UFS_TIER_DEFAULT =
+        "alluxio.user.file.write.from.ufs.tier.default";
     public static final String USER_HEARTBEAT_INTERVAL_MS = "alluxio.user.heartbeat.interval.ms";
     public static final String USER_HOSTNAME = "alluxio.user.hostname";
     public static final String USER_LINEAGE_ENABLED = "alluxio.user.lineage.enabled";

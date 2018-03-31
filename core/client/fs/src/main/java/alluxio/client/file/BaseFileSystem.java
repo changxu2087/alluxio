@@ -146,20 +146,25 @@ public class BaseFileSystem implements FileSystem {
       mFileSystemContext.releaseMasterClient(masterClient);
     }
     if (options.getWriteType() == WriteType.ASYNC_THROUGH) {
-      double factor = Configuration.getDouble(PropertyKey.USER_FILE_WRITE_THRESHOLD_FACTOR);
-//      if (factor < 0.99) {
-      long capacityBytes;
-      long pinnedFileSize;
-      try (CloseableResource<BlockMasterClient> blockMasterClientResource =
-                   mFileSystemContext.acquireBlockMasterClientResource()) {
-        capacityBytes = blockMasterClientResource.get().getCapacityBytes();
-        pinnedFileSize = masterClient.getPinnedFileSizeBytes();
-        if (pinnedFileSize >= capacityBytes * factor || status.getLength() + pinnedFileSize >= capacityBytes) {
+      long limit = Configuration.getBytes(PropertyKey.USER_FILE_WRITE_TYPE_LIMIT);
+      if (limit > 1) {
+        if (status.getLength() > limit) {
           options.setWriteType(WriteType.THROUGH);
         }
-
       }
-//      }
+      double factor = Configuration.getDouble(PropertyKey.USER_FILE_WRITE_THRESHOLD_FACTOR);
+      if (factor < 0.99) {
+        long capacityBytes;
+        long pinnedFileSize;
+        try (CloseableResource<BlockMasterClient> blockMasterClientResource =
+            mFileSystemContext.acquireBlockMasterClientResource()) {
+          capacityBytes = blockMasterClientResource.get().getCapacityBytes();
+          pinnedFileSize = masterClient.getPinnedFileSizeBytes();
+          if (status.getLength() + pinnedFileSize >= capacityBytes * factor) {
+            options.setWriteType(WriteType.THROUGH);
+          }
+        }
+      }
     }
     OutStreamOptions outStreamOptions = options.toOutStreamOptions();
     outStreamOptions.setUfsPath(status.getUfsPath());

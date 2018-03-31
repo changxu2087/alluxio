@@ -235,8 +235,10 @@ public class BlockOutStream extends OutputStream implements BoundedStream, Cance
       try {
         if (mCurrentPacket.readableBytes() > 0) {
           for (PacketWriter packetWriter : mPacketWriters) {
-            mCurrentPacket.retain();
-            packetWriter.writePacket(mCurrentPacket.duplicate());
+            if (mCurrentPacket.refCnt() > 0) {
+              mCurrentPacket.retain();
+              packetWriter.writePacket(mCurrentPacket.duplicate());
+            }
           }
         } else {
           Preconditions.checkState(lastPacket);
@@ -245,7 +247,10 @@ public class BlockOutStream extends OutputStream implements BoundedStream, Cance
         // If the packet has bytes to read, we increment its refcount explicitly for every packet
         // writer. So we need to release here. If the packet has no bytes to read, then it has
         // to be the last packet. It needs to be released as well.
-        mCurrentPacket.release();
+        if (mCurrentPacket.refCnt() > 0) {
+          mCurrentPacket.release();
+        }
+//        mCurrentPacket.release();
       }
       mCurrentPacket = null;
     }

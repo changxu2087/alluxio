@@ -1,7 +1,7 @@
 /*
- * The Alluxio Open Foundation licenses this work under the Apache License, version 2.0
- * (the "License"). You may not use this work except in compliance with the License, which is
- * available at www.apache.org/licenses/LICENSE-2.0
+ * The Alluxio Open Foundation licenses this work under the Apache License, version 2.0 (the
+ * "License"). You may not use this work except in compliance with the License, which is available
+ * at www.apache.org/licenses/LICENSE-2.0
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied, as more fully set forth in the License.
@@ -44,8 +44,8 @@ import java.nio.channels.ReadableByteChannel;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * This class implements a {@link BlockReader} to read a block directly from UFS, and
- * optionally cache the block to the Alluxio worker if the whole block it is read.
+ * This class implements a {@link BlockReader} to read a block directly from UFS, and optionally
+ * cache the block to the Alluxio worker if the whole block it is read.
  */
 @NotThreadSafe
 public final class UnderFileSystemBlockReader implements BlockReader {
@@ -71,8 +71,8 @@ public final class UnderFileSystemBlockReader implements BlockReader {
   private final UfsManager mUfsManager;
 
   /**
-   * The position of mUnderFileSystemInputStream (if not null) is blockStart + mInStreamPos.
-   * When mUnderFileSystemInputStream is not set, this is set to -1 (an invalid state) when
+   * The position of mUnderFileSystemInputStream (if not null) is blockStart + mInStreamPos. When
+   * mUnderFileSystemInputStream is not set, this is set to -1 (an invalid state) when
    * mUnderFileSystemInputStream is null. Check mUnderFileSystemInputStream directly to see whether
    * that is valid instead of relying on this invalid state of the position to be safe.
    */
@@ -172,9 +172,9 @@ public final class UnderFileSystemBlockReader implements BlockReader {
 
     // We should always read the number of bytes as expected since the UFS file length (hence block
     // size) should be always accurate.
-    Preconditions
-        .checkState(bytesRead == bytesToRead, PreconditionMessage.NOT_ENOUGH_BYTES_READ.toString(),
-            bytesRead, bytesToRead, mBlockMeta.getUnderFileSystemPath());
+    Preconditions.checkState(bytesRead == bytesToRead,
+        PreconditionMessage.NOT_ENOUGH_BYTES_READ.toString(), bytesRead, bytesToRead,
+        mBlockMeta.getUnderFileSystemPath());
     if (mBlockWriter != null && mBlockWriter.getPosition() < mInStreamPos) {
       Preconditions.checkState(mBlockWriter.getPosition() >= offset);
       ByteBuffer buffer = ByteBuffer.wrap(data, (int) (mBlockWriter.getPosition() - offset),
@@ -199,7 +199,7 @@ public final class UnderFileSystemBlockReader implements BlockReader {
     if (mBlockMeta.getBlockSize() <= mInStreamPos) {
       return -1;
     }
-   // Make a copy of the state to keep track of what we have read in this transferTo call.
+    // Make a copy of the state to keep track of what we have read in this transferTo call.
     ByteBuf bufCopy = null;
     if (mBlockWriter != null) {
       bufCopy = buf.duplicate();
@@ -225,9 +225,9 @@ public final class UnderFileSystemBlockReader implements BlockReader {
   }
 
   /**
-   * Closes the block reader. After this, this block reader should not be used anymore.
-   * This is recommended to be called after the client finishes reading the block. It is usually
-   * triggered when the client unlocks the block.
+   * Closes the block reader. After this, this block reader should not be used anymore. This is
+   * recommended to be called after the client finishes reading the block. It is usually triggered
+   * when the client unlocks the block.
    */
   @Override
   public void close() throws IOException {
@@ -278,8 +278,8 @@ public final class UnderFileSystemBlockReader implements BlockReader {
   }
 
   /**
-   * Updates the block writer given an offset to read. If the offset is beyond the current
-   * position of the block writer, the block writer will be aborted.
+   * Updates the block writer given an offset to read. If the offset is beyond the current position
+   * of the block writer, the block writer will be aborted.
    *
    * @param offset the read offset
    */
@@ -301,10 +301,11 @@ public final class UnderFileSystemBlockReader implements BlockReader {
     }
     try {
       if (mBlockWriter == null && offset == 0 && !mBlockMeta.isNoCache()) {
-        BlockStoreLocation loc = BlockStoreLocation.anyDirInTier(mStorageTierAssoc.getAlias(0));
+        BlockStoreLocation loc = BlockStoreLocation.anyDirInTier(mStorageTierAssoc
+            .getAlias(Configuration.getInt(PropertyKey.USER_FILE_WRITE_FROM_UFS_TIER_DEFAULT)));
         String blockPath = mLocalBlockStore
-            .createBlock(mBlockMeta.getSessionId(), mBlockMeta.getBlockId(), loc,
-                mInitialBlockSize).getPath();
+            .createBlock(mBlockMeta.getSessionId(), mBlockMeta.getBlockId(), loc, mInitialBlockSize)
+            .getPath();
         mBlockWriter = new LocalFileBlockWriter(blockPath);
       }
     } catch (IOException | BlockAlreadyExistsException | WorkerOutOfSpaceException e) {

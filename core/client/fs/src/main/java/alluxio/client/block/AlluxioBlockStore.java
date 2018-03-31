@@ -143,8 +143,8 @@ public final class AlluxioBlockStore {
       BlockLocationPolicy blockLocationPolicy = Preconditions
           .checkNotNull(options.getUfsReadLocationPolicy(),
               PreconditionMessage.UFS_READ_LOCATION_POLICY_UNSPECIFIED);
-//      System.out.println("No HIT!" + blockId);
-//      LOG.warn("No HIT! {}", blockId);
+      System.out.println("No HIT!" + blockId);
+      LOG.warn("No HIT! {}", blockId);
       address = blockLocationPolicy.getWorker(
           GetWorkerOptions.defaults().setBlockWorkerInfos(getWorkerInfoList()).setBlockId(blockId)
               .setBlockSize(blockInfo.getLength()));
@@ -158,8 +158,8 @@ public final class AlluxioBlockStore {
     // TODO(cc): Check mContext.hasLocalWorker before finding for a local block when the TODO
     // for hasLocalWorker is fixed.
     for (BlockLocation location : blockInfo.getLocations()) {
-//      System.out.println("HIT!" + blockId);
-//      LOG.warn("HIT! {}", blockId);
+      System.out.println("HIT!" + blockId);
+      LOG.warn("HIT! {}", blockId);
       WorkerNetAddress workerNetAddress = location.getWorkerAddress();
       if (workerNetAddress.getHost().equals(mLocalHostName)) {
         address = workerNetAddress;
