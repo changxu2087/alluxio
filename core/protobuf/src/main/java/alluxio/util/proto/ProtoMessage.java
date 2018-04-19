@@ -122,6 +122,13 @@ public final class ProtoMessage {
   }
 
   /**
+   * @param request the delete worker request
+   */
+  public ProtoMessage(Protocol.DeleteWorkerRequest request) {
+    mMessage = request;
+  }
+
+  /**
    * Gets the read request or throws runtime exception if mMessage is not of type
    * {@link Protocol.ReadRequest}.
    *
@@ -305,6 +312,21 @@ public final class ProtoMessage {
    */
   public boolean isAsyncCacheRequest() {
     return mMessage instanceof Protocol.AsyncCacheRequest;
+  }
+
+  /**
+   * @return an DeleteWorkerRequest object if the message is of the same type
+   */
+  public Protocol.DeleteWorkerRequest asDeleteWorkerRequest() {
+    Preconditions.checkState(isDeleteWorkerRequest());
+    return (Protocol.DeleteWorkerRequest) mMessage;
+  }
+
+  /**
+   * @return true if the message is of type DeleteWorkerRequest
+   */
+  public boolean isDeleteWorkerRequest() {
+    return mMessage instanceof Protocol.DeleteWorkerRequest;
   }
 
   /**

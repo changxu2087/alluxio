@@ -16,6 +16,7 @@ import alluxio.Constants;
 import alluxio.MasterStorageTierAssoc;
 import alluxio.PropertyKey;
 import alluxio.StorageTierAssoc;
+import alluxio.client.file.FileSystemContext;
 import alluxio.clock.SystemClock;
 import alluxio.collections.ConcurrentHashSet;
 import alluxio.collections.IndexDefinition;
@@ -32,8 +33,11 @@ import alluxio.master.MasterContext;
 import alluxio.master.block.meta.MasterBlockInfo;
 import alluxio.master.block.meta.MasterBlockLocation;
 import alluxio.master.block.meta.MasterWorkerInfo;
+import alluxio.master.block.options.RemoveWorkerOptions;
 import alluxio.master.journal.JournalContext;
 import alluxio.metrics.MetricsSystem;
+import alluxio.network.protocol.RPCProtoMessage;
+import alluxio.proto.dataserver.Protocol;
 import alluxio.proto.journal.Block.BlockContainerIdGeneratorEntry;
 import alluxio.proto.journal.Block.BlockInfoEntry;
 import alluxio.proto.journal.Block.DeleteBlockEntry;
@@ -46,6 +50,7 @@ import alluxio.util.CommonUtils;
 import alluxio.util.IdUtils;
 import alluxio.util.executor.ExecutorServiceFactories;
 import alluxio.util.executor.ExecutorServiceFactory;
+import alluxio.util.proto.ProtoMessage;
 import alluxio.wire.BlockInfo;
 import alluxio.wire.BlockLocation;
 import alluxio.wire.WorkerInfo;
@@ -55,6 +60,8 @@ import com.codahale.metrics.Gauge;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import org.apache.thrift.TProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,8 +79,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import javax.annotation.concurrent.GuardedBy;
@@ -554,7 +563,99 @@ public final class DefaultBlockMaster extends AbstractMaster implements BlockMas
     return ret;
   }
 
-  @Override
+    @Override
+    public void removeWorker(WorkerNetAddress address, RemoveWorkerOptions options) {
+        MasterWorkerInfo worker = mWorkers.getFirstByField(ADDRESS_INDEX, address);
+        synchronized (worker) {
+            mWorkers.remove(worker);
+            processWorkerRemovedBlocks(worker, worker.getBlocks());
+            LOG.info("The worker {} has been removed by user", worker);
+        }
+        System.out.println("RPC is call");
+    }
+
+    @Override
+    public void deleteWorker(List<String> deleteHosts) throws IOException {
+        LOG.debug("go to send.");
+        System.out.println("go to send.");
+        FileSystemContext context = FileSystemContext.INSTANCE;
+        Channel channel;
+        ChannelFuture future;
+        long availableCapacity = 0;
+        long totalUsed = 0;
+        String tmpHost;
+        Map<String, Long> hostUsed = new HashMap<>();
+        Protocol.DeleteWorkerRequest.Builder builder =
+                Protocol.DeleteWorkerRequest.newBuilder();
+        List<WorkerNetAddress> deleteAddress = new ArrayList<>();
+        System.out.println("deleteHost " + deleteHosts);
+        for (MasterWorkerInfo workerInfo : mWorkers) {
+            tmpHost = workerInfo.getWorkerAddress().getHost();
+            System.out.println("tmpHost " + tmpHost);
+            if (deleteHosts.contains(tmpHost)) {
+                hostUsed.put(tmpHost, workerInfo.getUsedBytes());
+                deleteAddress.add(workerInfo.getWorkerAddress());
+            } else {
+                availableCapacity += workerInfo.getCapacityBytes();
+                builder.addAvailableWorkerAddress(tmpHost);
+            }
+            totalUsed += workerInfo.getUsedBytes();
+        }
+        System.out.println(deleteAddress);
+        final AtomicInteger completeNum = new AtomicInteger(0);
+        final Map<String, ChannelFuture> result = new TreeMap<>();
+        for (final WorkerNetAddress address : deleteAddress) {
+            channel = context.acquireNettyChannel(address);
+            long transferByte =
+                    (long) ((double) availableCapacity / totalUsed * hostUsed.get(address.getHost()));
+            final Protocol.DeleteWorkerRequest request = builder.setTranferByte(transferByte).build();
+            LOG.debug("go to send11.");
+            System.out.println("go to send11.");
+            try {
+//        NettyRPC.call(NettyRPCContext.defaults().setChannel(channel).setTimeout(3600000),
+//            new ProtoMessage(request));
+                future = channel.writeAndFlush(new RPCProtoMessage(new ProtoMessage(request)));
+//                .addListener(new ChannelFutureListener() {
+//          @Override
+//          public void operationComplete(ChannelFuture channelFuture) throws Exception {
+////            result.put(address.getHost(), channelFuture.isSuccess());
+//            completeNum.getAndIncrement();
+//          }
+//        });
+//        result.put(address.getHost(), future);
+            } finally {
+                context.releaseNettyChannel(address, channel);
+            }
+        }
+        while (true) {
+            boolean complete = true;
+            System.out.println(getWorkerCount());
+            for (WorkerNetAddress address : deleteAddress) {
+                complete = complete && !mWorkers.contains(ADDRESS_INDEX, address);
+            }
+            if (complete) {
+                break;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+//    while (completeNum.get() != deleteAddress.size()) {
+//      System.out.println(completeNum.get());
+//      System.out.println(deleteAddress.size());
+//      try {
+//        Thread.sleep(1000);
+//      } catch (InterruptedException e) {
+//        e.printStackTrace();
+//      }
+//    }
+//    System.out.println(result);
+    }
+
+
+    @Override
   public Map<String, Long> getTotalBytesOnTiers() {
     Map<String, Long> ret = new HashMap<>();
     for (MasterWorkerInfo worker : mWorkers) {

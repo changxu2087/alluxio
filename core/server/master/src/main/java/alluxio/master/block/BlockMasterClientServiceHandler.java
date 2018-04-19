@@ -17,8 +17,11 @@ import alluxio.RpcUtils.RpcCallable;
 import alluxio.RpcUtils.RpcCallableThrowsIOException;
 import alluxio.exception.AlluxioException;
 import alluxio.exception.status.AlluxioStatusException;
+import alluxio.master.block.options.RemoveWorkerOptions;
 import alluxio.thrift.AlluxioTException;
 import alluxio.thrift.BlockMasterClientService;
+import alluxio.thrift.DeleteWorkerTOptions;
+import alluxio.thrift.DeleteWorkerTResponse;
 import alluxio.thrift.GetBlockInfoTOptions;
 import alluxio.thrift.GetBlockInfoTResponse;
 import alluxio.thrift.GetCapacityBytesTOptions;
@@ -29,13 +32,18 @@ import alluxio.thrift.GetUsedBytesTOptions;
 import alluxio.thrift.GetUsedBytesTResponse;
 import alluxio.thrift.GetWorkerInfoListTOptions;
 import alluxio.thrift.GetWorkerInfoListTResponse;
+import alluxio.thrift.RemoveWorkerTOptions;
+import alluxio.thrift.RemoveWorkerTResponse;
 import alluxio.thrift.WorkerInfo;
+import alluxio.thrift.WorkerNetAddress;
 import alluxio.wire.ThriftUtils;
 
 import com.google.common.base.Preconditions;
+import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,6 +89,31 @@ public final class BlockMasterClientServiceHandler implements BlockMasterClientS
       @Override
       public String toString() {
         return String.format("getWorkerInfoList: options=%s", options);
+      }
+    });
+  }
+
+  @Override
+  public RemoveWorkerTResponse removeWorker(final WorkerNetAddress address,
+                                            final RemoveWorkerTOptions options) throws AlluxioTException {
+    return RpcUtils.call(LOG, new RpcUtils.RpcCallable<RemoveWorkerTResponse>() {
+      @Override
+      public RemoveWorkerTResponse call() throws AlluxioException {
+        mBlockMaster.removeWorker(ThriftUtils.fromThrift(address), new RemoveWorkerOptions(options));
+        return new RemoveWorkerTResponse();
+      }
+    });
+  }
+
+  @Override
+  public DeleteWorkerTResponse deleteWorker(final List<String> hosts, DeleteWorkerTOptions options) throws AlluxioTException {
+    LOG.debug("server delete worker");
+    System.out.println("server delete worker");
+    return RpcUtils.call(LOG, new RpcUtils.RpcCallableThrowsIOException<DeleteWorkerTResponse>() {
+      @Override
+      public DeleteWorkerTResponse call() throws AlluxioException, IOException {
+        mBlockMaster.deleteWorker(hosts);
+        return new DeleteWorkerTResponse();
       }
     });
   }

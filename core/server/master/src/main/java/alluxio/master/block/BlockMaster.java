@@ -16,11 +16,13 @@ import alluxio.exception.BlockInfoException;
 import alluxio.exception.NoWorkerException;
 import alluxio.exception.status.UnavailableException;
 import alluxio.master.Master;
+import alluxio.master.block.options.RemoveWorkerOptions;
 import alluxio.thrift.Command;
 import alluxio.wire.BlockInfo;
 import alluxio.wire.WorkerInfo;
 import alluxio.wire.WorkerNetAddress;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -117,6 +119,22 @@ public interface BlockMaster extends Master, ContainerIdGenerable {
    *         list is in the same order as the input list
    */
   List<BlockInfo> getBlockInfoList(List<Long> blockIds) throws UnavailableException;
+
+  /**
+   * Remove Worker from the cluster.
+   *
+   * @param address The address of the worker to remove
+   * @param options The remove worker options
+   */
+  void removeWorker(WorkerNetAddress address, RemoveWorkerOptions options);
+
+  /**
+   * Delete Workers from the cluster.
+   *
+   * @param hosts The list of delete worker's host
+   */
+  void deleteWorker(List<String> hosts) throws IOException;
+
 
   /**
    * @return the total bytes on each storage tier

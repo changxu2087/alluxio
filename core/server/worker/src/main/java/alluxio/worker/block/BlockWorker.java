@@ -18,6 +18,7 @@ import alluxio.exception.UfsBlockAccessTokenUnavailableException;
 import alluxio.exception.WorkerOutOfSpaceException;
 import alluxio.proto.dataserver.Protocol;
 import alluxio.wire.FileInfo;
+import alluxio.wire.WorkerNetAddress;
 import alluxio.worker.SessionCleanable;
 import alluxio.worker.Worker;
 import alluxio.worker.block.io.BlockReader;
@@ -25,6 +26,7 @@ import alluxio.worker.block.io.BlockWriter;
 import alluxio.worker.block.meta.BlockMeta;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -391,4 +393,16 @@ public interface BlockWorker extends Worker, SessionCleanable {
   void closeUfsBlock(long sessionId, long blockId)
       throws BlockAlreadyExistsException, BlockDoesNotExistException, IOException,
       WorkerOutOfSpaceException;
+
+  /**
+   * Delete the worker from the cluster. It will transfer the partial blocks from local to the other
+   * available workers
+   *
+   * @param sessionId the session ID
+   * @param availableWorker the available workers which the blocks will be transferred to
+   * @param transferByte the amount of bytes to transfer
+   */
+  void deleteWorker(long sessionId, List<String> availableWorker, long transferByte) throws IOException;
+
+  void removeWorker(long sessionId, WorkerNetAddress address) throws IOException;
 }

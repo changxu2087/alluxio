@@ -144,3 +144,9 @@ message LocalBlockCompleteRequest {
   optional int64 block_id = 1;
   optional bool cancel = 2;
 }
+
+// next available id: 3
+message DeleteWorkerRequest {
+  repeated string available_worker_address = 1;
+  optional int64 tranferByte = 2;
+}

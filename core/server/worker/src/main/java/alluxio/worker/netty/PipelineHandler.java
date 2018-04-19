@@ -66,6 +66,10 @@ final class PipelineHandler extends ChannelInitializer<Channel> {
     pipeline.addLast("idleReadHandler", new IdleReadHandler());
     pipeline.addLast("heartbeatHandler", new HeartbeatHandler());
 
+    // Delete Worker Handlers
+    pipeline.addLast("dataServerDeleteWorkerHandler",
+            new DataServerDeleteWorkerHandler(mWorkerProcess.getWorker(BlockWorker.class)));
+
     // Block Handlers
     pipeline.addLast("blockReadHandler",
         new BlockReadHandler(NettyExecutors.BLOCK_READER_EXECUTOR,

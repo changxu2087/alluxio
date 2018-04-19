@@ -9892,6 +9892,595 @@ public final class Protocol {
     // @@protoc_insertion_point(class_scope:alluxio.proto.dataserver.LocalBlockCompleteRequest)
   }
 
+  public interface DeleteWorkerRequestOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+
+    // repeated string available_worker_address = 1;
+    /**
+     * <code>repeated string available_worker_address = 1;</code>
+     */
+    java.util.List<java.lang.String>
+    getAvailableWorkerAddressList();
+    /**
+     * <code>repeated string available_worker_address = 1;</code>
+     */
+    int getAvailableWorkerAddressCount();
+    /**
+     * <code>repeated string available_worker_address = 1;</code>
+     */
+    java.lang.String getAvailableWorkerAddress(int index);
+    /**
+     * <code>repeated string available_worker_address = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getAvailableWorkerAddressBytes(int index);
+
+    // optional int64 tranferByte = 2;
+    /**
+     * <code>optional int64 tranferByte = 2;</code>
+     */
+    boolean hasTranferByte();
+    /**
+     * <code>optional int64 tranferByte = 2;</code>
+     */
+    long getTranferByte();
+  }
+  /**
+   * Protobuf type {@code alluxio.proto.dataserver.DeleteWorkerRequest}
+   *
+   * <pre>
+   * next available id: 3
+   * </pre>
+   */
+  public static final class DeleteWorkerRequest extends
+      com.google.protobuf.GeneratedMessage
+      implements DeleteWorkerRequestOrBuilder {
+    // Use DeleteWorkerRequest.newBuilder() to construct.
+    private DeleteWorkerRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private DeleteWorkerRequest(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final DeleteWorkerRequest defaultInstance;
+    public static DeleteWorkerRequest getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public DeleteWorkerRequest getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private DeleteWorkerRequest(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                availableWorkerAddress_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              availableWorkerAddress_.add(input.readBytes());
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000001;
+              tranferByte_ = input.readInt64();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+          availableWorkerAddress_ = new com.google.protobuf.UnmodifiableLazyStringList(availableWorkerAddress_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return alluxio.proto.dataserver.Protocol.internal_static_alluxio_proto_dataserver_DeleteWorkerRequest_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return alluxio.proto.dataserver.Protocol.internal_static_alluxio_proto_dataserver_DeleteWorkerRequest_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              alluxio.proto.dataserver.Protocol.DeleteWorkerRequest.class, alluxio.proto.dataserver.Protocol.DeleteWorkerRequest.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<DeleteWorkerRequest> PARSER =
+        new com.google.protobuf.AbstractParser<DeleteWorkerRequest>() {
+      public DeleteWorkerRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new DeleteWorkerRequest(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<DeleteWorkerRequest> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    // repeated string available_worker_address = 1;
+    public static final int AVAILABLE_WORKER_ADDRESS_FIELD_NUMBER = 1;
+    private com.google.protobuf.LazyStringList availableWorkerAddress_;
+    /**
+     * <code>repeated string available_worker_address = 1;</code>
+     */
+    public java.util.List<java.lang.String>
+        getAvailableWorkerAddressList() {
+      return availableWorkerAddress_;
+    }
+    /**
+     * <code>repeated string available_worker_address = 1;</code>
+     */
+    public int getAvailableWorkerAddressCount() {
+      return availableWorkerAddress_.size();
+    }
+    /**
+     * <code>repeated string available_worker_address = 1;</code>
+     */
+    public java.lang.String getAvailableWorkerAddress(int index) {
+      return availableWorkerAddress_.get(index);
+    }
+    /**
+     * <code>repeated string available_worker_address = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getAvailableWorkerAddressBytes(int index) {
+      return availableWorkerAddress_.getByteString(index);
+    }
+
+    // optional int64 tranferByte = 2;
+    public static final int TRANFERBYTE_FIELD_NUMBER = 2;
+    private long tranferByte_;
+    /**
+     * <code>optional int64 tranferByte = 2;</code>
+     */
+    public boolean hasTranferByte() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional int64 tranferByte = 2;</code>
+     */
+    public long getTranferByte() {
+      return tranferByte_;
+    }
+
+    private void initFields() {
+      availableWorkerAddress_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      tranferByte_ = 0L;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      for (int i = 0; i < availableWorkerAddress_.size(); i++) {
+        output.writeBytes(1, availableWorkerAddress_.getByteString(i));
+      }
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeInt64(2, tranferByte_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      {
+        int dataSize = 0;
+        for (int i = 0; i < availableWorkerAddress_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(availableWorkerAddress_.getByteString(i));
+        }
+        size += dataSize;
+        size += 1 * getAvailableWorkerAddressList().size();
+      }
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(2, tranferByte_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static alluxio.proto.dataserver.Protocol.DeleteWorkerRequest parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static alluxio.proto.dataserver.Protocol.DeleteWorkerRequest parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static alluxio.proto.dataserver.Protocol.DeleteWorkerRequest parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static alluxio.proto.dataserver.Protocol.DeleteWorkerRequest parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static alluxio.proto.dataserver.Protocol.DeleteWorkerRequest parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static alluxio.proto.dataserver.Protocol.DeleteWorkerRequest parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static alluxio.proto.dataserver.Protocol.DeleteWorkerRequest parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static alluxio.proto.dataserver.Protocol.DeleteWorkerRequest parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static alluxio.proto.dataserver.Protocol.DeleteWorkerRequest parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static alluxio.proto.dataserver.Protocol.DeleteWorkerRequest parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(alluxio.proto.dataserver.Protocol.DeleteWorkerRequest prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code alluxio.proto.dataserver.DeleteWorkerRequest}
+     *
+     * <pre>
+     * next available id: 3
+     * </pre>
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements alluxio.proto.dataserver.Protocol.DeleteWorkerRequestOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return alluxio.proto.dataserver.Protocol.internal_static_alluxio_proto_dataserver_DeleteWorkerRequest_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return alluxio.proto.dataserver.Protocol.internal_static_alluxio_proto_dataserver_DeleteWorkerRequest_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                alluxio.proto.dataserver.Protocol.DeleteWorkerRequest.class, alluxio.proto.dataserver.Protocol.DeleteWorkerRequest.Builder.class);
+      }
+
+      // Construct using alluxio.proto.dataserver.Protocol.DeleteWorkerRequest.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        availableWorkerAddress_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        tranferByte_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return alluxio.proto.dataserver.Protocol.internal_static_alluxio_proto_dataserver_DeleteWorkerRequest_descriptor;
+      }
+
+      public alluxio.proto.dataserver.Protocol.DeleteWorkerRequest getDefaultInstanceForType() {
+        return alluxio.proto.dataserver.Protocol.DeleteWorkerRequest.getDefaultInstance();
+      }
+
+      public alluxio.proto.dataserver.Protocol.DeleteWorkerRequest build() {
+        alluxio.proto.dataserver.Protocol.DeleteWorkerRequest result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public alluxio.proto.dataserver.Protocol.DeleteWorkerRequest buildPartial() {
+        alluxio.proto.dataserver.Protocol.DeleteWorkerRequest result = new alluxio.proto.dataserver.Protocol.DeleteWorkerRequest(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          availableWorkerAddress_ = new com.google.protobuf.UnmodifiableLazyStringList(
+              availableWorkerAddress_);
+          bitField0_ = (bitField0_ & ~0x00000001);
+        }
+        result.availableWorkerAddress_ = availableWorkerAddress_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.tranferByte_ = tranferByte_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof alluxio.proto.dataserver.Protocol.DeleteWorkerRequest) {
+          return mergeFrom((alluxio.proto.dataserver.Protocol.DeleteWorkerRequest)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(alluxio.proto.dataserver.Protocol.DeleteWorkerRequest other) {
+        if (other == alluxio.proto.dataserver.Protocol.DeleteWorkerRequest.getDefaultInstance()) return this;
+        if (!other.availableWorkerAddress_.isEmpty()) {
+          if (availableWorkerAddress_.isEmpty()) {
+            availableWorkerAddress_ = other.availableWorkerAddress_;
+            bitField0_ = (bitField0_ & ~0x00000001);
+          } else {
+            ensureAvailableWorkerAddressIsMutable();
+            availableWorkerAddress_.addAll(other.availableWorkerAddress_);
+          }
+          onChanged();
+        }
+        if (other.hasTranferByte()) {
+          setTranferByte(other.getTranferByte());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        alluxio.proto.dataserver.Protocol.DeleteWorkerRequest parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (alluxio.proto.dataserver.Protocol.DeleteWorkerRequest) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // repeated string available_worker_address = 1;
+      private com.google.protobuf.LazyStringList availableWorkerAddress_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureAvailableWorkerAddressIsMutable() {
+        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+          availableWorkerAddress_ = new com.google.protobuf.LazyStringArrayList(availableWorkerAddress_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+      /**
+       * <code>repeated string available_worker_address = 1;</code>
+       */
+      public java.util.List<java.lang.String>
+          getAvailableWorkerAddressList() {
+        return java.util.Collections.unmodifiableList(availableWorkerAddress_);
+      }
+      /**
+       * <code>repeated string available_worker_address = 1;</code>
+       */
+      public int getAvailableWorkerAddressCount() {
+        return availableWorkerAddress_.size();
+      }
+      /**
+       * <code>repeated string available_worker_address = 1;</code>
+       */
+      public java.lang.String getAvailableWorkerAddress(int index) {
+        return availableWorkerAddress_.get(index);
+      }
+      /**
+       * <code>repeated string available_worker_address = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getAvailableWorkerAddressBytes(int index) {
+        return availableWorkerAddress_.getByteString(index);
+      }
+      /**
+       * <code>repeated string available_worker_address = 1;</code>
+       */
+      public Builder setAvailableWorkerAddress(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureAvailableWorkerAddressIsMutable();
+        availableWorkerAddress_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string available_worker_address = 1;</code>
+       */
+      public Builder addAvailableWorkerAddress(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureAvailableWorkerAddressIsMutable();
+        availableWorkerAddress_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string available_worker_address = 1;</code>
+       */
+      public Builder addAllAvailableWorkerAddress(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureAvailableWorkerAddressIsMutable();
+        super.addAll(values, availableWorkerAddress_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string available_worker_address = 1;</code>
+       */
+      public Builder clearAvailableWorkerAddress() {
+        availableWorkerAddress_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string available_worker_address = 1;</code>
+       */
+      public Builder addAvailableWorkerAddressBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureAvailableWorkerAddressIsMutable();
+        availableWorkerAddress_.add(value);
+        onChanged();
+        return this;
+      }
+
+      // optional int64 tranferByte = 2;
+      private long tranferByte_ ;
+      /**
+       * <code>optional int64 tranferByte = 2;</code>
+       */
+      public boolean hasTranferByte() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional int64 tranferByte = 2;</code>
+       */
+      public long getTranferByte() {
+        return tranferByte_;
+      }
+      /**
+       * <code>optional int64 tranferByte = 2;</code>
+       */
+      public Builder setTranferByte(long value) {
+        bitField0_ |= 0x00000002;
+        tranferByte_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 tranferByte = 2;</code>
+       */
+      public Builder clearTranferByte() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        tranferByte_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:alluxio.proto.dataserver.DeleteWorkerRequest)
+    }
+
+    static {
+      defaultInstance = new DeleteWorkerRequest(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:alluxio.proto.dataserver.DeleteWorkerRequest)
+  }
+
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_alluxio_proto_dataserver_ReadRequest_descriptor;
   private static
@@ -9962,6 +10551,11 @@ public final class Protocol {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_alluxio_proto_dataserver_LocalBlockCompleteRequest_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_alluxio_proto_dataserver_DeleteWorkerRequest_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_alluxio_proto_dataserver_DeleteWorkerRequest_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -10008,8 +10602,10 @@ public final class Protocol {
       "serve\030\004 \001(\003\022\032\n\022only_reserve_space\030\005 \001(\010\"" +
       "(\n\030LocalBlockCreateResponse\022\014\n\004path\030\001 \001(" +
       "\t\"=\n\031LocalBlockCompleteRequest\022\020\n\010block_" +
-      "id\030\001 \001(\003\022\016\n\006cancel\030\002 \001(\010*.\n\013RequestType\022" +
-      "\021\n\rALLUXIO_BLOCK\020\000\022\014\n\010UFS_FILE\020\001"
+      "id\030\001 \001(\003\022\016\n\006cancel\030\002 \001(\010\"L\n\023DeleteWorker" +
+      "Request\022 \n\030available_worker_address\030\001 \003(" +
+      "\t\022\023\n\013tranferByte\030\002 \001(\003*.\n\013RequestType\022\021\n",
+      "\rALLUXIO_BLOCK\020\000\022\014\n\010UFS_FILE\020\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -10100,6 +10696,12 @@ public final class Protocol {
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_alluxio_proto_dataserver_LocalBlockCompleteRequest_descriptor,
               new java.lang.String[] { "BlockId", "Cancel", });
+          internal_static_alluxio_proto_dataserver_DeleteWorkerRequest_descriptor =
+            getDescriptor().getMessageTypes().get(14);
+          internal_static_alluxio_proto_dataserver_DeleteWorkerRequest_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_alluxio_proto_dataserver_DeleteWorkerRequest_descriptor,
+              new java.lang.String[] { "AvailableWorkerAddress", "TranferByte", });
           return null;
         }
       };

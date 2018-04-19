@@ -13,9 +13,11 @@ package alluxio.client.block;
 
 import alluxio.AbstractMasterClient;
 import alluxio.Constants;
+import alluxio.client.block.options.RemoveWorkerOptions;
 import alluxio.master.MasterClientConfig;
 import alluxio.thrift.AlluxioService;
 import alluxio.thrift.BlockMasterClientService;
+import alluxio.thrift.DeleteWorkerTOptions;
 import alluxio.thrift.GetBlockInfoTOptions;
 import alluxio.thrift.GetCapacityBytesTOptions;
 import alluxio.thrift.GetUsedBytesTOptions;
@@ -23,6 +25,7 @@ import alluxio.thrift.GetWorkerInfoListTOptions;
 import alluxio.wire.BlockInfo;
 import alluxio.wire.ThriftUtils;
 import alluxio.wire.WorkerInfo;
+import alluxio.wire.WorkerNetAddress;
 
 import org.apache.thrift.TException;
 
@@ -131,6 +134,38 @@ public final class RetryHandlingBlockMasterClient extends AbstractMasterClient
       @Override
       public Long call() throws TException {
         return mClient.getUsedBytes(new GetUsedBytesTOptions()).getBytes();
+      }
+    });
+  }
+
+  /**
+   * Remove Worker from the cluster.
+   *
+   * @param address The address of the worker to remove
+   * @param options The remove worker options
+   */
+  public synchronized void removeWorker(final WorkerNetAddress address, final RemoveWorkerOptions options) throws IOException {
+    retryRPC(new RpcCallable<Void>() {
+      @Override
+      public Void call() throws TException {
+        mClient.removeWorker(ThriftUtils.toThrift(address), options.toThrift());
+        return null;
+      }
+    });
+  }
+
+  /**
+   * Delete Workers from the cluster.
+   *
+   * @param hosts The list of the delete worker host
+   */
+  public void deleteWorker(final List<String> hosts) throws IOException {
+    System.out.println("client delete worker");
+    retryRPC(new RpcCallable<Void>() {
+      @Override
+      public Void call() throws TException {
+        mClient.deleteWorker(hosts, new DeleteWorkerTOptions());
+        return null;
       }
     });
   }

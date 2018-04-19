@@ -33,6 +33,15 @@ struct GetWorkerInfoListTResponse {
   1: list<WorkerInfo> workerInfoList
 }
 
+struct RemoveWorkerTOptions {
+  1: optional bool transferCache
+  2: optional bool persist
+}
+struct RemoveWorkerTResponse {}
+
+struct DeleteWorkerTOptions {}
+struct DeleteWorkerTResponse {}
+
 /**
  * This interface contains block master service endpoints for Alluxio clients.
  */
@@ -66,6 +75,16 @@ service BlockMasterClientService extends common.AlluxioService {
    */
   GetWorkerInfoListTResponse getWorkerInfoList(
     /** the method options */ 1: GetWorkerInfoListTOptions options,
+  ) throws (1: exception.AlluxioTException e)
+
+  RemoveWorkerTResponse removeWorker(
+    /** the address of the removed worker */  1: common.WorkerNetAddress address,
+    /** the method options */ 2: RemoveWorkerTOptions options,
+  ) throws (1: exception.AlluxioTException e)
+
+  DeleteWorkerTResponse deleteWorker(
+    /** the address of the delete worker */ 1: list<string> hosts,
+    /** the method options */ 2: DeleteWorkerTOptions options,
   ) throws (1: exception.AlluxioTException e)
 }
 

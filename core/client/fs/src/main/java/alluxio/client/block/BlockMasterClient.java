@@ -12,9 +12,11 @@
 package alluxio.client.block;
 
 import alluxio.Client;
+import alluxio.client.block.options.RemoveWorkerOptions;
 import alluxio.master.MasterClientConfig;
 import alluxio.wire.BlockInfo;
 import alluxio.wire.WorkerInfo;
+import alluxio.wire.WorkerNetAddress;
 
 import java.io.IOException;
 import java.util.List;
@@ -73,4 +75,19 @@ public interface BlockMasterClient extends Client {
    * @return amount of used space in bytes
    */
   long getUsedBytes() throws IOException;
+
+  /**
+   * Remove Worker from the cluster.
+   *
+   * @param address The address of the worker to remove
+   * @param options The remove worker options
+   */
+  void removeWorker(final WorkerNetAddress address, final RemoveWorkerOptions options) throws IOException;
+
+  /**
+   * Delete Workers from the cluster.
+   *
+   * @param hosts The list of the delete worker host
+   */
+  void deleteWorker(final List<String> hosts) throws IOException;
 }
