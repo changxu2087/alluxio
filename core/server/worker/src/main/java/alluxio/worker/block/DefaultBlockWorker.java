@@ -20,6 +20,7 @@ import alluxio.Server;
 import alluxio.Sessions;
 import alluxio.client.block.AlluxioBlockStore;
 import alluxio.client.block.BlockWorkerInfo;
+import alluxio.client.block.options.RemoveWorkerOptions;
 import alluxio.client.block.stream.BlockOutStream;
 import alluxio.client.file.FileSystemContext;
 import alluxio.client.file.URIStatus;
