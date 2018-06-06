@@ -12,7 +12,9 @@
 package alluxio.client.file;
 
 import alluxio.AlluxioURI;
+import alluxio.Configuration;
 import alluxio.annotation.PublicApi;
+import alluxio.client.WriteType;
 import alluxio.client.file.options.CreateDirectoryOptions;
 import alluxio.client.file.options.CreateFileOptions;
 import alluxio.client.file.options.DeleteOptions;
@@ -92,6 +94,10 @@ public class BaseFileSystem implements FileSystem {
   public void createDirectory(AlluxioURI path, CreateDirectoryOptions options)
       throws FileAlreadyExistsException, InvalidPathException, IOException, AlluxioException {
     FileSystemMasterClient masterClient = mFileSystemContext.acquireMasterClient();
+    String writeTypeStr = Configuration.sPathWritetype.inMap(path.getPath());
+    if (!writeTypeStr.isEmpty()) {
+      options.setWriteType(Enum.valueOf(WriteType.class, writeTypeStr));
+    }
     try {
       masterClient.createDirectory(path, options);
       LOG.debug("Created directory {}, options: {}", path.getPath(), options);
@@ -119,6 +125,10 @@ public class BaseFileSystem implements FileSystem {
       throws FileAlreadyExistsException, InvalidPathException, IOException, AlluxioException {
     FileSystemMasterClient masterClient = mFileSystemContext.acquireMasterClient();
     URIStatus status;
+    String writeTypeStr = Configuration.sPathWritetype.inMap(path.getPath());
+    if (!writeTypeStr.isEmpty()) {
+      options.setWriteType(Enum.valueOf(WriteType.class, writeTypeStr));
+    }
     try {
       masterClient.createFile(path, options);
       // Do not sync before this getStatus, since the UFS file is expected to not exist.

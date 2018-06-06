@@ -48,6 +48,7 @@ public abstract class RPCMessage implements EncodedMessage {
     RPC_LOCAL_BLOCK_COMPLETE_REQUEST(110),
     RPC_READ_RESPONSE(111),
     RPC_ASYNC_CACHE_REQUEST(112),
+    RPC_DELETE_WORKER_REQUEST(113),
 
     RPC_UNKNOWN(1000),
     ;
@@ -117,6 +118,8 @@ public abstract class RPCMessage implements EncodedMessage {
           return RPC_READ_RESPONSE;
         case 112:
           return RPC_ASYNC_CACHE_REQUEST;
+        case 113:
+          return RPC_DELETE_WORKER_REQUEST;
         default:
           throw new IllegalArgumentException("Unknown RPCMessage type id. id: " + id);
       }
@@ -216,6 +219,9 @@ public abstract class RPCMessage implements EncodedMessage {
       case RPC_READ_RESPONSE:
         return RPCProtoMessage
             .decode(in, new ProtoMessage(Protocol.ReadResponse.getDefaultInstance()));
+      case RPC_DELETE_WORKER_REQUEST:
+        return RPCProtoMessage.decode(in,
+            new ProtoMessage(Protocol.DeleteWorkerRequest.getDefaultInstance()));
       default:
         throw new IllegalArgumentException("Unknown RPCMessage type. type: " + type);
     }

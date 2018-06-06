@@ -160,6 +160,8 @@ public final class RPCProtoMessage extends RPCMessage {
       return Type.RPC_HEARTBEAT;
     } else if (mMessage.isReadResponse()) {
       return Type.RPC_READ_RESPONSE;
+    } else if (mMessage.isDeleteWorkerRequest()) {
+      return Type.RPC_DELETE_WORKER_REQUEST;
     } else {
       return RPCMessage.Type.RPC_UNKNOWN;
     }
