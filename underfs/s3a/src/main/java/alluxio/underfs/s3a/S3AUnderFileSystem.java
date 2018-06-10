@@ -79,7 +79,7 @@ public class S3AUnderFileSystem extends ObjectUnderFileSystem {
   private static final String DIR_HASH;
 
   /** Threshold to do multipart copy. */
-  private static final long MULTIPART_COPY_THRESHOLD = 10L * Constants.GB;
+  private static final long MULTIPART_COPY_THRESHOLD = 100 * Constants.MB;
 
   /** Default mode of objects if mode cannot be determined. */
   private static final short DEFAULT_MODE = 0700;
@@ -210,7 +210,7 @@ public class S3AUnderFileSystem extends ObjectUnderFileSystem {
     TransferManager transferManager = new TransferManager(amazonS3Client, service);
 
     TransferManagerConfiguration transferConf = new TransferManagerConfiguration();
-    transferConf.setMultipartCopyThreshold(MULTIPART_COPY_THRESHOLD);
+    //transferConf.setMultipartCopyThreshold(MULTIPART_COPY_THRESHOLD);
     transferManager.setConfiguration(transferConf);
     return new S3AUnderFileSystem(uri, amazonS3Client, bucketName, transferManager, conf);
   }

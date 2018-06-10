@@ -37,6 +37,7 @@ public final class SetAttributeOptions {
   private boolean mRecursive;
   private long mOperationTimeMs;
   private String mUfsFingerprint;
+  private boolean mForAsyncWrite;
 
   /**
    * @return the default {@link SetAttributeOptions}
@@ -65,6 +66,7 @@ public final class SetAttributeOptions {
       mMode = options.isSetMode() ? options.getMode() : Constants.INVALID_MODE;
       mRecursive = options.isRecursive();
       mOperationTimeMs = System.currentTimeMillis();
+      mForAsyncWrite = options.isForAsyncWrite();
     }
   }
 
@@ -81,6 +83,7 @@ public final class SetAttributeOptions {
     mRecursive = false;
     mOperationTimeMs = System.currentTimeMillis();
     mUfsFingerprint = Constants.INVALID_UFS_FINGERPRINT;
+    mForAsyncWrite = false;
   }
 
   /**
@@ -159,6 +162,22 @@ public final class SetAttributeOptions {
   public String getUfsFingerprint() {
     return mUfsFingerprint;
   }
+
+    /**
+     * @return whether for async_write
+     */
+    public boolean isForAsyncWrite() {
+        return mForAsyncWrite;
+    }
+
+    /**
+     * @param mForAsyncWrite the whether if for async write.
+     * @return the updated options object
+     */
+    public SetAttributeOptions setForAsyncWrite(boolean mForAsyncWrite) {
+        this.mForAsyncWrite = mForAsyncWrite;
+        return this;
+    }
 
   /**
    * @param options the common options
@@ -286,14 +305,15 @@ public final class SetAttributeOptions {
         && Objects.equal(mMode, that.mMode)
         && Objects.equal(mRecursive, that.mRecursive)
         && mOperationTimeMs == that.mOperationTimeMs
-        && Objects.equal(mUfsFingerprint, that.mUfsFingerprint);
+        && Objects.equal(mUfsFingerprint, that.mUfsFingerprint)
+        && Objects.equal(mForAsyncWrite, that.mForAsyncWrite);
   }
 
   @Override
   public int hashCode() {
     return Objects
         .hashCode(mPinned, mTtl, mTtlAction, mPersisted, mOwner, mGroup, mMode, mRecursive,
-            mOperationTimeMs, mCommonOptions, mUfsFingerprint);
+            mOperationTimeMs, mCommonOptions, mUfsFingerprint, mForAsyncWrite);
   }
 
   @Override
@@ -310,6 +330,7 @@ public final class SetAttributeOptions {
         .add("recursive", mRecursive)
         .add("operationTimeMs", mOperationTimeMs)
         .add("ufsFingerprint", mUfsFingerprint)
+        .add("forAsyncWrite", mForAsyncWrite)
         .toString();
   }
 }
