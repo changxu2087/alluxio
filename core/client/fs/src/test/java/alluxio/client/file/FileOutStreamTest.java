@@ -145,7 +145,7 @@ public class FileOutStreamTest {
     BlockWorkerInfo workerInfo =
         new BlockWorkerInfo(new WorkerNetAddress().setHost("localhost")
             .setTieredIdentity(TieredIdentityFactory.fromString("node=localhost"))
-            .setRpcPort(1).setDataPort(2).setWebPort(3), Constants.GB, 0);
+            .setRpcPort(1).setDataPort(2).setWebPort(3), Constants.GB, 0, 0);
     when(mBlockStore.getEligibleWorkers()).thenReturn(Lists.newArrayList(workerInfo));
     mAlluxioOutStreamMap = outStreamMap;
 

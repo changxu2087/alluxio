@@ -473,7 +473,7 @@ public class AbstractFileSystemTest {
     PowerMockito.mockStatic(AlluxioBlockStore.class);
     PowerMockito.when(AlluxioBlockStore.create(null)).thenReturn(blockStore);
     List<BlockWorkerInfo> eligibleWorkerInfos = allWorkers.stream().map(worker ->
-        new BlockWorkerInfo(worker, 0, 0)).collect(toList());
+        new BlockWorkerInfo(worker, 0, 0, 0)).collect(toList());
     PowerMockito.when(blockStore.getEligibleWorkers()).thenReturn(eligibleWorkerInfos);
     List<HostAndPort> expectedWorkerNames = expectedWorkers.stream()
         .map(addr -> HostAndPort.fromParts(addr.getHost(), addr.getDataPort())).collect(toList());

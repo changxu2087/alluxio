@@ -147,8 +147,8 @@ public final class NettyPacketWriter implements PacketWriter {
     mContext = context;
     mAddress = address;
     mLength = length;
-    Protocol.WriteRequest.Builder builder =
-        Protocol.WriteRequest.newBuilder().setId(id).setTier(options.getWriteTier()).setType(type);
+    Protocol.WriteRequest.Builder builder = Protocol.WriteRequest.newBuilder().setId(id)
+        .setTier(options.getWriteTier()).setType(type).setMustReserve(options.isMustReserve()).setPreReserveBytes(length);
     if (type == Protocol.RequestType.UFS_FILE) {
       Protocol.CreateUfsFileOptions ufsFileOptions =
           Protocol.CreateUfsFileOptions.newBuilder().setUfsPath(options.getUfsPath())

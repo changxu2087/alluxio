@@ -61,6 +61,8 @@ public final class MasterWorkerInfo {
   private Map<String, Long> mTotalBytesOnTiers;
   /** Mapping from storage tier alias to used bytes. */
   private Map<String, Long> mUsedBytesOnTiers;
+  /** Worker's unavailable bytes. */
+  private long mUnavailableBytes;
 
   /** ids of blocks the worker contains. */
   private Set<Long> mBlocks;
@@ -84,6 +86,7 @@ public final class MasterWorkerInfo {
     mUsedBytesOnTiers = new HashMap<>();
     mBlocks = new HashSet<>();
     mToRemoveBlocks = new HashSet<>();
+    mUnavailableBytes = 0;
   }
 
   /**
@@ -99,7 +102,7 @@ public final class MasterWorkerInfo {
    */
   public Set<Long> register(final StorageTierAssoc globalStorageTierAssoc,
       final List<String> storageTierAliases, final Map<String, Long> totalBytesOnTiers,
-      final Map<String, Long> usedBytesOnTiers, final Set<Long> blocks) {
+      final Map<String, Long> usedBytesOnTiers, final Set<Long> blocks, long unavailableBytes) {
     // If the storage aliases do not have strictly increasing ordinal value based on the total
     // ordering, throw an error
     for (int i = 0; i < storageTierAliases.size() - 1; i++) {
@@ -132,6 +135,7 @@ public final class MasterWorkerInfo {
     for (long bytes : mUsedBytesOnTiers.values()) {
       mUsedBytes += bytes;
     }
+    mUnavailableBytes = unavailableBytes;
 
     Set<Long> removedBlocks;
     if (mIsRegistered) {
@@ -181,7 +185,7 @@ public final class MasterWorkerInfo {
         .setLastContactSec(
             (int) ((CommonUtils.getCurrentMs() - mLastUpdatedTimeMs) / Constants.SECOND_MS))
         .setState("In Service").setCapacityBytes(mCapacityBytes).setUsedBytes(mUsedBytes)
-        .setStartTimeMs(mStartTimeMs);
+        .setStartTimeMs(mStartTimeMs).setUnavailableBytes(mUnavailableBytes);
   }
 
   /**
@@ -241,6 +245,13 @@ public final class MasterWorkerInfo {
   }
 
   /**
+   * @return unavailable space of the worker in bytes
+   */
+  public long getUnavailableBytes() {
+    return mUnavailableBytes;
+  }
+
+  /**
    * @return the storage tier mapping for the worker
    */
   public StorageTierAssoc getStorageTierAssoc() {
@@ -291,7 +302,8 @@ public final class MasterWorkerInfo {
   public String toString() {
     return Objects.toStringHelper(this).add("id", mId).add("workerAddress", mWorkerAddress)
         .add("capacityBytes", mCapacityBytes).add("usedBytes", mUsedBytes)
-        .add("lastUpdatedTimeMs", mLastUpdatedTimeMs).add("blocks", mBlocks).toString();
+        .add("lastUpdatedTimeMs", mLastUpdatedTimeMs).add("blocks", mBlocks)
+        .add("unavailableBytes", mUnavailableBytes).toString();
   }
 
   /**
@@ -339,5 +351,14 @@ public final class MasterWorkerInfo {
   public void updateUsedBytes(String tierAlias, long usedBytesOnTier) {
     mUsedBytes += usedBytesOnTier - mUsedBytesOnTiers.get(tierAlias);
     mUsedBytesOnTiers.put(tierAlias, usedBytesOnTier);
+  }
+
+  /**
+   * Update the unavailable space of the worker in bytes.
+   *
+   * @param addUnavailableBytes unavailable bytes of the worker
+   */
+  public void updateUnavailableBytes(long addUnavailableBytes) {
+    mUnavailableBytes += addUnavailableBytes;
   }
 }

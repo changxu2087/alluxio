@@ -97,12 +97,14 @@ public interface BlockWorker extends Worker, SessionCleanable {
    * @param tierAlias the alias of the tier to place the new block in,
    *        {@link BlockStoreLocation#ANY_TIER} for any tier
    * @param initialBytes the initial amount of bytes to be allocated
+   * @param isMustReserve whether or not the block must be reserved
+   * @param preReserveBytes if isMustReserve is true, the size of pre reserved block in byte
    * @return a string representing the path to the local file
    * @throws BlockAlreadyExistsException if blockId already exists, either temporary or committed,
    *         or block in eviction plan already exists
    * @throws WorkerOutOfSpaceException if this Store has no more space than the initialBlockSize
    */
-  String createBlock(long sessionId, long blockId, String tierAlias, long initialBytes)
+  String createBlock(long sessionId, long blockId, String tierAlias, long initialBytes, boolean isMustReserve, long preReserveBytes)
       throws BlockAlreadyExistsException, WorkerOutOfSpaceException, IOException;
 
   /**
@@ -114,11 +116,14 @@ public interface BlockWorker extends Worker, SessionCleanable {
    * @param blockId the id of the block to be created
    * @param tierAlias the alias of the tier to place the new block in
    * @param initialBytes the initial amount of bytes to be allocated
+   * @param isMustReserve whether or not the block must be reserved
+   * @param preReserveBytes if isMustReserve is true, the size of pre reserved block in byte
    * @throws BlockAlreadyExistsException if blockId already exists, either temporary or committed,
    *         or block in eviction plan already exists
    * @throws WorkerOutOfSpaceException if this Store has no more space than the initialBlockSize
    */
-  void createBlockRemote(long sessionId, long blockId, String tierAlias, long initialBytes)
+  void createBlockRemote(long sessionId, long blockId, String tierAlias, long initialBytes,
+      boolean isMustReserve, long preReserveBytes)
       throws BlockAlreadyExistsException, WorkerOutOfSpaceException, IOException;
 
   /**

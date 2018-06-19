@@ -126,7 +126,7 @@ public abstract class AbstractEvictor extends AbstractBlockStoreEventListener im
       for (Long blockId : candidateBlocks) {
         try {
           BlockMeta block = mManagerView.getBlockMeta(blockId);
-          if (block != null) {
+          if (block != null && !block.isMustReserve()) {
             candidateDirView.markBlockMoveOut(blockId, block.getBlockSize());
             plan.toEvict().add(new Pair<>(blockId, candidateDirView.toBlockStoreLocation()));
           }
@@ -151,6 +151,9 @@ public abstract class AbstractEvictor extends AbstractBlockStoreEventListener im
           if (nextDirView == null) {
             // If we failed to find a dir in the next tier to move this block, evict it and
             // continue. Normally this should not happen.
+            if (block.isMustReserve()) {
+              continue;
+            }
             plan.toEvict().add(new Pair<>(blockId, block.getBlockLocation()));
             candidateDirView.markBlockMoveOut(blockId, block.getBlockSize());
             continue;

@@ -33,6 +33,7 @@ public final class WorkerInfo implements Serializable {
   private long mCapacityBytes;
   private long mUsedBytes;
   private long mStartTimeMs;
+  private long mUnavailableBytes;
 
   /**
    * Creates a new instance of {@link WorkerInfo}.
@@ -52,6 +53,7 @@ public final class WorkerInfo implements Serializable {
     mCapacityBytes = workerInfo.getCapacityBytes();
     mUsedBytes = workerInfo.getUsedBytes();
     mStartTimeMs = workerInfo.getStartTimeMs();
+    mUnavailableBytes = workerInfo.getUnavailableBytes();
   }
 
   /**
@@ -101,6 +103,13 @@ public final class WorkerInfo implements Serializable {
    */
   public long getStartTimeMs() {
     return mStartTimeMs;
+  }
+
+  /**
+   * @return the worker unavailable capacity (in bytes)
+   */
+  public long getUnavailableBytes() {
+    return mUnavailableBytes;
   }
 
   /**
@@ -168,12 +177,17 @@ public final class WorkerInfo implements Serializable {
     return this;
   }
 
+  public WorkerInfo setUnavailableBytes(long unavailableBytes) {
+    mUnavailableBytes = unavailableBytes;
+    return this;
+  }
+
   /**
    * @return thrift representation of the worker information
    */
   protected alluxio.thrift.WorkerInfo toThrift() {
     return new alluxio.thrift.WorkerInfo(mId, mAddress.toThrift(), mLastContactSec, mState,
-        mCapacityBytes, mUsedBytes, mStartTimeMs);
+        mCapacityBytes, mUsedBytes, mStartTimeMs, mUnavailableBytes);
   }
 
   @Override
@@ -188,7 +202,7 @@ public final class WorkerInfo implements Serializable {
     return mId == that.mId && mAddress.equals(that.mAddress)
         && mLastContactSec == that.mLastContactSec && mState.equals(that.mState)
         && mCapacityBytes == that.mCapacityBytes && mUsedBytes == that.mUsedBytes
-        && mStartTimeMs == that.mStartTimeMs;
+        && mStartTimeMs == that.mStartTimeMs && mUnavailableBytes == that.mUnavailableBytes;
   }
 
   /**
@@ -209,7 +223,7 @@ public final class WorkerInfo implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hashCode(mId, mAddress, mLastContactSec, mState, mCapacityBytes, mUsedBytes,
-        mStartTimeMs);
+        mStartTimeMs, mUnavailableBytes);
   }
 
   @Override
@@ -217,6 +231,6 @@ public final class WorkerInfo implements Serializable {
     return Objects.toStringHelper(this).add("id", mId).add("address", mAddress)
         .add("lastContactSec", mLastContactSec).add("state", mState)
         .add("capacityBytes", mCapacityBytes).add("usedBytes", mUsedBytes)
-        .add("startTimeMs", mStartTimeMs).toString();
+        .add("startTimeMs", mStartTimeMs).add("unavailableByte", mUnavailableBytes).toString();
   }
 }

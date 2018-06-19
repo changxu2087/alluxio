@@ -39,16 +39,16 @@ public final class DeterministicHashPolicyTest {
     mWorkerInfos.clear();
     mWorkerInfos.add(new BlockWorkerInfo(
         new WorkerNetAddress().setHost("worker1").setRpcPort(PORT).setDataPort(PORT)
-            .setWebPort(PORT), Constants.GB, 0));
+            .setWebPort(PORT), Constants.GB, 0, 0));
     mWorkerInfos.add(new BlockWorkerInfo(
         new WorkerNetAddress().setHost("worker2").setRpcPort(PORT).setDataPort(PORT)
-            .setWebPort(PORT), 2 * (long) Constants.GB, 0));
+            .setWebPort(PORT), 2 * (long) Constants.GB, 0, 0));
     mWorkerInfos.add(new BlockWorkerInfo(
         new WorkerNetAddress().setHost("worker3").setRpcPort(PORT).setDataPort(PORT)
-            .setWebPort(PORT), 3 * (long) Constants.GB, 0));
+            .setWebPort(PORT), 3 * (long) Constants.GB, 0, 0));
     mWorkerInfos.add(new BlockWorkerInfo(
         new WorkerNetAddress().setHost("worker4").setRpcPort(PORT).setDataPort(PORT)
-            .setWebPort(PORT), 3 * (long) Constants.GB, 0));
+            .setWebPort(PORT), 3 * (long) Constants.GB, 0, 0));
   }
 
   @Test

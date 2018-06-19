@@ -56,6 +56,8 @@ public final class BlockMetadataManager {
   /** A map from tier alias to {@link StorageTier}. */
   private final Map<String, StorageTier> mAliasToTiers;
 
+  private long mUnavailableBytes;
+
   private BlockMetadataManager() {
     try {
       StorageTierAssoc storageTierAssoc = new WorkerStorageTierAssoc();
@@ -66,9 +68,20 @@ public final class BlockMetadataManager {
         mTiers.add(tier);
         mAliasToTiers.put(tier.getTierAlias(), tier);
       }
+      mUnavailableBytes = 0;
     } catch (BlockAlreadyExistsException | IOException | WorkerOutOfSpaceException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  /**
+   * Gets the amount of unavailable space in bytes. The generation of unusable space is because
+   * that some non-persist blocks couldn't be evict.
+   *
+   * @return the amount of unavailable space in bytes.
+   */ 
+  public long getUnavailableBytes() {
+      return mUnavailableBytes;
   }
 
   /**
@@ -376,8 +389,8 @@ public final class BlockMetadataManager {
     StorageDir srcDir = blockMeta.getParentDir();
     StorageDir dstDir = tempBlockMeta.getParentDir();
     srcDir.removeBlockMeta(blockMeta);
-    BlockMeta newBlockMeta =
-        new BlockMeta(blockMeta.getBlockId(), blockMeta.getBlockSize(), dstDir);
+    BlockMeta newBlockMeta = new BlockMeta(blockMeta.getBlockId(), blockMeta.getBlockSize(), dstDir,
+        blockMeta.isMustReserve(), blockMeta.getPreReserveBytes());
     dstDir.removeTempBlockMeta(tempBlockMeta);
     dstDir.addBlockMeta(newBlockMeta);
     return newBlockMeta;
@@ -431,7 +444,8 @@ public final class BlockMetadataManager {
     }
     StorageDir oldDir = blockMeta.getParentDir();
     oldDir.removeBlockMeta(blockMeta);
-    BlockMeta newBlockMeta = new BlockMeta(blockMeta.getBlockId(), blockSize, newDir);
+    BlockMeta newBlockMeta = new BlockMeta(blockMeta.getBlockId(), blockSize, newDir,
+        blockMeta.isMustReserve(), blockMeta.getPreReserveBytes());
     newDir.addBlockMeta(newBlockMeta);
     return newBlockMeta;
   }

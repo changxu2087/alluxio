@@ -85,6 +85,8 @@ public interface BlockStore extends SessionCleanable {
    * @param blockId the id of the block to create
    * @param location location to create this block
    * @param initialBlockSize initial size of this block in bytes
+   * @param isMustReserve whether or not the block must be reserved
+   * @param preReserveBytes if isMustReserve is true, the size of pre reserved block in byte
    * @return metadata of the temp block created
    * @throws IllegalArgumentException if location does not belong to tiered storage
    * @throws BlockAlreadyExistsException if block id already exists, either temporary or committed,
@@ -92,8 +94,8 @@ public interface BlockStore extends SessionCleanable {
    * @throws WorkerOutOfSpaceException if this Store has no more space than the initialBlockSize
    */
   TempBlockMeta createBlock(long sessionId, long blockId, BlockStoreLocation location,
-      long initialBlockSize) throws BlockAlreadyExistsException, WorkerOutOfSpaceException,
-      IOException;
+      long initialBlockSize, boolean isMustReserve, long preReserveBytes)
+      throws BlockAlreadyExistsException, WorkerOutOfSpaceException, IOException;
 
   /**
    * Gets the metadata of a block given its block id or throws {@link BlockDoesNotExistException}.

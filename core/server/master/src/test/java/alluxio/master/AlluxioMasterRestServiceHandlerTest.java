@@ -129,9 +129,9 @@ public final class AlluxioMasterRestServiceHandlerTest {
     List<String> tiers = Arrays.asList("MEM", "SSD");
 
     mBlockMaster.workerRegister(worker1, tiers, WORKER1_TOTAL_BYTES_ON_TIERS,
-        WORKER1_USED_BYTES_ON_TIERS, NO_BLOCKS_ON_TIERS);
+        WORKER1_USED_BYTES_ON_TIERS, NO_BLOCKS_ON_TIERS, 0);
     mBlockMaster.workerRegister(worker2, tiers, WORKER2_TOTAL_BYTES_ON_TIERS,
-        WORKER2_USED_BYTES_ON_TIERS, NO_BLOCKS_ON_TIERS);
+        WORKER2_USED_BYTES_ON_TIERS, NO_BLOCKS_ON_TIERS, 0);
   }
 
   private void registerFileSystemMock() throws IOException {

@@ -89,7 +89,9 @@ public final class LocalFilePacketWriter implements PacketWriter {
 
       ProtoMessage createRequest = new ProtoMessage(
           Protocol.LocalBlockCreateRequest.newBuilder().setBlockId(blockId)
-              .setTier(options.getWriteTier()).setSpaceToReserve(FILE_BUFFER_BYTES).build());
+              .setTier(options.getWriteTier()).setSpaceToReserve(FILE_BUFFER_BYTES)
+              .setMustReserve(options.isMustReserve())
+              .setPreReserveBytes(options.getBlockSizeBytes()).build());
       NettyRPCContext nettyRPCContext =
           NettyRPCContext.defaults().setChannel(channel).setTimeout(WRITE_TIMEOUT_MS);
       ProtoMessage message = NettyRPC.call(nettyRPCContext, createRequest);

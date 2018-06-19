@@ -136,7 +136,7 @@ public final class FileInStreamTest {
           .getIncreasingByteArray((int) (i * BLOCK_LENGTH), (int) getBlockLength(i));
       mInStreams.add(new TestBlockInStream(input, i, input.length, false, mBlockSource));
       Mockito.when(mBlockStore.getEligibleWorkers())
-          .thenReturn(Arrays.asList(new BlockWorkerInfo(new WorkerNetAddress(), 0, 0)));
+          .thenReturn(Arrays.asList(new BlockWorkerInfo(new WorkerNetAddress(), 0, 0, 0)));
       Mockito.when(mBlockStore.getInStream(Mockito.eq((long) i), Mockito.any(InStreamOptions
           .class), any()))
           .thenAnswer(new Answer<BlockInStream>() {

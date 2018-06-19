@@ -22,6 +22,8 @@ import javax.annotation.concurrent.ThreadSafe;
 public final class BlockWriteRequest extends WriteRequest {
   /** Which tier this block writes to. */
   private final int mTier;
+  private final boolean mMustReserve;
+  private final long mPreReserveBytes;
 
   /**
    * @param request block request in proto
@@ -29,6 +31,8 @@ public final class BlockWriteRequest extends WriteRequest {
   BlockWriteRequest(Protocol.WriteRequest request) {
     super(request);
     mTier = request.getTier();
+    mMustReserve = request.getMustReserve();
+    mPreReserveBytes = request.getPreReserveBytes();
   }
 
   /**
@@ -36,5 +40,16 @@ public final class BlockWriteRequest extends WriteRequest {
    */
   public int getTier() {
     return mTier;
+  }
+
+  /**
+   * @return whether or not the block must be reserve
+   */
+  public boolean getMustReserver() {
+    return mMustReserve;
+  }
+
+  public long getPreReserveBytes() {
+    return mPreReserveBytes;
   }
 }

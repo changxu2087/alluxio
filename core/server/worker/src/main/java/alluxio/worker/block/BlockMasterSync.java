@@ -115,7 +115,7 @@ public final class BlockMasterSync implements HeartbeatExecutor {
     StorageTierAssoc storageTierAssoc = new WorkerStorageTierAssoc();
     mMasterClient.register(mWorkerId.get(),
         storageTierAssoc.getOrderedStorageAliases(), storeMeta.getCapacityBytesOnTiers(),
-        storeMeta.getUsedBytesOnTiers(), storeMeta.getBlockList());
+        storeMeta.getUsedBytesOnTiers(), storeMeta.getBlockList(), storeMeta.getUnavailableBytes());
   }
 
   /**

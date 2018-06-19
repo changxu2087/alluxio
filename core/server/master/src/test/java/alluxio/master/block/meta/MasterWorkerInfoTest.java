@@ -59,7 +59,7 @@ public final class MasterWorkerInfoTest {
     // register
     mInfo = new MasterWorkerInfo(0, new WorkerNetAddress());
     mInfo.register(GLOBAL_STORAGE_TIER_ASSOC, STORAGE_TIER_ALIASES, TOTAL_BYTES_ON_TIERS,
-        USED_BYTES_ON_TIERS, NEW_BLOCKS);
+        USED_BYTES_ON_TIERS, NEW_BLOCKS, 0);
   }
 
   /**
@@ -91,7 +91,7 @@ public final class MasterWorkerInfoTest {
   public void registerAgain() {
     Set<Long> newBlocks = Sets.newHashSet(3L);
     Set<Long> removedBlocks = mInfo.register(GLOBAL_STORAGE_TIER_ASSOC, STORAGE_TIER_ALIASES,
-        TOTAL_BYTES_ON_TIERS, USED_BYTES_ON_TIERS, newBlocks);
+        TOTAL_BYTES_ON_TIERS, USED_BYTES_ON_TIERS, newBlocks, 0);
     assertEquals(NEW_BLOCKS, removedBlocks);
     assertEquals(newBlocks, mInfo.getBlocks());
   }
@@ -109,7 +109,7 @@ public final class MasterWorkerInfoTest {
         + " totalBytesOnTiers has 2 tiers and usedBytesOnTiers has 1 tiers");
 
     mInfo.register(GLOBAL_STORAGE_TIER_ASSOC, STORAGE_TIER_ALIASES, TOTAL_BYTES_ON_TIERS,
-        ImmutableMap.of("SSD", (long) Constants.KB), NEW_BLOCKS);
+        ImmutableMap.of("SSD", (long) Constants.KB), NEW_BLOCKS, 0);
   }
 
   /**

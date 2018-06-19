@@ -169,7 +169,7 @@ public final class BlockMetadataManagerTest {
   public void blockMeta() throws Exception {
     StorageDir dir = mMetaManager.getTier("HDD").getDir(0);
     TempBlockMeta tempBlockMeta =
-        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, TEST_BLOCK_SIZE, dir);
+        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, TEST_BLOCK_SIZE, false, 0, dir);
 
     // Empty storage
     assertFalse(mMetaManager.hasTempBlockMeta(TEST_TEMP_BLOCK_ID));
@@ -232,9 +232,9 @@ public final class BlockMetadataManagerTest {
     // create and add two temp block metas with same tier and dir to the meta manager
     StorageDir dir = mMetaManager.getTier("MEM").getDir(0);
     TempBlockMeta tempBlockMeta1 =
-        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, TEST_BLOCK_SIZE, dir);
+        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, TEST_BLOCK_SIZE, false, 0, dir);
     TempBlockMeta tempBlockMeta2 =
-        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID2, TEST_BLOCK_SIZE, dir);
+        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID2, TEST_BLOCK_SIZE, false, 0, dir);
     mMetaManager.addTempBlockMeta(tempBlockMeta1);
     mMetaManager.addTempBlockMeta(tempBlockMeta2);
 
@@ -262,9 +262,9 @@ public final class BlockMetadataManagerTest {
     StorageDir dir1 = mMetaManager.getTier("HDD").getDir(0);
     StorageDir dir2 = mMetaManager.getTier("HDD").getDir(1);
     TempBlockMeta tempBlockMeta1 =
-        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, TEST_BLOCK_SIZE, dir1);
+        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, TEST_BLOCK_SIZE, false, 0, dir1);
     TempBlockMeta tempBlockMeta2 =
-        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID2, TEST_BLOCK_SIZE, dir2);
+        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID2, TEST_BLOCK_SIZE, false, 0, dir2);
     mMetaManager.addTempBlockMeta(tempBlockMeta1);
     mMetaManager.addTempBlockMeta(tempBlockMeta2);
 
@@ -297,7 +297,7 @@ public final class BlockMetadataManagerTest {
     long blockMetaSize = maxHddDir1Capacity + 1;
     BlockMeta blockMeta = new BlockMeta(TEST_BLOCK_ID, blockMetaSize, dir2);
     TempBlockMeta tempBlockMeta2 =
-        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID2, TEST_BLOCK_SIZE, dir1);
+        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID2, TEST_BLOCK_SIZE, false, 0, dir1);
     mMetaManager.addTempBlockMeta(tempBlockMeta2);
     dir2.addBlockMeta(blockMeta);
 
@@ -314,7 +314,7 @@ public final class BlockMetadataManagerTest {
   public void moveBlockMetaDeprecated() throws Exception {
     StorageDir dir = mMetaManager.getTier("MEM").getDir(0);
     TempBlockMeta tempBlockMeta =
-        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, TEST_BLOCK_SIZE, dir);
+        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, TEST_BLOCK_SIZE, false, 0, dir);
     mMetaManager.addTempBlockMeta(tempBlockMeta);
     mMetaManager.commitTempBlockMeta(tempBlockMeta);
     BlockMeta blockMeta = mMetaManager.getBlockMeta(TEST_TEMP_BLOCK_ID);
@@ -355,7 +355,7 @@ public final class BlockMetadataManagerTest {
   public void resizeTempBlockMeta() throws Exception {
     StorageDir dir = mMetaManager.getTier("MEM").getDir(0);
     TempBlockMeta tempBlockMeta =
-        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, TEST_BLOCK_SIZE, dir);
+        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, TEST_BLOCK_SIZE, false, 0, dir);
     mMetaManager.resizeTempBlockMeta(tempBlockMeta, TEST_BLOCK_SIZE + 1);
     assertEquals(TEST_BLOCK_SIZE + 1, tempBlockMeta.getBlockSize());
   }
@@ -372,11 +372,11 @@ public final class BlockMetadataManagerTest {
     final long sessionId1 = 100;
     final long sessionId2 = 200;
     TempBlockMeta tempBlockMeta1 =
-        new TempBlockMeta(sessionId1, tempBlockId1, TEST_BLOCK_SIZE, dir);
+        new TempBlockMeta(sessionId1, tempBlockId1, TEST_BLOCK_SIZE, false, 0, dir);
     TempBlockMeta tempBlockMeta2 =
-        new TempBlockMeta(sessionId1, tempBlockId2, TEST_BLOCK_SIZE, dir);
+        new TempBlockMeta(sessionId1, tempBlockId2, TEST_BLOCK_SIZE, false, 0, dir);
     TempBlockMeta tempBlockMeta3 =
-        new TempBlockMeta(sessionId2, tempBlockId3, TEST_BLOCK_SIZE, dir);
+        new TempBlockMeta(sessionId2, tempBlockId3, TEST_BLOCK_SIZE, false, 0, dir);
     BlockMeta blockMeta = new BlockMeta(TEST_BLOCK_ID, TEST_BLOCK_SIZE, dir);
     dir.addTempBlockMeta(tempBlockMeta1);
     dir.addTempBlockMeta(tempBlockMeta2);

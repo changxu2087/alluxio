@@ -217,7 +217,7 @@ public class TieredBlockStore implements BlockStore {
 
   @Override
   public TempBlockMeta createBlock(long sessionId, long blockId, BlockStoreLocation location,
-      long initialBlockSize)
+      long initialBlockSize, boolean isMustReserve, long preReserveBytes)
           throws BlockAlreadyExistsException, WorkerOutOfSpaceException, IOException {
     LOG.debug("createBlock: sessionId={}, blockId={}, location={}, initialBlockSize={}",
         sessionId, blockId, location, initialBlockSize);
@@ -225,7 +225,7 @@ public class TieredBlockStore implements BlockStore {
       RetryPolicy retryPolicy = new TimeoutRetry(FREE_SPACE_TIMEOUT_MS, EVICTION_INTERVAL_MS);
       while (retryPolicy.attemptRetry()) {
         TempBlockMeta tempBlockMeta =
-            createBlockMetaInternal(sessionId, blockId, location, initialBlockSize, true);
+            createBlockMetaInternal(sessionId, blockId, location, initialBlockSize, isMustReserve, preReserveBytes, true);
         if (tempBlockMeta != null) {
           createBlockFile(tempBlockMeta.getPath());
           return tempBlockMeta;
@@ -237,7 +237,7 @@ public class TieredBlockStore implements BlockStore {
       RetryPolicy retryPolicy = new CountingRetry(MAX_RETRIES);
       while (retryPolicy.attemptRetry()) {
         TempBlockMeta tempBlockMeta =
-            createBlockMetaInternal(sessionId, blockId, location, initialBlockSize, true);
+            createBlockMetaInternal(sessionId, blockId, location, initialBlockSize, isMustReserve, preReserveBytes, true);
         if (tempBlockMeta != null) {
           createBlockFile(tempBlockMeta.getPath());
           return tempBlockMeta;
@@ -625,13 +625,15 @@ public class TieredBlockStore implements BlockStore {
    * @param blockId block id
    * @param location location to create the block
    * @param initialBlockSize initial block size in bytes
+   * @param isMustReserve whether or not the block must be reserved
+   * @param preReserveBytes if isMustReserve is true, the size of pre reserved block in byte
    * @param newBlock true if this temp block is created for a new block
    * @return a temp block created if successful, or null if allocation failed (instead of throwing
    *         {@link WorkerOutOfSpaceException} because allocation failure could be an expected case)
    * @throws BlockAlreadyExistsException if there is already a block with the same block id
    */
   private TempBlockMeta createBlockMetaInternal(long sessionId, long blockId,
-      BlockStoreLocation location, long initialBlockSize, boolean newBlock)
+      BlockStoreLocation location, long initialBlockSize, boolean isMustReserve, long preReserveBytes, boolean newBlock)
           throws BlockAlreadyExistsException {
     // NOTE: a temp block is supposed to be visible for its own writer, unnecessary to acquire
     // block lock here since no sharing
@@ -647,7 +649,8 @@ public class TieredBlockStore implements BlockStore {
       }
       // TODO(carson): Add tempBlock to corresponding storageDir and remove the use of
       // StorageDirView.createTempBlockMeta.
-      TempBlockMeta tempBlock = dirView.createTempBlockMeta(sessionId, blockId, initialBlockSize);
+      TempBlockMeta tempBlock = dirView.createTempBlockMeta(sessionId, blockId, initialBlockSize,
+          isMustReserve, preReserveBytes);
       try {
         // Add allocated temp block to metadata manager. This should never fail if allocator
         // correctly assigns a StorageDir.
@@ -819,6 +822,8 @@ public class TieredBlockStore implements BlockStore {
       BlockMeta srcBlockMeta;
       BlockStoreLocation srcLocation;
       BlockStoreLocation dstLocation;
+      boolean isMustReserve;
+      long preReserveBytes;
 
       try (LockResource r = new LockResource(mMetadataReadLock)) {
         if (mMetaManager.hasTempBlockMeta(blockId)) {
@@ -828,6 +833,8 @@ public class TieredBlockStore implements BlockStore {
         srcLocation = srcBlockMeta.getBlockLocation();
         srcFilePath = srcBlockMeta.getPath();
         blockSize = srcBlockMeta.getBlockSize();
+        isMustReserve = srcBlockMeta.isMustReserve();
+        preReserveBytes = srcBlockMeta.getPreReserveBytes();
       }
 
       if (!srcLocation.belongsTo(oldLocation)) {
@@ -835,7 +842,7 @@ public class TieredBlockStore implements BlockStore {
             oldLocation);
       }
       TempBlockMeta dstTempBlock =
-          createBlockMetaInternal(sessionId, blockId, newLocation, blockSize, false);
+          createBlockMetaInternal(sessionId, blockId, newLocation, blockSize, isMustReserve, preReserveBytes, false);
       if (dstTempBlock == null) {
         return new MoveBlockResult(false, blockSize, null, null);
       }

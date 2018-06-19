@@ -67,7 +67,7 @@ public class StorageTierTest {
 
     mTier = StorageTier.newStorageTier("MEM");
     mDir1 = mTier.getDir(0);
-    mTempBlockMeta = new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, TEST_BLOCK_SIZE, mDir1);
+    mTempBlockMeta = new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, TEST_BLOCK_SIZE, false, 0, mDir1);
   }
 
   /**

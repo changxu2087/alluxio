@@ -3463,6 +3463,26 @@ public final class Protocol {
      */
     int getTier();
 
+    // optional bool mustReserve = 8;
+    /**
+     * <code>optional bool mustReserve = 8;</code>
+     */
+    boolean hasMustReserve();
+    /**
+     * <code>optional bool mustReserve = 8;</code>
+     */
+    boolean getMustReserve();
+
+    // optional int64 preReserveBytes = 9;
+    /**
+     * <code>optional int64 preReserveBytes = 9;</code>
+     */
+    boolean hasPreReserveBytes();
+    /**
+     * <code>optional int64 preReserveBytes = 9;</code>
+     */
+    long getPreReserveBytes();
+
     // optional bool eof = 5;
     /**
      * <code>optional bool eof = 5;</code>
@@ -3514,7 +3534,7 @@ public final class Protocol {
    *
    * <pre>
    * The write request.
-   * next available id: 8
+   * next available id: 10
    * </pre>
    */
   public static final class WriteRequest extends
@@ -3592,18 +3612,18 @@ public final class Protocol {
               break;
             }
             case 40: {
-              bitField0_ |= 0x00000010;
+              bitField0_ |= 0x00000040;
               eof_ = input.readBool();
               break;
             }
             case 48: {
-              bitField0_ |= 0x00000020;
+              bitField0_ |= 0x00000080;
               cancel_ = input.readBool();
               break;
             }
             case 58: {
               alluxio.proto.dataserver.Protocol.CreateUfsFileOptions.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000040) == 0x00000040)) {
+              if (((bitField0_ & 0x00000100) == 0x00000100)) {
                 subBuilder = createUfsFileOptions_.toBuilder();
               }
               createUfsFileOptions_ = input.readMessage(alluxio.proto.dataserver.Protocol.CreateUfsFileOptions.PARSER, extensionRegistry);
@@ -3611,7 +3631,17 @@ public final class Protocol {
                 subBuilder.mergeFrom(createUfsFileOptions_);
                 createUfsFileOptions_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000040;
+              bitField0_ |= 0x00000100;
+              break;
+            }
+            case 64: {
+              bitField0_ |= 0x00000010;
+              mustReserve_ = input.readBool();
+              break;
+            }
+            case 72: {
+              bitField0_ |= 0x00000020;
+              preReserveBytes_ = input.readInt64();
               break;
             }
           }
@@ -3734,6 +3764,38 @@ public final class Protocol {
       return tier_;
     }
 
+    // optional bool mustReserve = 8;
+    public static final int MUSTRESERVE_FIELD_NUMBER = 8;
+    private boolean mustReserve_;
+    /**
+     * <code>optional bool mustReserve = 8;</code>
+     */
+    public boolean hasMustReserve() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional bool mustReserve = 8;</code>
+     */
+    public boolean getMustReserve() {
+      return mustReserve_;
+    }
+
+    // optional int64 preReserveBytes = 9;
+    public static final int PRERESERVEBYTES_FIELD_NUMBER = 9;
+    private long preReserveBytes_;
+    /**
+     * <code>optional int64 preReserveBytes = 9;</code>
+     */
+    public boolean hasPreReserveBytes() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional int64 preReserveBytes = 9;</code>
+     */
+    public long getPreReserveBytes() {
+      return preReserveBytes_;
+    }
+
     // optional bool eof = 5;
     public static final int EOF_FIELD_NUMBER = 5;
     private boolean eof_;
@@ -3741,7 +3803,7 @@ public final class Protocol {
      * <code>optional bool eof = 5;</code>
      */
     public boolean hasEof() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
      * <code>optional bool eof = 5;</code>
@@ -3757,7 +3819,7 @@ public final class Protocol {
      * <code>optional bool cancel = 6;</code>
      */
     public boolean hasCancel() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
+      return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
      * <code>optional bool cancel = 6;</code>
@@ -3777,7 +3839,7 @@ public final class Protocol {
      * </pre>
      */
     public boolean hasCreateUfsFileOptions() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
+      return ((bitField0_ & 0x00000100) == 0x00000100);
     }
     /**
      * <code>optional .alluxio.proto.dataserver.CreateUfsFileOptions create_ufs_file_options = 7;</code>
@@ -3805,6 +3867,8 @@ public final class Protocol {
       id_ = 0L;
       offset_ = 0L;
       tier_ = 0;
+      mustReserve_ = false;
+      preReserveBytes_ = 0L;
       eof_ = false;
       cancel_ = false;
       createUfsFileOptions_ = alluxio.proto.dataserver.Protocol.CreateUfsFileOptions.getDefaultInstance();
@@ -3833,14 +3897,20 @@ public final class Protocol {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeInt32(4, tier_);
       }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
         output.writeBool(5, eof_);
       }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
         output.writeBool(6, cancel_);
       }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
         output.writeMessage(7, createUfsFileOptions_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeBool(8, mustReserve_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeInt64(9, preReserveBytes_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -3867,17 +3937,25 @@ public final class Protocol {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(4, tier_);
       }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(5, eof_);
       }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(6, cancel_);
       }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(7, createUfsFileOptions_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(8, mustReserve_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(9, preReserveBytes_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3962,7 +4040,7 @@ public final class Protocol {
      *
      * <pre>
      * The write request.
-     * next available id: 8
+     * next available id: 10
      * </pre>
      */
     public static final class Builder extends
@@ -4009,16 +4087,20 @@ public final class Protocol {
         bitField0_ = (bitField0_ & ~0x00000004);
         tier_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
-        eof_ = false;
+        mustReserve_ = false;
         bitField0_ = (bitField0_ & ~0x00000010);
-        cancel_ = false;
+        preReserveBytes_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000020);
+        eof_ = false;
+        bitField0_ = (bitField0_ & ~0x00000040);
+        cancel_ = false;
+        bitField0_ = (bitField0_ & ~0x00000080);
         if (createUfsFileOptionsBuilder_ == null) {
           createUfsFileOptions_ = alluxio.proto.dataserver.Protocol.CreateUfsFileOptions.getDefaultInstance();
         } else {
           createUfsFileOptionsBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000100);
         return this;
       }
 
@@ -4066,13 +4148,21 @@ public final class Protocol {
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000010;
         }
-        result.eof_ = eof_;
+        result.mustReserve_ = mustReserve_;
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
         }
-        result.cancel_ = cancel_;
+        result.preReserveBytes_ = preReserveBytes_;
         if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
           to_bitField0_ |= 0x00000040;
+        }
+        result.eof_ = eof_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.cancel_ = cancel_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
         }
         if (createUfsFileOptionsBuilder_ == null) {
           result.createUfsFileOptions_ = createUfsFileOptions_;
@@ -4106,6 +4196,12 @@ public final class Protocol {
         }
         if (other.hasTier()) {
           setTier(other.getTier());
+        }
+        if (other.hasMustReserve()) {
+          setMustReserve(other.getMustReserve());
+        }
+        if (other.hasPreReserveBytes()) {
+          setPreReserveBytes(other.getPreReserveBytes());
         }
         if (other.hasEof()) {
           setEof(other.getEof());
@@ -4310,13 +4406,79 @@ public final class Protocol {
         return this;
       }
 
+      // optional bool mustReserve = 8;
+      private boolean mustReserve_ ;
+      /**
+       * <code>optional bool mustReserve = 8;</code>
+       */
+      public boolean hasMustReserve() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional bool mustReserve = 8;</code>
+       */
+      public boolean getMustReserve() {
+        return mustReserve_;
+      }
+      /**
+       * <code>optional bool mustReserve = 8;</code>
+       */
+      public Builder setMustReserve(boolean value) {
+        bitField0_ |= 0x00000010;
+        mustReserve_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool mustReserve = 8;</code>
+       */
+      public Builder clearMustReserve() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        mustReserve_ = false;
+        onChanged();
+        return this;
+      }
+
+      // optional int64 preReserveBytes = 9;
+      private long preReserveBytes_ ;
+      /**
+       * <code>optional int64 preReserveBytes = 9;</code>
+       */
+      public boolean hasPreReserveBytes() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional int64 preReserveBytes = 9;</code>
+       */
+      public long getPreReserveBytes() {
+        return preReserveBytes_;
+      }
+      /**
+       * <code>optional int64 preReserveBytes = 9;</code>
+       */
+      public Builder setPreReserveBytes(long value) {
+        bitField0_ |= 0x00000020;
+        preReserveBytes_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 preReserveBytes = 9;</code>
+       */
+      public Builder clearPreReserveBytes() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        preReserveBytes_ = 0L;
+        onChanged();
+        return this;
+      }
+
       // optional bool eof = 5;
       private boolean eof_ ;
       /**
        * <code>optional bool eof = 5;</code>
        */
       public boolean hasEof() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
        * <code>optional bool eof = 5;</code>
@@ -4328,7 +4490,7 @@ public final class Protocol {
        * <code>optional bool eof = 5;</code>
        */
       public Builder setEof(boolean value) {
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000040;
         eof_ = value;
         onChanged();
         return this;
@@ -4337,7 +4499,7 @@ public final class Protocol {
        * <code>optional bool eof = 5;</code>
        */
       public Builder clearEof() {
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000040);
         eof_ = false;
         onChanged();
         return this;
@@ -4349,7 +4511,7 @@ public final class Protocol {
        * <code>optional bool cancel = 6;</code>
        */
       public boolean hasCancel() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
        * <code>optional bool cancel = 6;</code>
@@ -4361,7 +4523,7 @@ public final class Protocol {
        * <code>optional bool cancel = 6;</code>
        */
       public Builder setCancel(boolean value) {
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000080;
         cancel_ = value;
         onChanged();
         return this;
@@ -4370,7 +4532,7 @@ public final class Protocol {
        * <code>optional bool cancel = 6;</code>
        */
       public Builder clearCancel() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000080);
         cancel_ = false;
         onChanged();
         return this;
@@ -4388,7 +4550,7 @@ public final class Protocol {
        * </pre>
        */
       public boolean hasCreateUfsFileOptions() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
+        return ((bitField0_ & 0x00000100) == 0x00000100);
       }
       /**
        * <code>optional .alluxio.proto.dataserver.CreateUfsFileOptions create_ufs_file_options = 7;</code>
@@ -4421,7 +4583,7 @@ public final class Protocol {
         } else {
           createUfsFileOptionsBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000100;
         return this;
       }
       /**
@@ -4439,7 +4601,7 @@ public final class Protocol {
         } else {
           createUfsFileOptionsBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000100;
         return this;
       }
       /**
@@ -4451,7 +4613,7 @@ public final class Protocol {
        */
       public Builder mergeCreateUfsFileOptions(alluxio.proto.dataserver.Protocol.CreateUfsFileOptions value) {
         if (createUfsFileOptionsBuilder_ == null) {
-          if (((bitField0_ & 0x00000040) == 0x00000040) &&
+          if (((bitField0_ & 0x00000100) == 0x00000100) &&
               createUfsFileOptions_ != alluxio.proto.dataserver.Protocol.CreateUfsFileOptions.getDefaultInstance()) {
             createUfsFileOptions_ =
               alluxio.proto.dataserver.Protocol.CreateUfsFileOptions.newBuilder(createUfsFileOptions_).mergeFrom(value).buildPartial();
@@ -4462,7 +4624,7 @@ public final class Protocol {
         } else {
           createUfsFileOptionsBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000100;
         return this;
       }
       /**
@@ -4479,7 +4641,7 @@ public final class Protocol {
         } else {
           createUfsFileOptionsBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000100);
         return this;
       }
       /**
@@ -4490,7 +4652,7 @@ public final class Protocol {
        * </pre>
        */
       public alluxio.proto.dataserver.Protocol.CreateUfsFileOptions.Builder getCreateUfsFileOptionsBuilder() {
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000100;
         onChanged();
         return getCreateUfsFileOptionsFieldBuilder().getBuilder();
       }
@@ -8299,12 +8461,32 @@ public final class Protocol {
      * </pre>
      */
     boolean getOnlyReserveSpace();
+
+    // optional bool mustReserve = 6;
+    /**
+     * <code>optional bool mustReserve = 6;</code>
+     */
+    boolean hasMustReserve();
+    /**
+     * <code>optional bool mustReserve = 6;</code>
+     */
+    boolean getMustReserve();
+
+    // optional int64 preReserveBytes = 7;
+    /**
+     * <code>optional int64 preReserveBytes = 7;</code>
+     */
+    boolean hasPreReserveBytes();
+    /**
+     * <code>optional int64 preReserveBytes = 7;</code>
+     */
+    long getPreReserveBytes();
   }
   /**
    * Protobuf type {@code alluxio.proto.dataserver.LocalBlockCreateRequest}
    *
    * <pre>
-   * next available id: 6
+   * next available id: 8
    * </pre>
    */
   public static final class LocalBlockCreateRequest extends
@@ -8373,6 +8555,16 @@ public final class Protocol {
             case 40: {
               bitField0_ |= 0x00000008;
               onlyReserveSpace_ = input.readBool();
+              break;
+            }
+            case 48: {
+              bitField0_ |= 0x00000010;
+              mustReserve_ = input.readBool();
+              break;
+            }
+            case 56: {
+              bitField0_ |= 0x00000020;
+              preReserveBytes_ = input.readInt64();
               break;
             }
           }
@@ -8487,11 +8679,45 @@ public final class Protocol {
       return onlyReserveSpace_;
     }
 
+    // optional bool mustReserve = 6;
+    public static final int MUSTRESERVE_FIELD_NUMBER = 6;
+    private boolean mustReserve_;
+    /**
+     * <code>optional bool mustReserve = 6;</code>
+     */
+    public boolean hasMustReserve() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional bool mustReserve = 6;</code>
+     */
+    public boolean getMustReserve() {
+      return mustReserve_;
+    }
+
+    // optional int64 preReserveBytes = 7;
+    public static final int PRERESERVEBYTES_FIELD_NUMBER = 7;
+    private long preReserveBytes_;
+    /**
+     * <code>optional int64 preReserveBytes = 7;</code>
+     */
+    public boolean hasPreReserveBytes() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional int64 preReserveBytes = 7;</code>
+     */
+    public long getPreReserveBytes() {
+      return preReserveBytes_;
+    }
+
     private void initFields() {
       blockId_ = 0L;
       tier_ = 0;
       spaceToReserve_ = 0L;
       onlyReserveSpace_ = false;
+      mustReserve_ = false;
+      preReserveBytes_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -8517,6 +8743,12 @@ public final class Protocol {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeBool(5, onlyReserveSpace_);
       }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeBool(6, mustReserve_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeInt64(7, preReserveBytes_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -8541,6 +8773,14 @@ public final class Protocol {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(5, onlyReserveSpace_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(6, mustReserve_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(7, preReserveBytes_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -8624,7 +8864,7 @@ public final class Protocol {
      * Protobuf type {@code alluxio.proto.dataserver.LocalBlockCreateRequest}
      *
      * <pre>
-     * next available id: 6
+     * next available id: 8
      * </pre>
      */
     public static final class Builder extends
@@ -8670,6 +8910,10 @@ public final class Protocol {
         bitField0_ = (bitField0_ & ~0x00000004);
         onlyReserveSpace_ = false;
         bitField0_ = (bitField0_ & ~0x00000008);
+        mustReserve_ = false;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        preReserveBytes_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
 
@@ -8714,6 +8958,14 @@ public final class Protocol {
           to_bitField0_ |= 0x00000008;
         }
         result.onlyReserveSpace_ = onlyReserveSpace_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.mustReserve_ = mustReserve_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.preReserveBytes_ = preReserveBytes_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -8741,6 +8993,12 @@ public final class Protocol {
         }
         if (other.hasOnlyReserveSpace()) {
           setOnlyReserveSpace(other.getOnlyReserveSpace());
+        }
+        if (other.hasMustReserve()) {
+          setMustReserve(other.getMustReserve());
+        }
+        if (other.hasPreReserveBytes()) {
+          setPreReserveBytes(other.getPreReserveBytes());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -8913,6 +9171,72 @@ public final class Protocol {
       public Builder clearOnlyReserveSpace() {
         bitField0_ = (bitField0_ & ~0x00000008);
         onlyReserveSpace_ = false;
+        onChanged();
+        return this;
+      }
+
+      // optional bool mustReserve = 6;
+      private boolean mustReserve_ ;
+      /**
+       * <code>optional bool mustReserve = 6;</code>
+       */
+      public boolean hasMustReserve() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional bool mustReserve = 6;</code>
+       */
+      public boolean getMustReserve() {
+        return mustReserve_;
+      }
+      /**
+       * <code>optional bool mustReserve = 6;</code>
+       */
+      public Builder setMustReserve(boolean value) {
+        bitField0_ |= 0x00000010;
+        mustReserve_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool mustReserve = 6;</code>
+       */
+      public Builder clearMustReserve() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        mustReserve_ = false;
+        onChanged();
+        return this;
+      }
+
+      // optional int64 preReserveBytes = 7;
+      private long preReserveBytes_ ;
+      /**
+       * <code>optional int64 preReserveBytes = 7;</code>
+       */
+      public boolean hasPreReserveBytes() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional int64 preReserveBytes = 7;</code>
+       */
+      public long getPreReserveBytes() {
+        return preReserveBytes_;
+      }
+      /**
+       * <code>optional int64 preReserveBytes = 7;</code>
+       */
+      public Builder setPreReserveBytes(long value) {
+        bitField0_ |= 0x00000020;
+        preReserveBytes_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 preReserveBytes = 7;</code>
+       */
+      public Builder clearPreReserveBytes() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        preReserveBytes_ = 0L;
         onChanged();
         return this;
       }
@@ -10580,32 +10904,35 @@ public final class Protocol {
       "\n\010ufs_path\030\001 \001(\t\022\026\n\016offset_in_file\030\002 \001(\003" +
       "\022\022\n\nblock_size\030\003 \001(\003\022\035\n\025maxUfsReadConcur" +
       "rency\030\004 \001(\005\022\017\n\007mountId\030\005 \001(\003\022\020\n\010no_cache" +
-      "\030\006 \001(\010\022\014\n\004user\030\007 \001(\t\"\333\001\n\014WriteRequest\0223\n" +
+      "\030\006 \001(\010\022\014\n\004user\030\007 \001(\t\"\211\002\n\014WriteRequest\0223\n" +
       "\004type\030\001 \001(\0162%.alluxio.proto.dataserver.R" +
       "equestType\022\n\n\002id\030\002 \001(\003\022\016\n\006offset\030\003 \001(\003\022\014" +
-      "\n\004tier\030\004 \001(\005\022\013\n\003eof\030\005 \001(\010\022\016\n\006cancel\030\006 \001(" +
-      "\010\022O\n\027create_ufs_file_options\030\007 \001(\0132..all",
-      "uxio.proto.dataserver.CreateUfsFileOptio" +
-      "ns\"f\n\024CreateUfsFileOptions\022\020\n\010ufs_path\030\001" +
-      " \001(\t\022\r\n\005owner\030\002 \001(\t\022\r\n\005group\030\003 \001(\t\022\014\n\004mo" +
-      "de\030\004 \001(\005\022\020\n\010mount_id\030\005 \001(\003\"J\n\010Response\022-" +
-      "\n\006status\030\001 \001(\0162\035.alluxio.proto.status.PS" +
-      "tatus\022\017\n\007message\030\002 \001(\t\"i\n\014ReadResponse\0229" +
-      "\n\004type\030\001 \001(\0162+.alluxio.proto.dataserver." +
-      "ReadResponse.Type\"\036\n\004Type\022\026\n\022UFS_READ_HE" +
-      "ARTBEAT\020\001\"\013\n\tHeartbeat\":\n\025LocalBlockOpen" +
-      "Request\022\020\n\010block_id\030\001 \001(\003\022\017\n\007promote\030\002 \001",
-      "(\010\"&\n\026LocalBlockOpenResponse\022\014\n\004path\030\001 \001" +
-      "(\t\"*\n\026LocalBlockCloseRequest\022\020\n\010block_id" +
-      "\030\001 \001(\003\"o\n\027LocalBlockCreateRequest\022\020\n\010blo" +
-      "ck_id\030\001 \001(\003\022\014\n\004tier\030\003 \001(\005\022\030\n\020space_to_re" +
-      "serve\030\004 \001(\003\022\032\n\022only_reserve_space\030\005 \001(\010\"" +
-      "(\n\030LocalBlockCreateResponse\022\014\n\004path\030\001 \001(" +
-      "\t\"=\n\031LocalBlockCompleteRequest\022\020\n\010block_" +
-      "id\030\001 \001(\003\022\016\n\006cancel\030\002 \001(\010\"L\n\023DeleteWorker" +
-      "Request\022 \n\030available_worker_address\030\001 \003(" +
-      "\t\022\023\n\013tranferByte\030\002 \001(\003*.\n\013RequestType\022\021\n",
-      "\rALLUXIO_BLOCK\020\000\022\014\n\010UFS_FILE\020\001"
+      "\n\004tier\030\004 \001(\005\022\023\n\013mustReserve\030\010 \001(\010\022\027\n\017pre" +
+      "ReserveBytes\030\t \001(\003\022\013\n\003eof\030\005 \001(\010\022\016\n\006cance",
+      "l\030\006 \001(\010\022O\n\027create_ufs_file_options\030\007 \001(\013" +
+      "2..alluxio.proto.dataserver.CreateUfsFil" +
+      "eOptions\"f\n\024CreateUfsFileOptions\022\020\n\010ufs_" +
+      "path\030\001 \001(\t\022\r\n\005owner\030\002 \001(\t\022\r\n\005group\030\003 \001(\t" +
+      "\022\014\n\004mode\030\004 \001(\005\022\020\n\010mount_id\030\005 \001(\003\"J\n\010Resp" +
+      "onse\022-\n\006status\030\001 \001(\0162\035.alluxio.proto.sta" +
+      "tus.PStatus\022\017\n\007message\030\002 \001(\t\"i\n\014ReadResp" +
+      "onse\0229\n\004type\030\001 \001(\0162+.alluxio.proto.datas" +
+      "erver.ReadResponse.Type\"\036\n\004Type\022\026\n\022UFS_R" +
+      "EAD_HEARTBEAT\020\001\"\013\n\tHeartbeat\":\n\025LocalBlo",
+      "ckOpenRequest\022\020\n\010block_id\030\001 \001(\003\022\017\n\007promo" +
+      "te\030\002 \001(\010\"&\n\026LocalBlockOpenResponse\022\014\n\004pa" +
+      "th\030\001 \001(\t\"*\n\026LocalBlockCloseRequest\022\020\n\010bl" +
+      "ock_id\030\001 \001(\003\"\235\001\n\027LocalBlockCreateRequest" +
+      "\022\020\n\010block_id\030\001 \001(\003\022\014\n\004tier\030\003 \001(\005\022\030\n\020spac" +
+      "e_to_reserve\030\004 \001(\003\022\032\n\022only_reserve_space" +
+      "\030\005 \001(\010\022\023\n\013mustReserve\030\006 \001(\010\022\027\n\017preReserv" +
+      "eBytes\030\007 \001(\003\"(\n\030LocalBlockCreateResponse" +
+      "\022\014\n\004path\030\001 \001(\t\"=\n\031LocalBlockCompleteRequ" +
+      "est\022\020\n\010block_id\030\001 \001(\003\022\016\n\006cancel\030\002 \001(\010\"L\n",
+      "\023DeleteWorkerRequest\022 \n\030available_worker" +
+      "_address\030\001 \003(\t\022\023\n\013tranferByte\030\002 \001(\003*.\n\013R" +
+      "equestType\022\021\n\rALLUXIO_BLOCK\020\000\022\014\n\010UFS_FIL" +
+      "E\020\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -10635,7 +10962,7 @@ public final class Protocol {
           internal_static_alluxio_proto_dataserver_WriteRequest_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_alluxio_proto_dataserver_WriteRequest_descriptor,
-              new java.lang.String[] { "Type", "Id", "Offset", "Tier", "Eof", "Cancel", "CreateUfsFileOptions", });
+              new java.lang.String[] { "Type", "Id", "Offset", "Tier", "MustReserve", "PreReserveBytes", "Eof", "Cancel", "CreateUfsFileOptions", });
           internal_static_alluxio_proto_dataserver_CreateUfsFileOptions_descriptor =
             getDescriptor().getMessageTypes().get(4);
           internal_static_alluxio_proto_dataserver_CreateUfsFileOptions_fieldAccessorTable = new
@@ -10683,7 +11010,7 @@ public final class Protocol {
           internal_static_alluxio_proto_dataserver_LocalBlockCreateRequest_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_alluxio_proto_dataserver_LocalBlockCreateRequest_descriptor,
-              new java.lang.String[] { "BlockId", "Tier", "SpaceToReserve", "OnlyReserveSpace", });
+              new java.lang.String[] { "BlockId", "Tier", "SpaceToReserve", "OnlyReserveSpace", "MustReserve", "PreReserveBytes", });
           internal_static_alluxio_proto_dataserver_LocalBlockCreateResponse_descriptor =
             getDescriptor().getMessageTypes().get(12);
           internal_static_alluxio_proto_dataserver_LocalBlockCreateResponse_fieldAccessorTable = new

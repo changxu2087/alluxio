@@ -31,6 +31,8 @@ import alluxio.exception.status.ResourceExhaustedException;
 import alluxio.exception.status.UnavailableException;
 import alluxio.network.TieredIdentityFactory;
 import alluxio.resource.CloseableResource;
+import alluxio.retry.CountingRetry;
+import alluxio.retry.RetryPolicy;
 import alluxio.util.FormatUtils;
 import alluxio.wire.BlockInfo;
 import alluxio.wire.BlockLocation;
@@ -121,7 +123,8 @@ public final class AlluxioBlockStore {
     try (CloseableResource<BlockMasterClient> masterClientResource =
         mContext.acquireBlockMasterClientResource()) {
       return masterClientResource.get().getWorkerInfoList().stream()
-          .map(w -> new BlockWorkerInfo(w.getAddress(), w.getCapacityBytes(), w.getUsedBytes()))
+          .map(w -> new BlockWorkerInfo(w.getAddress(), w.getCapacityBytes(), w.getUsedBytes(),
+              w.getUnavailableBytes()))
           .collect(toList());
     }
   }
@@ -272,13 +275,25 @@ public final class AlluxioBlockStore {
    */
   public BlockOutStream getOutStream(long blockId, long blockSize, OutStreamOptions options)
       throws IOException {
-    WorkerNetAddress address;
+    WorkerNetAddress address = null;
     FileWriteLocationPolicy locationPolicy = Preconditions.checkNotNull(options.getLocationPolicy(),
         PreconditionMessage.FILE_WRITE_LOCATION_POLICY_UNSPECIFIED);
-    address = locationPolicy.getWorkerForNextBlock(getEligibleWorkers(), blockSize);
+    RetryPolicy retry = new CountingRetry(3);
+    List<BlockWorkerInfo> currentWorkers = getEligibleWorkers();
+    while (retry.attemptRetry()) {
+      address = locationPolicy.getWorkerForNextBlock(currentWorkers, blockSize);
+      if (address == null) {
+        break;
+      }
+      currentWorkers = validateAndReserve(address, blockSize);
+      if (!currentWorkers.isEmpty()) {
+        address = null;
+      } else {
+        break;
+      }
+    }
     if (address == null) {
-      throw new UnavailableException(
-          ExceptionMessage.NO_SPACE_FOR_BLOCK_ON_WORKER.getMessage(blockSize));
+      return null;
     }
     return getOutStream(blockId, blockSize, address, options);
   }
@@ -304,6 +319,25 @@ public final class AlluxioBlockStore {
     try (CloseableResource<BlockMasterClient> blockMasterClientResource =
         mContext.acquireBlockMasterClientResource()) {
       return blockMasterClientResource.get().getUsedBytes();
+    }
+  }
+
+  /**
+   * Validate whether the worker of this address can be used as block store, and if it could,
+   * reserve block size space on the worker. If not, return the latest information of all workers
+   *
+   * @param address the address that need to be validated
+   * @param preReserveBytes the size that need to be pre reserved
+   * @return null if the address is available; all workers info otherwise
+   */
+  private List<BlockWorkerInfo> validateAndReserve(WorkerNetAddress address, long preReserveBytes)
+      throws IOException {
+    try (CloseableResource<BlockMasterClient> masterClientResource =
+        mContext.acquireBlockMasterClientResource()) {
+      return masterClientResource.get().validateAndReserve(address, preReserveBytes).stream()
+          .map(w -> new BlockWorkerInfo(w.getAddress(), w.getCapacityBytes(), w.getUsedBytes(),
+              w.getUnavailableBytes()))
+          .collect(toList());
     }
   }
 }

@@ -183,7 +183,7 @@ public final class UnderFileSystemBlockReaderTest {
     BlockStore errorThrowingBlockStore = Mockito.spy(mAlluxioBlockStore);
     Mockito.doThrow(new WorkerOutOfSpaceException("Ignored")).when(errorThrowingBlockStore)
         .createBlock(Mockito.anyLong(), Mockito.anyLong(), Mockito.any(BlockStoreLocation.class),
-            Mockito.anyLong());
+            Mockito.anyLong(), false, 0);
     mReader = UnderFileSystemBlockReader.create(mUnderFileSystemBlockMeta, 0,
         errorThrowingBlockStore, mUfsManager, mUfsInstreamManager);
     ByteBuffer buffer = mReader.read(0, TEST_BLOCK_SIZE);

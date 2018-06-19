@@ -134,6 +134,6 @@ public final class LocalFirstPolicyTest {
       tiers.add(new LocalityTier(Constants.LOCALITY_RACK, rack));
     }
     address.setTieredIdentity(new TieredIdentity(tiers));
-    return new BlockWorkerInfo(address, capacity, 0);
+    return new BlockWorkerInfo(address, capacity, 0, 0);
   }
 }

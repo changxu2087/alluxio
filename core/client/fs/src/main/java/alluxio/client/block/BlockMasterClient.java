@@ -90,4 +90,14 @@ public interface BlockMasterClient extends Client {
    * @param hosts The list of the delete worker host
    */
   void deleteWorker(final List<String> hosts) throws IOException;
+
+  /**
+   * Validate whether the worker of this address can be used as block store, and if it could,
+   * reserve block size space on the worker. If not, return the latest information of all workers
+   * 
+   * @param address the address that need to be validated
+   * @param preReserveBytes the size that need to be pre reserved
+   * @return null if the address is available; all workers info otherwise
+   */
+  List<WorkerInfo> validateAndReserve(final WorkerNetAddress address, final long preReserveBytes) throws IOException;
 }

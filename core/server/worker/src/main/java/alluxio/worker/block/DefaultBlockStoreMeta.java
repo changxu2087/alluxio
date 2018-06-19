@@ -51,6 +51,8 @@ public final class DefaultBlockStoreMeta implements BlockStoreMeta {
   /** Mapping from storage dir tier and path to used bytes. */
   private final Map<Pair<String, String>, Long> mUsedBytesOnDirs = new HashMap<>();
 
+  private long mUnavailableBytes;
+
   @Override
   public Map<String, List<Long>> getBlockList() {
     Preconditions.checkNotNull(mBlockIdsOnTiers, "mBlockIdsOnTiers");
@@ -120,7 +122,12 @@ public final class DefaultBlockStoreMeta implements BlockStoreMeta {
     return mUsedBytesOnDirs;
   }
 
-  /**
+  @Override
+  public long getUnavailableBytes() {
+    return mUnavailableBytes;
+  }
+
+    /**
    * Creates a new instance of {@link DefaultBlockStoreMeta}.
    *
    * @param manager a block metadata manager handle
@@ -142,6 +149,8 @@ public final class DefaultBlockStoreMeta implements BlockStoreMeta {
         mUsedBytesOnDirs.put(dirKey, dir.getCapacityBytes() - dir.getAvailableBytes());
       }
     }
+
+    mUnavailableBytes = manager.getUnavailableBytes();
 
     if (shouldIncludeBlockIds) {
       mBlockIdsOnTiers = new HashMap<>();

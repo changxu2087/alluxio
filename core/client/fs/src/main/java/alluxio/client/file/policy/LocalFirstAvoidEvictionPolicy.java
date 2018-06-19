@@ -63,7 +63,14 @@ public final class LocalFirstAvoidEvictionPolicy
     if (workers.isEmpty()) {
       workers = allWorkers;
     }
-    return mPolicy.getWorkerForNextBlock(workers, blockSizeBytes);
+    // Select the actually available workers with enough real availability.
+    List<BlockWorkerInfo> realWorkers = workers.stream()
+        .filter(worker -> getRealAvailableBytes(worker) >= blockSizeBytes)
+        .collect(Collectors.toList());
+    if (realWorkers.isEmpty()){
+        return null;
+    }
+    return mPolicy.getWorkerForNextBlock(realWorkers, blockSizeBytes);
   }
 
   @Override
@@ -86,6 +93,22 @@ public final class LocalFirstAvoidEvictionPolicy
     long mCapacityBytes = workerInfo.getCapacityBytes();
     long mUsedBytes = workerInfo.getUsedBytes();
     return mCapacityBytes - mUsedBytes - mUserFileWriteCapacityReserved;
+  }
+
+  /**
+   * The information of BlockWorkerInfo is update after a file complete write. To avoid evict,
+   * user should configure "alluxio.user.file.write.avoid.eviction.policy.reserved.size.bytes"
+   * to reserve some space to store the block.
+   *
+   * @param workerInfo BlockWorkerInfo of the worker
+   * @return the real available bytes of the worker
+   */
+  private long getRealAvailableBytes(BlockWorkerInfo workerInfo) {
+      long mUserFileWriteCapacityReserved = Configuration
+              .getBytes(PropertyKey.USER_FILE_WRITE_AVOID_EVICTION_POLICY_RESERVED_BYTES);
+      long mCapacityBytes = workerInfo.getCapacityBytes();
+      long mUnavailableBytes = workerInfo.getUnavailableBytes();
+      return mCapacityBytes - mUnavailableBytes - mUserFileWriteCapacityReserved;
   }
 
   @Override

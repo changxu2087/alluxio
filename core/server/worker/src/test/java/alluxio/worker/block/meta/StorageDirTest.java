@@ -83,7 +83,7 @@ public final class StorageDirTest {
     mDir = StorageDir.newStorageDir(mTier, TEST_DIR_INDEX, TEST_DIR_CAPACITY, mTestDirPath);
     mBlockMeta = new BlockMeta(TEST_BLOCK_ID, TEST_BLOCK_SIZE, mDir);
     mTempBlockMeta =
-        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, TEST_TEMP_BLOCK_SIZE, mDir);
+        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, TEST_TEMP_BLOCK_SIZE, false, 0, mDir);
   }
 
   /**
@@ -364,7 +364,7 @@ public final class StorageDirTest {
   public void addTempBlockMetaTooBig() throws Exception {
     final long bigBlockSize = TEST_DIR_CAPACITY + 1;
     TempBlockMeta bigTempBlockMeta =
-        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, bigBlockSize, mDir);
+        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, bigBlockSize, false, 0, mDir);
     String alias = bigTempBlockMeta.getBlockLocation().tierAlias();
     mThrown.expect(WorkerOutOfSpaceException.class);
     mThrown.expectMessage(ExceptionMessage.NO_SPACE_FOR_BLOCK_META.getMessage(TEST_TEMP_BLOCK_ID,
@@ -383,7 +383,7 @@ public final class StorageDirTest {
         .expectMessage(ExceptionMessage.ADD_EXISTING_BLOCK.getMessage(TEST_TEMP_BLOCK_ID, "MEM"));
     mDir.addTempBlockMeta(mTempBlockMeta);
     TempBlockMeta dupTempBlockMeta =
-        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, TEST_TEMP_BLOCK_SIZE, mDir);
+        new TempBlockMeta(TEST_SESSION_ID, TEST_TEMP_BLOCK_ID, TEST_TEMP_BLOCK_SIZE, false, 0, mDir);
     mDir.addTempBlockMeta(dupTempBlockMeta);
   }
 
@@ -411,7 +411,7 @@ public final class StorageDirTest {
         .getMessage(TEST_TEMP_BLOCK_ID, alias, wrongSessionId));
     mDir.addTempBlockMeta(mTempBlockMeta);
     TempBlockMeta wrongTempBlockMeta =
-        new TempBlockMeta(wrongSessionId, TEST_TEMP_BLOCK_ID, TEST_TEMP_BLOCK_SIZE, mDir);
+        new TempBlockMeta(wrongSessionId, TEST_TEMP_BLOCK_ID, TEST_TEMP_BLOCK_SIZE,false, 0, mDir);
     mDir.removeTempBlockMeta(wrongTempBlockMeta);
   }
 
@@ -527,11 +527,11 @@ public final class StorageDirTest {
     long otherSessionId = TEST_SESSION_ID + 1;
 
     TempBlockMeta tempBlockMeta1 =
-        new TempBlockMeta(TEST_SESSION_ID, tempBlockId1, TEST_TEMP_BLOCK_SIZE, mDir);
+        new TempBlockMeta(TEST_SESSION_ID, tempBlockId1, TEST_TEMP_BLOCK_SIZE, false, 0, mDir);
     TempBlockMeta tempBlockMeta2 =
-        new TempBlockMeta(TEST_SESSION_ID, tempBlockId2, TEST_TEMP_BLOCK_SIZE, mDir);
+        new TempBlockMeta(TEST_SESSION_ID, tempBlockId2, TEST_TEMP_BLOCK_SIZE, false, 0, mDir);
     TempBlockMeta tempBlockMeta3 =
-        new TempBlockMeta(otherSessionId, tempBlockId3, TEST_TEMP_BLOCK_SIZE, mDir);
+        new TempBlockMeta(otherSessionId, tempBlockId3, TEST_TEMP_BLOCK_SIZE, false, 0, mDir);
     mDir.addTempBlockMeta(tempBlockMeta1);
     mDir.addTempBlockMeta(tempBlockMeta2);
     mDir.addTempBlockMeta(tempBlockMeta3);

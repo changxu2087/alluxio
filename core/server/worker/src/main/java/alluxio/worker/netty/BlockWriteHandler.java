@@ -99,7 +99,8 @@ public final class BlockWriteHandler extends AbstractWriteHandler<BlockWriteRequ
   protected void initRequestContext(BlockWriteRequestContext context) throws Exception {
     BlockWriteRequest request = context.getRequest();
     mWorker.createBlockRemote(request.getSessionId(), request.getId(),
-        mStorageTierAssoc.getAlias(request.getTier()), FILE_BUFFER_SIZE);
+        mStorageTierAssoc.getAlias(request.getTier()), FILE_BUFFER_SIZE, request.getMustReserver(),
+        request.getPreReserveBytes());
   }
 
   /**

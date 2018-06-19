@@ -143,10 +143,13 @@ public final class StorageDirView {
    * @param sessionId of the owning session
    * @param blockId of the new block
    * @param initialBlockSize of the new block
+   * @param isMustReserve whether or not the block must be reserve
+   * @param preReserveBytes if isMustReserve is true, the size of pre reserved block in byte
    * @return a new {@link TempBlockMeta} under the underlying directory
    */
-  public TempBlockMeta createTempBlockMeta(long sessionId, long blockId, long initialBlockSize) {
-    return new TempBlockMeta(sessionId, blockId, initialBlockSize, mDir);
+  public TempBlockMeta createTempBlockMeta(long sessionId, long blockId, long initialBlockSize,
+      boolean isMustReserve, long preReserveBytes) {
+    return new TempBlockMeta(sessionId, blockId, initialBlockSize, isMustReserve, preReserveBytes, mDir);
   }
 
   /**

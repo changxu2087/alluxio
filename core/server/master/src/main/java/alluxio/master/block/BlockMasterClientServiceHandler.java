@@ -17,6 +17,7 @@ import alluxio.RpcUtils.RpcCallable;
 import alluxio.RpcUtils.RpcCallableThrowsIOException;
 import alluxio.exception.AlluxioException;
 import alluxio.exception.status.AlluxioStatusException;
+import alluxio.exception.status.UnavailableException;
 import alluxio.master.block.options.RemoveWorkerOptions;
 import alluxio.thrift.AlluxioTException;
 import alluxio.thrift.BlockMasterClientService;
@@ -34,6 +35,8 @@ import alluxio.thrift.GetWorkerInfoListTOptions;
 import alluxio.thrift.GetWorkerInfoListTResponse;
 import alluxio.thrift.RemoveWorkerTOptions;
 import alluxio.thrift.RemoveWorkerTResponse;
+import alluxio.thrift.ValidateAndReserveTOptions;
+import alluxio.thrift.ValidateAndReserveTResponse;
 import alluxio.thrift.WorkerInfo;
 import alluxio.thrift.WorkerNetAddress;
 import alluxio.wire.ThriftUtils;
@@ -102,6 +105,11 @@ public final class BlockMasterClientServiceHandler implements BlockMasterClientS
         mBlockMaster.removeWorker(ThriftUtils.fromThrift(address), new RemoveWorkerOptions(options));
         return new RemoveWorkerTResponse();
       }
+
+      @Override
+      public String toString() {
+        return String.format("removeWorker: address=%s, options=%s", address, options);
+      }
     });
   }
 
@@ -109,11 +117,37 @@ public final class BlockMasterClientServiceHandler implements BlockMasterClientS
   public DeleteWorkerTResponse deleteWorker(final List<String> hosts, DeleteWorkerTOptions options) throws AlluxioTException {
     LOG.debug("server delete worker");
     System.out.println("server delete worker");
-    return RpcUtils.call(LOG, new RpcUtils.RpcCallableThrowsIOException<DeleteWorkerTResponse>() {
+    return RpcUtils.call(LOG, new RpcCallableThrowsIOException<DeleteWorkerTResponse>() {
       @Override
       public DeleteWorkerTResponse call() throws AlluxioException, IOException {
         mBlockMaster.deleteWorker(hosts);
         return new DeleteWorkerTResponse();
+      }
+
+      @Override
+      public String toString() {
+        return String.format("deleteWorker: hosts=%s, options=%s", hosts, options);
+      }
+    });
+  }
+
+  @Override
+  public ValidateAndReserveTResponse validateAndReserve(WorkerNetAddress address, long preReserveBytes,
+      ValidateAndReserveTOptions options) throws AlluxioTException {
+    return RpcUtils.call(LOG, new RpcCallable<ValidateAndReserveTResponse>() {
+      @Override
+      public ValidateAndReserveTResponse call() throws AlluxioException, UnavailableException {
+        List<WorkerInfo> workerInfos = new ArrayList<>();
+        for (alluxio.wire.WorkerInfo workerInfo : mBlockMaster
+            .validateAndReserve(ThriftUtils.fromThrift(address), preReserveBytes)) {
+          workerInfos.add(ThriftUtils.toThrift(workerInfo));
+        }
+        return new ValidateAndReserveTResponse(workerInfos);
+      }
+
+      public String toString() {
+        return String.format("validateAndReserve: address=%s, preReserveBytes=%s, options=%s", address,
+                preReserveBytes, options);
       }
     });
   }

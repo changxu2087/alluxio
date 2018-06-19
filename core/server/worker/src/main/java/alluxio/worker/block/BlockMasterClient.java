@@ -79,14 +79,17 @@ public final class BlockMasterClient extends AbstractMasterClient {
    * @param tierAlias the alias of the tier the block is being committed to
    * @param blockId the block id being committed
    * @param length the length of the block being committed
+   * @param isMustReserve whether or not the block must be reversed
+   * @param preReserveBytes the size of pre reserved block in byte
    */
   public synchronized void commitBlock(final long workerId, final long usedBytesOnTier,
-      final String tierAlias, final long blockId, final long length) throws IOException {
+      final String tierAlias, final long blockId, final long length, final boolean isMustReserve,
+      final long preReserveBytes) throws IOException {
     retryRPC(new RpcCallable<Void>() {
       @Override
       public Void call() throws TException {
-        mClient.commitBlock(workerId, usedBytesOnTier, tierAlias, blockId, length,
-            new CommitBlockTOptions());
+        mClient.commitBlock(workerId, usedBytesOnTier, tierAlias, blockId, length, isMustReserve,
+            preReserveBytes, new CommitBlockTOptions());
         return null;
       }
     });
@@ -137,16 +140,17 @@ public final class BlockMasterClient extends AbstractMasterClient {
    * @param totalBytesOnTiers mapping from storage tier alias to total bytes
    * @param usedBytesOnTiers mapping from storage tier alias to used bytes
    * @param currentBlocksOnTiers mapping from storage tier alias to the list of list of blocks
+   * @param unavailableBytes the unavailableBytes space of the worker
    */
   // TODO(yupeng): rename to workerBlockReport or workerInitialize?
   public synchronized void register(final long workerId, final List<String> storageTierAliases,
       final Map<String, Long> totalBytesOnTiers, final Map<String, Long> usedBytesOnTiers,
-      final Map<String, List<Long>> currentBlocksOnTiers) throws IOException {
+      final Map<String, List<Long>> currentBlocksOnTiers, long unavailableBytes) throws IOException {
     retryRPC(new RpcCallable<Void>() {
       @Override
       public Void call() throws TException {
         mClient.registerWorker(workerId, storageTierAliases, totalBytesOnTiers, usedBytesOnTiers,
-            currentBlocksOnTiers, new RegisterWorkerTOptions());
+            currentBlocksOnTiers, unavailableBytes, new RegisterWorkerTOptions());
         return null;
       }
     });

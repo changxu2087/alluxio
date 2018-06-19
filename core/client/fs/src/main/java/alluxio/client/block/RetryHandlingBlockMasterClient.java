@@ -22,6 +22,7 @@ import alluxio.thrift.GetBlockInfoTOptions;
 import alluxio.thrift.GetCapacityBytesTOptions;
 import alluxio.thrift.GetUsedBytesTOptions;
 import alluxio.thrift.GetWorkerInfoListTOptions;
+import alluxio.thrift.ValidateAndReserveTOptions;
 import alluxio.wire.BlockInfo;
 import alluxio.wire.ThriftUtils;
 import alluxio.wire.WorkerInfo;
@@ -160,12 +161,29 @@ public final class RetryHandlingBlockMasterClient extends AbstractMasterClient
    * @param hosts The list of the delete worker host
    */
   public void deleteWorker(final List<String> hosts) throws IOException {
-    System.out.println("client delete worker");
     retryRPC(new RpcCallable<Void>() {
       @Override
       public Void call() throws TException {
         mClient.deleteWorker(hosts, new DeleteWorkerTOptions());
         return null;
+      }
+    });
+  }
+
+  @Override
+  public List<WorkerInfo> validateAndReserve(final WorkerNetAddress address, final long preReserveBytes)
+      throws IOException {
+    return retryRPC(new RpcCallable<List<WorkerInfo>>() {
+      @Override
+      public List<WorkerInfo> call() throws TException {
+        List<WorkerInfo> result = new ArrayList<>();
+        for (alluxio.thrift.WorkerInfo workerInfo : mClient
+            .validateAndReserve(ThriftUtils.toThrift(address), preReserveBytes,
+                new ValidateAndReserveTOptions())
+            .getWorkerInfoList()) {
+          result.add(ThriftUtils.fromThrift(workerInfo));
+        }
+        return result;
       }
     });
   }

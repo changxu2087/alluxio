@@ -272,6 +272,13 @@ public final class OutStreamOptions {
     return this;
   }
 
+  /**
+   * @return whether or not the file or block must be reserved
+   */
+  public boolean isMustReserve() {
+      return mWriteType.isMustReserve();
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {

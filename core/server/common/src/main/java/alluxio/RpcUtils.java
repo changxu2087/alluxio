@@ -14,6 +14,7 @@ package alluxio;
 import alluxio.exception.AlluxioException;
 import alluxio.exception.status.AlluxioStatusException;
 import alluxio.exception.status.InternalException;
+import alluxio.exception.status.UnavailableException;
 import alluxio.thrift.AlluxioTException;
 
 import org.slf4j.Logger;
@@ -64,6 +65,9 @@ public final class RpcUtils {
       }
       throw AlluxioStatusException.fromAlluxioException(e).toThrift();
     } catch (RuntimeException e) {
+      logger.error("Exit (Error): {}", callable, e);
+      throw new InternalException(e).toThrift();
+    } catch (UnavailableException e) {
       logger.error("Exit (Error): {}", callable, e);
       throw new InternalException(e).toThrift();
     }
@@ -130,7 +134,7 @@ public final class RpcUtils {
      *
      * @return the return value from the RPC
      */
-    T call() throws AlluxioException;
+    T call() throws AlluxioException, UnavailableException;
   }
 
   /**

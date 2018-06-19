@@ -20,6 +20,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 public final class TempBlockMeta extends AbstractBlockMeta {
   private final long mSessionId;
   private long mTempBlockSize;
+  private final boolean mMustReserve;
+  private final long mPreReserveBytes;
 
   /**
    * Creates a new instance of {@link TempBlockMeta}.
@@ -27,12 +29,17 @@ public final class TempBlockMeta extends AbstractBlockMeta {
    * @param sessionId the session id
    * @param blockId the block id
    * @param initialBlockSize initial size of this block in bytes
+   * @param isMustReserve whether or not the block must be reserved
+   * @param preReserveBytes if isMustReserve is true, the size of pre reserved block in byte
    * @param dir {@link StorageDir} of this temp block belonging to
    */
-  public TempBlockMeta(long sessionId, long blockId, long initialBlockSize, StorageDir dir) {
+  public TempBlockMeta(long sessionId, long blockId, long initialBlockSize, boolean isMustReserve,
+      long preReserveBytes, StorageDir dir) {
     super(blockId, dir);
     mSessionId = sessionId;
     mTempBlockSize = initialBlockSize;
+    mMustReserve = isMustReserve;
+    mPreReserveBytes = preReserveBytes;
   }
 
   @Override
@@ -60,9 +67,23 @@ public final class TempBlockMeta extends AbstractBlockMeta {
   }
 
   /**
+   * @return true is must reserve, false otherwise
+   */
+  public boolean isMustReserve() {
+    return mMustReserve;
+  }
+
+  /**
    * @param newSize block size to use
    */
   public void setBlockSize(long newSize) {
     mTempBlockSize = newSize;
+  }
+
+  /**
+   * @return the size of reserved block in byte
+   */
+  public long getPreReserveBytes () {
+    return mPreReserveBytes;
   }
 }

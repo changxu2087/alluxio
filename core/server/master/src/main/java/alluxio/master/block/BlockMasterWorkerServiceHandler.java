@@ -87,21 +87,22 @@ public final class BlockMasterWorkerServiceHandler implements BlockMasterWorkerS
 
   @Override
   public CommitBlockTResponse commitBlock(final long workerId, final long usedBytesOnTier,
-      final String tierAlias, final long blockId, final long length, CommitBlockTOptions options)
-      throws AlluxioTException {
+      final String tierAlias, final long blockId, final long length, final boolean isMustReserve,
+      final long preReserveBytes, CommitBlockTOptions options) throws AlluxioTException {
     return RpcUtils.call(LOG, new RpcUtils.RpcCallableThrowsIOException<CommitBlockTResponse>() {
       @Override
       public CommitBlockTResponse call() throws AlluxioException, IOException {
-        mBlockMaster.commitBlock(workerId, usedBytesOnTier, tierAlias, blockId, length);
+        mBlockMaster.commitBlock(workerId, usedBytesOnTier, tierAlias, blockId, length,
+            isMustReserve, preReserveBytes);
         return new CommitBlockTResponse();
       }
 
       @Override
       public String toString() {
-        return String.format("commitBlock: workerId=%s, usedBytesOnTiers=%s, tierAlias=%s, "
-                + "blockId=%s, length=%s, options=%s", workerId, usedBytesOnTier, tierAlias,
-            blockId,
-            length, options);
+        return String.format(
+            "commitBlock: workerId=%s, usedBytesOnTiers=%s, tierAlias=%s, "
+                + "blockId=%s, length=%s, options=%s",
+            workerId, usedBytesOnTier, tierAlias, blockId, length, options);
       }
     });
   }
@@ -128,12 +129,12 @@ public final class BlockMasterWorkerServiceHandler implements BlockMasterWorkerS
   public RegisterWorkerTResponse registerWorker(final long workerId,
       final List<String> storageTiers, final Map<String, Long> totalBytesOnTiers,
       final Map<String, Long> usedBytesOnTiers, final Map<String, List<Long>> currentBlocksOnTiers,
-      RegisterWorkerTOptions options) throws AlluxioTException {
+      final long unavailableBytes, RegisterWorkerTOptions options) throws AlluxioTException {
     return RpcUtils.call(LOG, new RpcUtils.RpcCallable<RegisterWorkerTResponse>() {
       @Override
       public RegisterWorkerTResponse call() throws AlluxioException {
         mBlockMaster.workerRegister(workerId, storageTiers, totalBytesOnTiers, usedBytesOnTiers,
-            currentBlocksOnTiers);
+            currentBlocksOnTiers, unavailableBytes);
         return new RegisterWorkerTResponse();
       }
 
@@ -141,8 +142,8 @@ public final class BlockMasterWorkerServiceHandler implements BlockMasterWorkerS
       public String toString() {
         return String
             .format("registerWorker: workerId=%s, storageTiers=%s, totalBytesOnTiers=%s,"
-                + "usedBytesOnTiers=%s, currentBlocksOnTiers=%s, options=%s", workerId,
-            storageTiers, totalBytesOnTiers, usedBytesOnTiers, currentBlocksOnTiers, options);
+                + "usedBytesOnTiers=%s, currentBlocksOnTiers=%s, unavailableBytes=%s, options=%s", workerId,
+            storageTiers, totalBytesOnTiers, usedBytesOnTiers, currentBlocksOnTiers, unavailableBytes, options);
       }
     });
   }

@@ -11,6 +11,7 @@ struct WorkerInfo {
   5: i64 capacityBytes
   6: i64 usedBytes
   7: i64 startTimeMs
+  8: i64 unavailableBytes
 }
 
 struct GetBlockInfoTOptions {}
@@ -41,6 +42,11 @@ struct RemoveWorkerTResponse {}
 
 struct DeleteWorkerTOptions {}
 struct DeleteWorkerTResponse {}
+
+struct ValidateAndReserveTOptions {}
+struct ValidateAndReserveTResponse {
+  1: list<WorkerInfo> workerInfoList
+}
 
 /**
  * This interface contains block master service endpoints for Alluxio clients.
@@ -77,14 +83,33 @@ service BlockMasterClientService extends common.AlluxioService {
     /** the method options */ 1: GetWorkerInfoListTOptions options,
   ) throws (1: exception.AlluxioTException e)
 
+  /**
+   * Remove Worker from the cluster.
+   *
+   * @param address The address of the worker to remove
+   * @param options The remove worker options
+   */
   RemoveWorkerTResponse removeWorker(
     /** the address of the removed worker */  1: common.WorkerNetAddress address,
     /** the method options */ 2: RemoveWorkerTOptions options,
   ) throws (1: exception.AlluxioTException e)
 
+  /**
+   * Delete Workers from the cluster.
+   */
   DeleteWorkerTResponse deleteWorker(
     /** the address of the delete worker */ 1: list<string> hosts,
     /** the method options */ 2: DeleteWorkerTOptions options,
+  ) throws (1: exception.AlluxioTException e)
+
+  /**
+   * Validate whether the worker of this address can be used as block store, and if it could,
+   * reserve block size space on the worker. If not, return the latest information of all workers
+   */
+  ValidateAndReserveTResponse validateAndReserve(
+    /** the address of the validated worker */ 1: common.WorkerNetAddress address,
+    /** the size that need to be pre reserved */ 2: i64 preReserveBytes,
+    /** the method options */ 3: ValidateAndReserveTOptions options,
   ) throws (1: exception.AlluxioTException e)
 }
 
@@ -130,7 +155,9 @@ service BlockMasterWorkerService extends common.AlluxioService {
     /** the alias of the target tier */ 3: string tierAlias,
     /** the id of the block being committed */ 4: i64 blockId,
     /** the length of the block being committed */ 5: i64 length,
-    /** the method options */ 6: CommitBlockTOptions options,
+    /** whether or not the block must be reserved */ 6: bool isMustReserve
+    /** the size of pre reserved block in byte */ 7:  i64 preReserveBytes
+    /** the method options */ 8: CommitBlockTOptions options,
     )
     throws (1: exception.AlluxioTException e)
 
@@ -152,7 +179,8 @@ service BlockMasterWorkerService extends common.AlluxioService {
     /** the map of total bytes on each tier */  3: map<string, i64> totalBytesOnTiers,
     /** the map of used bytes on each tier */  4: map<string, i64> usedBytesOnTiers,
     /** the map of list of blocks on each tier */  5: map<string, list<i64>> currentBlocksOnTiers,
-    /** the method options */ 6: RegisterWorkerTOptions options,
+    /** the unavailable space of the worker in byte */  6: i64 unavailableBytes,
+    /** the method options */ 7: RegisterWorkerTOptions options,
     )
     throws (1: exception.AlluxioTException e)
 }

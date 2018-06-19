@@ -35,11 +35,11 @@ public final class MostAvailableFirstPolicyTest {
   public void getMostAvailableWorker() {
     List<BlockWorkerInfo> workerInfoList = new ArrayList<>();
     workerInfoList.add(new BlockWorkerInfo(new WorkerNetAddress().setHost("worker1")
-        .setRpcPort(PORT).setDataPort(PORT).setWebPort(PORT), Constants.GB, 0));
+        .setRpcPort(PORT).setDataPort(PORT).setWebPort(PORT), Constants.GB, 0, 0));
     workerInfoList.add(new BlockWorkerInfo(new WorkerNetAddress().setHost("worker2")
-        .setRpcPort(PORT).setDataPort(PORT).setWebPort(PORT), 2 * (long) Constants.GB, 0));
+        .setRpcPort(PORT).setDataPort(PORT).setWebPort(PORT), 2 * (long) Constants.GB, 0, 0));
     workerInfoList.add(new BlockWorkerInfo(new WorkerNetAddress().setHost("worker3")
-        .setRpcPort(PORT).setDataPort(PORT).setWebPort(PORT), 3 * (long) Constants.GB, 0));
+        .setRpcPort(PORT).setDataPort(PORT).setWebPort(PORT), 3 * (long) Constants.GB, 0, 0));
     MostAvailableFirstPolicy policy = new MostAvailableFirstPolicy();
     Assert.assertEquals("worker3",
         policy.getWorkerForNextBlock(workerInfoList, Constants.MB).getHost());

@@ -259,7 +259,7 @@ public final class TieredBlockStoreTestUtils {
    */
   public static void cache(long sessionId, long blockId, long bytes, BlockStore blockStore,
       BlockStoreLocation location) throws Exception {
-    TempBlockMeta tempBlockMeta = blockStore.createBlock(sessionId, blockId, location, bytes);
+    TempBlockMeta tempBlockMeta = blockStore.createBlock(sessionId, blockId, location, bytes, false, 0);
     // write data
     FileUtils.createFile(tempBlockMeta.getPath());
     BlockWriter writer = new LocalFileBlockWriter(tempBlockMeta.getPath());
@@ -299,7 +299,7 @@ public final class TieredBlockStoreTestUtils {
   public static TempBlockMeta createTempBlock(long sessionId, long blockId, long bytes,
       StorageDir dir) throws Exception {
     // prepare temp block
-    TempBlockMeta tempBlockMeta = new TempBlockMeta(sessionId, blockId, bytes, dir);
+    TempBlockMeta tempBlockMeta = new TempBlockMeta(sessionId, blockId, bytes, false, 0, dir);
     dir.addTempBlockMeta(tempBlockMeta);
 
     // write data

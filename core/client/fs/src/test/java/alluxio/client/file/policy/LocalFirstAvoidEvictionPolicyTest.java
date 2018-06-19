@@ -91,6 +91,6 @@ public class LocalFirstAvoidEvictionPolicyTest {
       tiers.add(new LocalityTier(Constants.LOCALITY_RACK, rack));
     }
     address.setTieredIdentity(new TieredIdentity(tiers));
-    return new BlockWorkerInfo(address, capacity, used);
+    return new BlockWorkerInfo(address, capacity, used, 0);
   }
 }

@@ -28,6 +28,21 @@ public final class BlockWorkerInfo {
   private final WorkerNetAddress mNetAddress;
   private final long mCapacityBytes;
   private final long mUsedBytes;
+  private final long mUnavailableBytes;
+
+//  /**
+//   * Constructs the block worker information.
+//   *
+//   * @param netAddress the address of the worker
+//   * @param capacityBytes the capacity of the worker in bytes
+//   * @param usedBytes the used bytes of the worker
+//   */
+//  public BlockWorkerInfo(WorkerNetAddress netAddress, long capacityBytes, long usedBytes) {
+//    mNetAddress = Preconditions.checkNotNull(netAddress, "netAddress");
+//    mCapacityBytes = capacityBytes;
+//    mUsedBytes = usedBytes;
+//    mUnavailableBytes = 0L;
+//  }
 
   /**
    * Constructs the block worker information.
@@ -35,11 +50,13 @@ public final class BlockWorkerInfo {
    * @param netAddress the address of the worker
    * @param capacityBytes the capacity of the worker in bytes
    * @param usedBytes the used bytes of the worker
+   * @param unavailableBytes the unavailable bytes (including the pinned block and non-persisted block) of the worker
    */
-  public BlockWorkerInfo(WorkerNetAddress netAddress, long capacityBytes, long usedBytes) {
+  public BlockWorkerInfo(WorkerNetAddress netAddress, long capacityBytes, long usedBytes, long unavailableBytes) {
     mNetAddress = Preconditions.checkNotNull(netAddress, "netAddress");
     mCapacityBytes = capacityBytes;
     mUsedBytes = usedBytes;
+    mUnavailableBytes = unavailableBytes;
   }
 
   /**
@@ -63,12 +80,20 @@ public final class BlockWorkerInfo {
     return mUsedBytes;
   }
 
+  /**
+   * @return the unavailable bytes (including the pinned block and non-persisted block) of the worker
+   */
+  public long getUnavailableBytes() {
+      return mUnavailableBytes;
+  }
+
   @Override
   public String toString() {
     return Objects.toStringHelper(this)
         .add("netAddress", mNetAddress)
         .add("capacityBytes", mCapacityBytes)
         .add("usedBytes", mUsedBytes)
+        .add("unavailableBytes", mUnavailableBytes)
         .toString();
   }
 }

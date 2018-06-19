@@ -21,6 +21,8 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public final class BlockMeta extends AbstractBlockMeta {
   private final long mBlockSize;
+  private final boolean mMustReserve;
+  private final long mPreReserveBytes;
 
   /**
    * Creates a new instance of {@link BlockMeta}.
@@ -32,6 +34,24 @@ public final class BlockMeta extends AbstractBlockMeta {
   public BlockMeta(long blockId, long blockSize, StorageDir dir) {
     super(blockId, dir);
     mBlockSize = blockSize;
+    mMustReserve = false;
+    mPreReserveBytes = 0;
+  }
+
+  /**
+   * Creates a new instance of {@link BlockMeta}.
+   *
+   * @param blockId the block id
+   * @param blockSize the block size
+   * @param dir the parent directory
+   * @param isMustReserve whether must reserve
+   * @param preReserveBytes the size of pre reserved block in byte
+   */
+  public BlockMeta(long blockId, long blockSize, StorageDir dir, boolean isMustReserve, long preReserveBytes) {
+    super(blockId, dir);
+    mBlockSize = blockSize;
+    mMustReserve = isMustReserve;
+    mPreReserveBytes = preReserveBytes;
   }
 
   /**
@@ -43,6 +63,8 @@ public final class BlockMeta extends AbstractBlockMeta {
     super(tempBlock.getBlockId(), tempBlock.getParentDir());
     // NOTE: TempBlockMeta must be committed after the actual data block file is moved.
     mBlockSize = new File(tempBlock.getCommitPath()).length();
+    mMustReserve = tempBlock.isMustReserve();
+    mPreReserveBytes = tempBlock.getPreReserveBytes();
   }
 
   @Override
@@ -53,5 +75,19 @@ public final class BlockMeta extends AbstractBlockMeta {
   @Override
   public String getPath() {
     return commitPath(mDir, mBlockId);
+  }
+
+  /**
+   * @return true is must reserve, false otherwise
+   */
+  public boolean isMustReserve() {
+    return mMustReserve;
+  }
+
+  /**
+   * @return the size of pre Reserve Bytes
+   */
+  public long getPreReserveBytes() {
+    return mPreReserveBytes;
   }
 }

@@ -450,7 +450,7 @@ public final class DefaultBlockMaster extends AbstractMaster implements BlockMas
   // TODO(binfan): check the logic is correct or not when commitBlock is a retry
   @Override
   public void commitBlock(long workerId, long usedBytesOnTier, String tierAlias, long blockId,
-      long length) throws NoWorkerException, UnavailableException {
+      long length, boolean isMustReserve, long preReserveBytes) throws NoWorkerException, UnavailableException {
     LOG.debug("Commit block from workerId: {}, usedBytesOnTier: {}, blockId: {}, length: {}",
         workerId, usedBytesOnTier, blockId, length);
 
@@ -508,6 +508,10 @@ public final class DefaultBlockMaster extends AbstractMaster implements BlockMas
             worker.addBlock(blockId);
             worker.updateUsedBytes(tierAlias, usedBytesOnTier);
             worker.updateLastUpdatedTimeMs();
+            // update the unavailable capacity by size that pre reserved more than the actual utilized
+            if (isMustReserve) {
+              worker.updateUnavailableBytes(length - preReserveBytes);
+            }
           }
           break;
         }
@@ -563,99 +567,115 @@ public final class DefaultBlockMaster extends AbstractMaster implements BlockMas
     return ret;
   }
 
-    @Override
-    public void removeWorker(WorkerNetAddress address, RemoveWorkerOptions options) {
-        MasterWorkerInfo worker = mWorkers.getFirstByField(ADDRESS_INDEX, address);
-        synchronized (worker) {
-            mWorkers.remove(worker);
-            processWorkerRemovedBlocks(worker, worker.getBlocks());
-            LOG.info("The worker {} has been removed by user", worker);
-        }
-        System.out.println("RPC is call");
+  //TODO(xuchang): handle the concurrent
+  @Override
+  public void removeWorker(WorkerNetAddress address, RemoveWorkerOptions options) {
+    MasterWorkerInfo worker = mWorkers.getFirstByField(ADDRESS_INDEX, address);
+    synchronized (worker) {
+      mWorkers.remove(worker);
+      processWorkerRemovedBlocks(worker, worker.getBlocks());
+      LOG.info("The worker {} has been removed by user", worker);
     }
+    System.out.println("RPC is call");
+  }
 
-    @Override
-    public void deleteWorker(List<String> deleteHosts) throws IOException {
-        LOG.debug("go to send.");
-        System.out.println("go to send.");
-        FileSystemContext context = FileSystemContext.INSTANCE;
-        Channel channel;
-        ChannelFuture future;
-        long availableCapacity = 0;
-        long totalUsed = 0;
-        String tmpHost;
-        Map<String, Long> hostUsed = new HashMap<>();
-        Protocol.DeleteWorkerRequest.Builder builder =
-                Protocol.DeleteWorkerRequest.newBuilder();
-        List<WorkerNetAddress> deleteAddress = new ArrayList<>();
-        System.out.println("deleteHost " + deleteHosts);
-        for (MasterWorkerInfo workerInfo : mWorkers) {
-            tmpHost = workerInfo.getWorkerAddress().getHost();
-            System.out.println("tmpHost " + tmpHost);
-            if (deleteHosts.contains(tmpHost)) {
-                hostUsed.put(tmpHost, workerInfo.getUsedBytes());
-                deleteAddress.add(workerInfo.getWorkerAddress());
-            } else {
-                availableCapacity += workerInfo.getCapacityBytes();
-                builder.addAvailableWorkerAddress(tmpHost);
-            }
-            totalUsed += workerInfo.getUsedBytes();
-        }
-        System.out.println(deleteAddress);
-        final AtomicInteger completeNum = new AtomicInteger(0);
-        final Map<String, ChannelFuture> result = new TreeMap<>();
-        for (final WorkerNetAddress address : deleteAddress) {
-            channel = context.acquireNettyChannel(address);
-            long transferByte =
-                    (long) ((double) availableCapacity / totalUsed * hostUsed.get(address.getHost()));
-            final Protocol.DeleteWorkerRequest request = builder.setTranferByte(transferByte).build();
-            LOG.debug("go to send11.");
-            System.out.println("go to send11.");
-            try {
-//        NettyRPC.call(NettyRPCContext.defaults().setChannel(channel).setTimeout(3600000),
-//            new ProtoMessage(request));
-                future = channel.writeAndFlush(new RPCProtoMessage(new ProtoMessage(request)));
-//                .addListener(new ChannelFutureListener() {
-//          @Override
-//          public void operationComplete(ChannelFuture channelFuture) throws Exception {
-////            result.put(address.getHost(), channelFuture.isSuccess());
-//            completeNum.getAndIncrement();
-//          }
-//        });
-//        result.put(address.getHost(), future);
-            } finally {
-                context.releaseNettyChannel(address, channel);
-            }
-        }
-        while (true) {
-            boolean complete = true;
-            System.out.println(getWorkerCount());
-            for (WorkerNetAddress address : deleteAddress) {
-                complete = complete && !mWorkers.contains(ADDRESS_INDEX, address);
-            }
-            if (complete) {
-                break;
-            }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-//    while (completeNum.get() != deleteAddress.size()) {
-//      System.out.println(completeNum.get());
-//      System.out.println(deleteAddress.size());
-//      try {
-//        Thread.sleep(1000);
-//      } catch (InterruptedException e) {
-//        e.printStackTrace();
-//      }
-//    }
-//    System.out.println(result);
+  @Override
+  public void deleteWorker(List<String> deleteHosts) throws IOException {
+    LOG.debug("go to send.");
+    System.out.println("go to send.");
+    FileSystemContext context = FileSystemContext.INSTANCE;
+    Channel channel;
+    ChannelFuture future;
+    long availableCapacity = 0;
+    long totalUsed = 0;
+    String tmpHost;
+    Map<String, Long> hostUsed = new HashMap<>();
+    Protocol.DeleteWorkerRequest.Builder builder = Protocol.DeleteWorkerRequest.newBuilder();
+    List<WorkerNetAddress> deleteAddress = new ArrayList<>();
+    System.out.println("deleteHost " + deleteHosts);
+    for (MasterWorkerInfo workerInfo : mWorkers) {
+      tmpHost = workerInfo.getWorkerAddress().getHost();
+      System.out.println("tmpHost " + tmpHost);
+      if (deleteHosts.contains(tmpHost)) {
+        hostUsed.put(tmpHost, workerInfo.getUsedBytes());
+        deleteAddress.add(workerInfo.getWorkerAddress());
+      } else {
+        availableCapacity += workerInfo.getCapacityBytes();
+        builder.addAvailableWorkerAddress(tmpHost);
+      }
+      totalUsed += workerInfo.getUsedBytes();
     }
+    System.out.println(deleteAddress);
+    final AtomicInteger completeNum = new AtomicInteger(0);
+    final Map<String, ChannelFuture> result = new TreeMap<>();
+    for (final WorkerNetAddress address : deleteAddress) {
+      channel = context.acquireNettyChannel(address);
+      long transferByte =
+          (long) ((double) availableCapacity / totalUsed * hostUsed.get(address.getHost()));
+      final Protocol.DeleteWorkerRequest request = builder.setTranferByte(transferByte).build();
+      LOG.debug("go to send11.");
+      System.out.println("go to send11.");
+      try {
+        // NettyRPC.call(NettyRPCContext.defaults().setChannel(channel).setTimeout(3600000),
+        // new ProtoMessage(request));
+        future = channel.writeAndFlush(new RPCProtoMessage(new ProtoMessage(request)));
+        // .addListener(new ChannelFutureListener() {
+        // @Override
+        // public void operationComplete(ChannelFuture channelFuture) throws Exception {
+        //// result.put(address.getHost(), channelFuture.isSuccess());
+        // completeNum.getAndIncrement();
+        // }
+        // });
+        // result.put(address.getHost(), future);
+      } finally {
+        context.releaseNettyChannel(address, channel);
+      }
+    }
+    while (true) {
+      boolean complete = true;
+      System.out.println(getWorkerCount());
+      for (WorkerNetAddress address : deleteAddress) {
+        complete = complete && !mWorkers.contains(ADDRESS_INDEX, address);
+      }
+      if (complete) {
+        break;
+      }
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+    // while (completeNum.get() != deleteAddress.size()) {
+    // System.out.println(completeNum.get());
+    // System.out.println(deleteAddress.size());
+    // try {
+    // Thread.sleep(1000);
+    // } catch (InterruptedException e) {
+    // e.printStackTrace();
+    // }
+    // }
+    // System.out.println(result);
+  }
+
+  @Override
+  public List<WorkerInfo> validateAndReserve(WorkerNetAddress address, long preReserveBytes) throws UnavailableException {
+    MasterWorkerInfo worker = mWorkers.getFirstByField(ADDRESS_INDEX, address);
+    synchronized (worker) {
+      // if the block size is less than or equal to the actual available capacity, the size of the
+      // block will be reserved in the unavailable capacity of the worker metadata and return a empty List.
+      if (preReserveBytes <= worker.getCapacityBytes() - worker.getUnavailableBytes()) {
+        worker.updateUnavailableBytes(preReserveBytes);
+        return new ArrayList<>();
+      }
+    }
+    // if the block size is greater than the actual available capacity, all current worker
+    // information will be returned.
+    return getWorkerInfoList();
+  }
 
 
-    @Override
+  @Override
   public Map<String, Long> getTotalBytesOnTiers() {
     Map<String, Long> ret = new HashMap<>();
     for (MasterWorkerInfo worker : mWorkers) {
@@ -722,7 +742,7 @@ public final class DefaultBlockMaster extends AbstractMaster implements BlockMas
   @Override
   public void workerRegister(long workerId, List<String> storageTiers,
       Map<String, Long> totalBytesOnTiers, Map<String, Long> usedBytesOnTiers,
-      Map<String, List<Long>> currentBlocksOnTiers) throws NoWorkerException {
+      Map<String, List<Long>> currentBlocksOnTiers, long unavailableBytes) throws NoWorkerException {
     MasterWorkerInfo worker = mWorkers.getFirstByField(ID_INDEX, workerId);
     if (worker == null) {
       throw new NoWorkerException(ExceptionMessage.NO_WORKER_FOUND.getMessage(workerId));
@@ -738,7 +758,7 @@ public final class DefaultBlockMaster extends AbstractMaster implements BlockMas
       worker.updateLastUpdatedTimeMs();
       // Detect any lost blocks on this worker.
       Set<Long> removedBlocks = worker.register(mGlobalStorageTierAssoc, storageTiers,
-          totalBytesOnTiers, usedBytesOnTiers, blocks);
+          totalBytesOnTiers, usedBytesOnTiers, blocks, unavailableBytes);
       processWorkerRemovedBlocks(worker, removedBlocks);
       processWorkerAddedBlocks(worker, currentBlocksOnTiers);
       processWorkerOrphanedBlocks(worker);

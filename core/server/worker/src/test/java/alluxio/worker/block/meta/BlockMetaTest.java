@@ -53,7 +53,7 @@ public class BlockMetaTest {
 
     StorageTier tier = StorageTier.newStorageTier(TEST_TIER_ALIAS);
     StorageDir dir = tier.getDir(0);
-    mTempBlockMeta = new TempBlockMeta(TEST_SESSION_ID, TEST_BLOCK_ID, TEST_BLOCK_SIZE, dir);
+    mTempBlockMeta = new TempBlockMeta(TEST_SESSION_ID, TEST_BLOCK_ID, TEST_BLOCK_SIZE, false, 0, dir);
   }
 
   /**

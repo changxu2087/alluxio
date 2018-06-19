@@ -1,7 +1,7 @@
 /*
- * The Alluxio Open Foundation licenses this work under the Apache License, version 2.0
- * (the "License"). You may not use this work except in compliance with the License, which is
- * available at www.apache.org/licenses/LICENSE-2.0
+ * The Alluxio Open Foundation licenses this work under the Apache License, version 2.0 (the
+ * "License"). You may not use this work except in compliance with the License, which is available
+ * at www.apache.org/licenses/LICENSE-2.0
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied, as more fully set forth in the License.
@@ -23,8 +23,8 @@ import javax.annotation.concurrent.ThreadSafe;
 public enum WriteType {
   /**
    * Write the file, guaranteeing the data is written to Alluxio storage or failing the operation.
-   * The data will be written to the highest tier in a worker's storage. Data will not be
-   * persisted to the under storage.
+   * The data will be written to the highest tier in a worker's storage. Data will not be persisted
+   * to the under storage.
    */
   MUST_CACHE(1),
   /**
@@ -53,8 +53,7 @@ public enum WriteType {
    * Do not store the data in Alluxio or Under Storage. This write type should only be used for
    * testing.
    */
-  NONE(6),
-  ;
+  NONE(6),;
 
   private final int mValue;
 
@@ -115,5 +114,16 @@ public enum WriteType {
    */
   public boolean isThrough() {
     return (mValue == CACHE_THROUGH.mValue) || (mValue == THROUGH.mValue);
+  }
+
+  /**
+   * @return true if by this write type data will be only cached in Alluxio space (e.g.,
+   *         {@link #MUST_CACHE}, {@link #TRY_CACHE} or {@link #ASYNC_THROUGH}), and not be
+   *         persisted synchronously to under storage (e.g., {@link #CACHE_THROUGH} or
+   *         {@link #THROUGH}), false otherwise
+   */
+  public boolean isMustReserve() {
+    return (mValue == MUST_CACHE.mValue) || (mValue == TRY_CACHE.mValue)
+        || (mValue == ASYNC_THROUGH.mValue);
   }
 }

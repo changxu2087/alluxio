@@ -317,6 +317,7 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
     mBlockStore.accessBlock(sessionId, blockId);
   }
 
+  //TODO(xuchang): update the unavailable bytes
   @Override
   public void commitBlock(long sessionId, long blockId)
       throws BlockAlreadyExistsException, BlockDoesNotExistException, InvalidWorkerStateException,
@@ -338,10 +339,12 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
       BlockMeta meta = mBlockStore.getBlockMeta(sessionId, blockId, lockId);
       BlockStoreLocation loc = meta.getBlockLocation();
       Long length = meta.getBlockSize();
+      boolean isMustReserve = meta.isMustReserve();
+      long preReserveBytes = meta.getPreReserveBytes();
       BlockStoreMeta storeMeta = mBlockStore.getBlockStoreMeta();
       Long bytesUsedOnTier = storeMeta.getUsedBytesOnTiers().get(loc.tierAlias());
       blockMasterClient.commitBlock(mWorkerId.get(), bytesUsedOnTier, loc.tierAlias(), blockId,
-          length);
+          length, isMustReserve, preReserveBytes);
     } catch (Exception e) {
       throw new IOException(ExceptionMessage.FAILED_COMMIT_BLOCK_TO_MASTER.getMessage(blockId), e);
     } finally {
@@ -351,12 +354,14 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
   }
 
   @Override
-  public String createBlock(long sessionId, long blockId, String tierAlias, long initialBytes)
+  public String createBlock(long sessionId, long blockId, String tierAlias, long initialBytes,
+      boolean isMustReserve, long preReserveBytes)
       throws BlockAlreadyExistsException, WorkerOutOfSpaceException, IOException {
     BlockStoreLocation loc = BlockStoreLocation.anyDirInTier(tierAlias);
     TempBlockMeta createdBlock;
     try {
-      createdBlock = mBlockStore.createBlock(sessionId, blockId, loc, initialBytes);
+      createdBlock = mBlockStore.createBlock(sessionId, blockId, loc, initialBytes, isMustReserve,
+          preReserveBytes);
     } catch (WorkerOutOfSpaceException e) {
       InetSocketAddress address =
           InetSocketAddress.createUnresolved(mAddress.getHost(), mAddress.getRpcPort());
@@ -367,10 +372,11 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
   }
 
   @Override
-  public void createBlockRemote(long sessionId, long blockId, String tierAlias, long initialBytes)
+  public void createBlockRemote(long sessionId, long blockId, String tierAlias, long initialBytes,
+      boolean isMustReserve, long preReserveBytes)
       throws BlockAlreadyExistsException, WorkerOutOfSpaceException, IOException {
     BlockStoreLocation loc = BlockStoreLocation.anyDirInTier(tierAlias);
-    mBlockStore.createBlock(sessionId, blockId, loc, initialBytes);
+    mBlockStore.createBlock(sessionId, blockId, loc, initialBytes, isMustReserve, preReserveBytes);
   }
 
   @Override

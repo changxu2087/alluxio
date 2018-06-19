@@ -387,7 +387,7 @@ public final class TieredBlockStoreTest {
   @Test
   public void createBlockMetaWithoutEviction() throws Exception {
     TempBlockMeta tempBlockMeta = mBlockStore.createBlock(SESSION_ID1, TEMP_BLOCK_ID,
-        mTestDir1.toBlockStoreLocation(), 1);
+        mTestDir1.toBlockStoreLocation(), 1, false, 0);
     assertEquals(1, tempBlockMeta.getBlockSize());
     assertEquals(mTestDir1, tempBlockMeta.getParentDir());
   }
@@ -401,7 +401,7 @@ public final class TieredBlockStoreTest {
     TieredBlockStoreTestUtils.cache(SESSION_ID1, BLOCK_ID1, BLOCK_SIZE, mTestDir1, mMetaManager,
         mEvictor);
     TempBlockMeta tempBlockMeta = mBlockStore.createBlock(SESSION_ID1, TEMP_BLOCK_ID,
-        mTestDir1.toBlockStoreLocation(), mTestDir1.getCapacityBytes());
+        mTestDir1.toBlockStoreLocation(), mTestDir1.getCapacityBytes(), false, 0);
     // Expect BLOCK_ID1 evicted from mTestDir1
     assertFalse(mTestDir1.hasBlockMeta(BLOCK_ID1));
     assertFalse(FileUtils.exists(BlockMeta.commitPath(mTestDir1, BLOCK_ID1)));
@@ -425,12 +425,12 @@ public final class TieredBlockStoreTest {
     mThrown.expect(WorkerOutOfSpaceException.class);
     mThrown.expectMessage(ExceptionMessage.NO_EVICTION_PLAN_TO_FREE_SPACE.getMessage());
     mBlockStore.createBlock(SESSION_ID1, TEMP_BLOCK_ID, mTestDir1.toBlockStoreLocation(),
-        mTestDir1.getCapacityBytes());
+        mTestDir1.getCapacityBytes(), false, 0);
 
     // Expect createBlockMeta to succeed after unlocking this block.
     mBlockStore.unlockBlock(lockId);
     mBlockStore.createBlock(SESSION_ID1, TEMP_BLOCK_ID, mTestDir1.toBlockStoreLocation(),
-        mTestDir1.getCapacityBytes());
+        mTestDir1.getCapacityBytes(), false, 0);
     assertEquals(0, mTestDir1.getAvailableBytes());
   }
 

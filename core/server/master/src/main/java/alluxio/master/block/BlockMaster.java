@@ -90,11 +90,13 @@ public interface BlockMaster extends Master, ContainerIdGenerable {
    * @param tierAlias the alias of the storage tier where the worker is committing the block to
    * @param blockId the committing block id
    * @param length the length of the block
+   * @param isMustReserve whether or not the block must be reserved
+   * @param preReserveBytes the size of pre reserved block in byte
    * @throws NoWorkerException if the workerId is not active
    */
   // TODO(binfan): check the logic is correct or not when commitBlock is a retry
   void commitBlock(long workerId, long usedBytesOnTier, String tierAlias, long blockId, long
-      length) throws NoWorkerException, UnavailableException;
+      length, boolean isMustReserve, long preReserveBytes) throws NoWorkerException, UnavailableException;
 
   /**
    * Marks a block as committed, but without a worker location. This means the block is only in ufs.
@@ -135,6 +137,15 @@ public interface BlockMaster extends Master, ContainerIdGenerable {
    */
   void deleteWorker(List<String> hosts) throws IOException;
 
+  /**
+   * Validate whether the worker of this address can be used as block store, and if it could,
+   * reserve block size space on the worker. If not, return the latest information of all workers
+   *
+   * @param address the address that need to be validated
+   * @param preReserveBytes the size that need to be pre reserved
+   * @return null if the address is available; all workers info otherwise
+   */
+  List<WorkerInfo> validateAndReserve(WorkerNetAddress address, long preReserveBytes) throws UnavailableException;
 
   /**
    * @return the total bytes on each storage tier
@@ -167,7 +178,7 @@ public interface BlockMaster extends Master, ContainerIdGenerable {
    */
   void workerRegister(long workerId, List<String> storageTiers,
       Map<String, Long> totalBytesOnTiers, Map<String, Long> usedBytesOnTiers,
-      Map<String, List<Long>> currentBlocksOnTiers) throws NoWorkerException;
+      Map<String, List<Long>> currentBlocksOnTiers, long unavailableBytes) throws NoWorkerException;
 
   /**
    * Updates metadata when a worker periodically heartbeats with the master.

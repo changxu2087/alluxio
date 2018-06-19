@@ -155,8 +155,8 @@ public class FileOutStream extends AbstractOutStream {
 
       // Complete the file if it's ready to be completed.
       if (!mCanceled && (mUnderStorageType.isSyncPersist() || mAlluxioStorageType.isStore())) {
-        try (CloseableResource<FileSystemMasterClient> masterClient =
-            mContext.acquireMasterClientResource()) {
+        try (CloseableResource<FileSystemMasterClient> masterClient = mContext
+            .acquireMasterClientResource()) {
           masterClient.get().completeFile(mUri, options);
         }
       }
@@ -201,8 +201,13 @@ public class FileOutStream extends AbstractOutStream {
       try {
         if (mCurrentBlockOutStream == null || mCurrentBlockOutStream.remaining() == 0) {
           getNextBlock();
+          if (mCurrentBlockOutStream == null) {
+            changeWriteType();
+          }
         }
-        mCurrentBlockOutStream.write(b);
+        if (mCurrentBlockOutStream != null) {
+          mCurrentBlockOutStream.write(b);
+        }
       } catch (IOException e) {
         handleCacheWriteException(e);
       }
@@ -227,6 +232,10 @@ public class FileOutStream extends AbstractOutStream {
         while (tLen > 0) {
           if (mCurrentBlockOutStream == null || mCurrentBlockOutStream.remaining() == 0) {
             getNextBlock();
+            if (mCurrentBlockOutStream == null) {
+              changeWriteType();
+              break;
+            }
           }
           long currentBlockLeftBytes = mCurrentBlockOutStream.remaining();
           if (currentBlockLeftBytes >= tLen) {
@@ -260,13 +269,13 @@ public class FileOutStream extends AbstractOutStream {
 
     if (mAlluxioStorageType.isStore()) {
       mCurrentBlockOutStream = mBlockStore.getOutStream(getNextBlockId(), mBlockSize, mOptions);
-      mShouldCacheCurrentBlock = true;
+      mShouldCacheCurrentBlock = mCurrentBlockOutStream != null;
     }
   }
 
   private long getNextBlockId() throws IOException {
-    try (CloseableResource<FileSystemMasterClient> masterClient =
-        mContext.acquireMasterClientResource()) {
+    try (CloseableResource<FileSystemMasterClient> masterClient = mContext
+        .acquireMasterClientResource()) {
       return masterClient.get().getNewBlockIdForFile(mUri);
     }
   }
@@ -278,30 +287,36 @@ public class FileOutStream extends AbstractOutStream {
     }
   }
 
-  private void handleCacheWriteException(Exception e) throws IOException {
-    LOG.warn("Failed to write into AlluxioStore, canceling write attempt.", e);
-    if (mCurrentBlockOutStream != null) {
-      mShouldCacheCurrentBlock = false;
-      mCurrentBlockOutStream.cancel();
-    }
+  private void changeWriteType() throws IOException {
     if (!mUnderStorageType.isSyncPersist()) {
-      // throw new IOException(ExceptionMessage.FAILED_CACHE.getMessage(e.getMessage()), e);
       mOptions.setWriteType(WriteType.THROUGH);
       mAlluxioStorageType = mOptions.getAlluxioStorageType();
       mUnderStorageType = mOptions.getUnderStorageType();
       setFilePersisted(mUri);
       WorkerNetAddress workerNetAddress = // not storing data to Alluxio, so block size is 0
-          mOptions.getLocationPolicy().getWorkerForNextBlock(mBlockStore.getEligibleWorkers(), 0);
+              mOptions.getLocationPolicy().getWorkerForNextBlock(mBlockStore.getEligibleWorkers(), 0);
       if (workerNetAddress == null) {
         // Assume no worker is available because block size is 0
         throw new UnavailableException(ExceptionMessage.NO_WORKER_AVAILABLE.getMessage());
       }
       try {
         mUnderStorageOutputStream = mCloser
-            .register(UnderFileSystemFileOutStream.create(mContext, workerNetAddress, mOptions));
+                .register(UnderFileSystemFileOutStream.create(mContext, workerNetAddress, mOptions));
       } catch (Throwable t) {
         throw CommonUtils.closeAndRethrow(mCloser, t);
       }
+    }
+  }
+
+  private void handleCacheWriteException(Exception e) throws IOException {
+    LOG.warn("Failed to write into AlluxioStore, canceling write attempt.", e);
+    if (!mUnderStorageType.isSyncPersist()) {
+      throw new IOException(ExceptionMessage.FAILED_CACHE.getMessage(e.getMessage()), e);
+    }
+
+    if (mCurrentBlockOutStream != null) {
+      mShouldCacheCurrentBlock = false;
+      mCurrentBlockOutStream.cancel();
     }
   }
 
@@ -309,8 +324,8 @@ public class FileOutStream extends AbstractOutStream {
    * Schedules the async persistence of the current file.
    */
   protected void scheduleAsyncPersist() throws IOException {
-    try (CloseableResource<FileSystemMasterClient> masterClient =
-        mContext.acquireMasterClientResource()) {
+    try (CloseableResource<FileSystemMasterClient> masterClient = mContext
+        .acquireMasterClientResource()) {
       masterClient.get().scheduleAsyncPersist(mUri);
     }
   }
