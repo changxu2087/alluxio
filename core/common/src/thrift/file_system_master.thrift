@@ -190,7 +190,6 @@ struct SetAttributeTOptions {
   7: optional bool recursive
   8: optional common.TTtlAction ttlAction
   9: optional FileSystemMasterCommonTOptions commonOptions
-  10: optional bool forAsyncWrite
 }
 struct SetAttributeTResponse {}
 

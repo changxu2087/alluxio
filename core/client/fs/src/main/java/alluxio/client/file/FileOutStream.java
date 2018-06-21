@@ -21,6 +21,7 @@ import alluxio.client.block.AlluxioBlockStore;
 import alluxio.client.block.stream.BlockOutStream;
 import alluxio.client.block.stream.UnderFileSystemFileOutStream;
 import alluxio.client.file.options.CompleteFileOptions;
+import alluxio.client.file.options.DeleteOptions;
 import alluxio.client.file.options.OutStreamOptions;
 import alluxio.client.file.options.SetAttributeOptions;
 import alluxio.exception.ExceptionMessage;
@@ -280,19 +281,16 @@ public class FileOutStream extends AbstractOutStream {
     }
   }
 
-  private void setFilePersisted(AlluxioURI path) throws IOException {
-    try (CloseableResource<FileSystemMasterClient> masterClient =
-        mContext.acquireMasterClientResource()) {
-      masterClient.get().setAttribute(path, SetAttributeOptions.defaults().setPersisted(true).setForAsyncWrite(true));
-    }
-  }
-
   private void changeWriteType() throws IOException {
     if (!mUnderStorageType.isSyncPersist()) {
       mOptions.setWriteType(WriteType.THROUGH);
       mAlluxioStorageType = mOptions.getAlluxioStorageType();
       mUnderStorageType = mOptions.getUnderStorageType();
-      setFilePersisted(mUri);
+      try (CloseableResource<FileSystemMasterClient> masterClient = mContext
+              .acquireMasterClientResource()) {
+        masterClient.get().delete(mUri, DeleteOptions.defaults());
+        masterClient.get().createFile(mUri, mOptions.toCreateFileOptions());
+      }
       WorkerNetAddress workerNetAddress = // not storing data to Alluxio, so block size is 0
               mOptions.getLocationPolicy().getWorkerForNextBlock(mBlockStore.getEligibleWorkers(), 0);
       if (workerNetAddress == null) {

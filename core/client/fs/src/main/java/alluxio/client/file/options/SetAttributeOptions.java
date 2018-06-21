@@ -42,7 +42,6 @@ public final class SetAttributeOptions {
   private String mGroup;
   private Mode mMode;
   private boolean mRecursive;
-  private boolean mForAsyncWrite;
 
   /**
    * @return the default {@link SetAttributeOptions}
@@ -61,7 +60,6 @@ public final class SetAttributeOptions {
     mGroup = null;
     mMode = null;
     mRecursive = false;
-    mForAsyncWrite = false;
   }
 
   /**
@@ -130,22 +128,6 @@ public final class SetAttributeOptions {
    */
   public boolean isRecursive() {
     return mRecursive;
-  }
-
-  /**
-   * @return whether for async_write
-   */
-  public boolean isForAsyncWrite() {
-    return mForAsyncWrite;
-  }
-
-  /**
-   * @param mForAsyncWrite the whether if for async write.
-   * @return the updated options object
-   */
-  public SetAttributeOptions setForAsyncWrite(boolean mForAsyncWrite) {
-    this.mForAsyncWrite = mForAsyncWrite;
-    return this;
   }
 
   /**
@@ -273,7 +255,6 @@ public final class SetAttributeOptions {
     }
     options.setRecursive(mRecursive);
     options.setCommonOptions(mCommonOptions.toThrift());
-    options.setForAsyncWrite(mForAsyncWrite);
     return options;
   }
 
@@ -294,8 +275,7 @@ public final class SetAttributeOptions {
         && Objects.equal(mOwner, that.mOwner)
         && Objects.equal(mGroup, that.mGroup)
         && Objects.equal(mMode, that.mMode)
-        && Objects.equal(mRecursive, that.mRecursive)
-        && Objects.equal(mForAsyncWrite, that.mForAsyncWrite);
+        && Objects.equal(mRecursive, that.mRecursive);
   }
 
   @Override
@@ -316,7 +296,6 @@ public final class SetAttributeOptions {
         .add("group", mGroup)
         .add("mode", mMode)
         .add("recursive", mRecursive)
-        .add("forAsyncWrite", mForAsyncWrite)
         .toString();
   }
 }

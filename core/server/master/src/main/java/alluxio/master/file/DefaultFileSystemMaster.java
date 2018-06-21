@@ -3377,10 +3377,8 @@ public final class DefaultFileSystemMaster extends AbstractMaster implements Fil
     }
     if (options.getPersisted() != null) {
       Preconditions.checkArgument(inode.isFile(), PreconditionMessage.PERSIST_ONLY_FOR_FILE);
-      if (!options.isForAsyncWrite()) {
-        Preconditions.checkArgument(((InodeFile) inode).isCompleted(),
-                PreconditionMessage.FILE_TO_PERSIST_MUST_BE_COMPLETE);
-      }
+      Preconditions.checkArgument(((InodeFile) inode).isCompleted(),
+          PreconditionMessage.FILE_TO_PERSIST_MUST_BE_COMPLETE);
       InodeFile file = (InodeFile) inode;
       // TODO(manugoyal) figure out valid behavior in the un-persist case
       Preconditions

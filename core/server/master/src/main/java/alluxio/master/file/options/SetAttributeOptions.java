@@ -66,7 +66,6 @@ public final class SetAttributeOptions {
       mMode = options.isSetMode() ? options.getMode() : Constants.INVALID_MODE;
       mRecursive = options.isRecursive();
       mOperationTimeMs = System.currentTimeMillis();
-      mForAsyncWrite = options.isForAsyncWrite();
     }
   }
 

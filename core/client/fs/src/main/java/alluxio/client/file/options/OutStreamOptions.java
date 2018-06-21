@@ -279,6 +279,17 @@ public final class OutStreamOptions {
       return mWriteType.isMustReserve();
   }
 
+
+  public CreateFileOptions toCreateFileOptions() {
+    return CreateFileOptions.defaults()
+            .setBlockSizeBytes(mBlockSizeBytes)
+            .setLocationPolicy(mLocationPolicy)
+            .setMode(mMode)
+            .setTtl(mTtl)
+            .setTtlAction(mTtlAction)
+            .setWriteTier(mWriteTier)
+            .setWriteType(mWriteType);
+  }
   @Override
   public boolean equals(Object o) {
     if (this == o) {
