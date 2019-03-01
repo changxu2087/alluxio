@@ -24,12 +24,13 @@ import javax.annotation.concurrent.ThreadSafe;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by shawn-pc on 4/10/18.
  * Delete workers from the cluster by the hosts in args and transfer partial blocks from the deleted workers to
- * the rest workers.
+ * the rest workers or under file system.
  */
 @ThreadSafe
 public class DeleteWorkerCommand extends AbstractFileSystemCommand{
@@ -45,10 +46,7 @@ public class DeleteWorkerCommand extends AbstractFileSystemCommand{
     @Override
     public int run(CommandLine cl) throws AlluxioException, IOException {
         String[] args = cl.getArgs();
-        List<String> hosts = new ArrayList<>();
-        for (String host : args) {
-            hosts.add(host);
-        }
+        List<String> hosts = Arrays.asList(args);
         try(CloseableResource<BlockMasterClient> client = FileSystemContext.INSTANCE.acquireBlockMasterClientResource()) {
             client.get().deleteWorker(hosts);
         }
@@ -63,7 +61,7 @@ public class DeleteWorkerCommand extends AbstractFileSystemCommand{
     @Override
     public String getDescription() {
         return "Delete workers from the cluster by the hosts in args and " +
-                "transfer partial blocks from the deleted workers to the rest workers.";
+                "transfer partial blocks from the deleted workers to the rest workers or under file system.";
     }
 
     @Override

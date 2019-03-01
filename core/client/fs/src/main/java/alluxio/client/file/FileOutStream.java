@@ -23,7 +23,6 @@ import alluxio.client.block.stream.UnderFileSystemFileOutStream;
 import alluxio.client.file.options.CompleteFileOptions;
 import alluxio.client.file.options.DeleteOptions;
 import alluxio.client.file.options.OutStreamOptions;
-import alluxio.client.file.options.SetAttributeOptions;
 import alluxio.exception.ExceptionMessage;
 import alluxio.exception.PreconditionMessage;
 import alluxio.exception.status.UnavailableException;
