@@ -157,11 +157,19 @@ public final class DefaultBlockMaster extends AbstractMaster implements BlockMas
    */
   private StorageTierAssoc mGlobalStorageTierAssoc;
 
-  /** Keeps track of workers which are in communication with the master. */
-  private final IndexedSet<MasterWorkerInfo> mWorkers =
-      new IndexedSet<>(ID_INDEX, ADDRESS_INDEX);
-  /** Keeps track of workers which are no longer in communication with the master. */
+  /**
+   * Keeps track of workers which are in communication with the master.
+   */
+  private final IndexedSet<MasterWorkerInfo> mWorkers = new IndexedSet<>(ID_INDEX, ADDRESS_INDEX);
+  /**
+   * Keeps track of workers which are no longer in communication with the master.
+   */
   private final IndexedSet<MasterWorkerInfo> mLostWorkers =
+      new IndexedSet<>(ID_INDEX, ADDRESS_INDEX);
+  /**
+   * Keeps track of workers which are in decommissioning.
+   */
+  private final IndexedSet<MasterWorkerInfo> mDecomWorkers =
       new IndexedSet<>(ID_INDEX, ADDRESS_INDEX);
 
   /**
@@ -303,6 +311,22 @@ public final class DefaultBlockMaster extends AbstractMaster implements BlockMas
       }
     }
     return workerInfoList;
+  }
+
+  @Override
+  public List<WorkerInfo> getWorkerInfoListforWrite() throws UnavailableException {
+    if (mSafeModeManager.isInSafeMode()) {
+      throw new UnavailableException(ExceptionMessage.MASTER_IN_SAFEMODE.getMessage());
+    }
+    List<WorkerInfo> workerInfoListforWrite = new ArrayList<>(mWorkers.size());
+    for (MasterWorkerInfo worker : mWorkers) {
+      if (!mDecomWorkers.contains(ADDRESS_INDEX, worker.getWorkerAddress())) {
+        synchronized (worker) {
+          workerInfoListforWrite.add(worker.generateClientWorkerInfo());
+        }
+      }
+    }
+    return workerInfoListforWrite;
   }
 
   @Override
@@ -567,7 +591,7 @@ public final class DefaultBlockMaster extends AbstractMaster implements BlockMas
     return ret;
   }
 
-  //TODO(xuchang): handle the concurrent
+  // TODO(xuchang): handle the concurrent
   @Override
   public void removeWorker(WorkerNetAddress address, RemoveWorkerOptions options) {
     MasterWorkerInfo worker = mWorkers.getFirstByField(ADDRESS_INDEX, address);
@@ -580,39 +604,40 @@ public final class DefaultBlockMaster extends AbstractMaster implements BlockMas
   }
 
   @Override
-  public void deleteWorker(List<String> deleteHosts) throws IOException {
+  public void deleteWorker(Map<String, List<Long>> nonPersisted) throws IOException {
     LOG.debug("go to send.");
     System.out.println("go to send.");
     FileSystemContext context = FileSystemContext.INSTANCE;
-    Channel channel;
     ChannelFuture future;
-    long availableCapacity = 0;
-    long totalUsed = 0;
-    String tmpHost;
-    Map<String, Long> hostUsed = new HashMap<>();
     Protocol.DeleteWorkerRequest.Builder builder = Protocol.DeleteWorkerRequest.newBuilder();
+    System.out.println("deleteHost " + nonPersisted);
     List<WorkerNetAddress> deleteAddress = new ArrayList<>();
-    System.out.println("deleteHost " + deleteHosts);
+    Set<String> deleteHosts = nonPersisted.keySet();
     for (MasterWorkerInfo workerInfo : mWorkers) {
-      tmpHost = workerInfo.getWorkerAddress().getHost();
-      System.out.println("tmpHost " + tmpHost);
-      if (deleteHosts.contains(tmpHost)) {
-        hostUsed.put(tmpHost, workerInfo.getUsedBytes());
+      if (deleteHosts.contains(workerInfo.getWorkerAddress().getHost())) {
+        mDecomWorkers.add(workerInfo);
         deleteAddress.add(workerInfo.getWorkerAddress());
-      } else {
-        availableCapacity += workerInfo.getCapacityBytes();
-        builder.addAvailableWorkerAddress(tmpHost);
       }
-      totalUsed += workerInfo.getUsedBytes();
     }
+
+    // tmpHost = workerInfo.getWorkerAddress().getHost();
+    // System.out.println("tmpHost " + tmpHost);
+    //
+    // if (deleteHosts.contains(tmpHost)) {
+    // hostUsed.put(tmpHost, workerInfo.getUsedBytes());
+    // deleteAddress.add(workerInfo.getWorkerAddress());
+    // } else {
+    // availableCapacity += workerInfo.getCapacityBytes();
+    // builder.addAvailableWorkerAddress(tmpHost);
+    // }
+    // totalUsed += workerInfo.getUsedBytes();
     System.out.println(deleteAddress);
-    final AtomicInteger completeNum = new AtomicInteger(0);
-    final Map<String, ChannelFuture> result = new TreeMap<>();
+    // final AtomicInteger completeNum = new AtomicInteger(0);
+    // final Map<String, ChannelFuture> result = new TreeMap<>();
     for (final WorkerNetAddress address : deleteAddress) {
-      channel = context.acquireNettyChannel(address);
-      long transferByte =
-          (long) ((double) availableCapacity / totalUsed * hostUsed.get(address.getHost()));
-      final Protocol.DeleteWorkerRequest request = builder.setTranferByte(transferByte).build();
+      Channel channel = context.acquireNettyChannel(address);
+      final Protocol.DeleteWorkerRequest request =
+          builder.addAllNonPersist(nonPersisted.get(address.getHost())).build();
       LOG.debug("go to send11.");
       System.out.println("go to send11.");
       try {

@@ -22,6 +22,7 @@ import alluxio.thrift.GetBlockInfoTOptions;
 import alluxio.thrift.GetCapacityBytesTOptions;
 import alluxio.thrift.GetUsedBytesTOptions;
 import alluxio.thrift.GetWorkerInfoListTOptions;
+import alluxio.thrift.GetWorkerInfoListforWriteTOptions;
 import alluxio.thrift.ValidateAndReserveTOptions;
 import alluxio.wire.BlockInfo;
 import alluxio.wire.ThriftUtils;
@@ -33,6 +34,7 @@ import org.apache.thrift.TException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -88,6 +90,22 @@ public final class RetryHandlingBlockMasterClient extends AbstractMasterClient
         List<WorkerInfo> result = new ArrayList<>();
         for (alluxio.thrift.WorkerInfo workerInfo : mClient
             .getWorkerInfoList(new GetWorkerInfoListTOptions()).getWorkerInfoList()) {
+          result.add(ThriftUtils.fromThrift(workerInfo));
+        }
+        return result;
+      }
+    });
+  }
+
+  @Override
+  public List<WorkerInfo> getWorkerInfoListforWrite() throws IOException {
+    return retryRPC(new RpcCallable<List<WorkerInfo>>() {
+      @Override
+      public List<WorkerInfo> call() throws TException {
+        List<WorkerInfo> result = new ArrayList<>();
+        for (alluxio.thrift.WorkerInfo workerInfo : mClient
+            .getWorkerInfoListforWrite(new GetWorkerInfoListforWriteTOptions())
+            .getWorkerInfoListforWrite()) {
           result.add(ThriftUtils.fromThrift(workerInfo));
         }
         return result;
@@ -158,13 +176,14 @@ public final class RetryHandlingBlockMasterClient extends AbstractMasterClient
   /**
    * Delete Workers from the cluster.
    *
-   * @param hosts The list of the delete worker host
+   * @param nonPersisted The map of the delete worker host to the non-persist file ids.
    */
-  public void deleteWorker(final List<String> hosts) throws IOException {
+  @Override
+  public void deleteWorker(Map<String, List<Long>> nonPersisted) throws IOException {
     retryRPC(new RpcCallable<Void>() {
       @Override
       public Void call() throws TException {
-        mClient.deleteWorker(hosts, new DeleteWorkerTOptions());
+        mClient.deleteWorker(nonPersisted, new DeleteWorkerTOptions());
         return null;
       }
     });

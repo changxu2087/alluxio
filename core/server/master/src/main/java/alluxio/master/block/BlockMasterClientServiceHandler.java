@@ -1,7 +1,7 @@
 /*
- * The Alluxio Open Foundation licenses this work under the Apache License, version 2.0
- * (the "License"). You may not use this work except in compliance with the License, which is
- * available at www.apache.org/licenses/LICENSE-2.0
+ * The Alluxio Open Foundation licenses this work under the Apache License, version 2.0 (the
+ * "License"). You may not use this work except in compliance with the License, which is available
+ * at www.apache.org/licenses/LICENSE-2.0
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied, as more fully set forth in the License.
@@ -33,6 +33,8 @@ import alluxio.thrift.GetUsedBytesTOptions;
 import alluxio.thrift.GetUsedBytesTResponse;
 import alluxio.thrift.GetWorkerInfoListTOptions;
 import alluxio.thrift.GetWorkerInfoListTResponse;
+import alluxio.thrift.GetWorkerInfoListforWriteTOptions;
+import alluxio.thrift.GetWorkerInfoListforWriteTResponse;
 import alluxio.thrift.RemoveWorkerTOptions;
 import alluxio.thrift.RemoveWorkerTResponse;
 import alluxio.thrift.ValidateAndReserveTOptions;
@@ -49,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -97,12 +100,35 @@ public final class BlockMasterClientServiceHandler implements BlockMasterClientS
   }
 
   @Override
+  public GetWorkerInfoListforWriteTResponse getWorkerInfoListforWrite(
+      GetWorkerInfoListforWriteTOptions options) throws AlluxioTException, TException {
+    return RpcUtils.call(LOG,
+        new RpcCallableThrowsIOException<GetWorkerInfoListforWriteTResponse>() {
+          @Override
+          public GetWorkerInfoListforWriteTResponse call()
+              throws AlluxioException, AlluxioStatusException {
+            List<WorkerInfo> workerInfos = new ArrayList<>();
+            for (alluxio.wire.WorkerInfo workerInfo : mBlockMaster.getWorkerInfoListforWrite()) {
+              workerInfos.add(ThriftUtils.toThrift(workerInfo));
+            }
+            return new GetWorkerInfoListforWriteTResponse(workerInfos);
+          }
+
+          @Override
+          public String toString() {
+            return String.format("getWorkerInfoListforWrite: options=%s", options);
+          }
+        });
+  }
+
+  @Override
   public RemoveWorkerTResponse removeWorker(final WorkerNetAddress address,
-                                            final RemoveWorkerTOptions options) throws AlluxioTException {
+      final RemoveWorkerTOptions options) throws AlluxioTException {
     return RpcUtils.call(LOG, new RpcUtils.RpcCallable<RemoveWorkerTResponse>() {
       @Override
       public RemoveWorkerTResponse call() throws AlluxioException {
-        mBlockMaster.removeWorker(ThriftUtils.fromThrift(address), new RemoveWorkerOptions(options));
+        mBlockMaster.removeWorker(ThriftUtils.fromThrift(address),
+            new RemoveWorkerOptions(options));
         return new RemoveWorkerTResponse();
       }
 
@@ -114,26 +140,27 @@ public final class BlockMasterClientServiceHandler implements BlockMasterClientS
   }
 
   @Override
-  public DeleteWorkerTResponse deleteWorker(final List<String> hosts, DeleteWorkerTOptions options) throws AlluxioTException {
+  public DeleteWorkerTResponse deleteWorker(Map<String, List<Long>> nonPersisted,
+      DeleteWorkerTOptions options) throws AlluxioTException, TException {
     LOG.debug("server delete worker");
     System.out.println("server delete worker");
     return RpcUtils.call(LOG, new RpcCallableThrowsIOException<DeleteWorkerTResponse>() {
       @Override
       public DeleteWorkerTResponse call() throws AlluxioException, IOException {
-        mBlockMaster.deleteWorker(hosts);
+        mBlockMaster.deleteWorker(nonPersisted);
         return new DeleteWorkerTResponse();
       }
 
       @Override
       public String toString() {
-        return String.format("deleteWorker: hosts=%s, options=%s", hosts, options);
+        return String.format("deleteWorker: non-persisted=%s, options=%s", nonPersisted, options);
       }
     });
   }
 
   @Override
-  public ValidateAndReserveTResponse validateAndReserve(WorkerNetAddress address, long preReserveBytes,
-      ValidateAndReserveTOptions options) throws AlluxioTException {
+  public ValidateAndReserveTResponse validateAndReserve(WorkerNetAddress address,
+      long preReserveBytes, ValidateAndReserveTOptions options) throws AlluxioTException {
     return RpcUtils.call(LOG, new RpcCallable<ValidateAndReserveTResponse>() {
       @Override
       public ValidateAndReserveTResponse call() throws AlluxioException, UnavailableException {
@@ -146,8 +173,8 @@ public final class BlockMasterClientServiceHandler implements BlockMasterClientS
       }
 
       public String toString() {
-        return String.format("validateAndReserve: address=%s, preReserveBytes=%s, options=%s", address,
-                preReserveBytes, options);
+        return String.format("validateAndReserve: address=%s, preReserveBytes=%s, options=%s",
+            address, preReserveBytes, options);
       }
     });
   }

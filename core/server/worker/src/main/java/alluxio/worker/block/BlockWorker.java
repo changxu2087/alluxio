@@ -400,14 +400,13 @@ public interface BlockWorker extends Worker, SessionCleanable {
       WorkerOutOfSpaceException;
 
   /**
-   * Delete the worker from the cluster. It will transfer the partial blocks from local to the other
-   * available workers
+   * Delete the worker from the cluster. It will transfer the non-persisted blocks from local to the
+   * other available workers or the UFS.
    *
    * @param sessionId the session ID
-   * @param availableWorker the available workers which the blocks will be transferred to
-   * @param transferByte the amount of bytes to transfer
+   * @param nonPersisted the non-persist file ids.
    */
-  void deleteWorker(long sessionId, List<String> availableWorker, long transferByte) throws IOException;
+  void deleteWorker(long sessionId, List<Long> nonPersisted) throws IOException;
 
   void removeWorker(long sessionId, WorkerNetAddress address) throws IOException;
 }

@@ -96,25 +96,24 @@ public class DataServerDeleteWorkerHandler extends ChannelInboundHandlerAdapter 
                                            final Protocol.DeleteWorkerRequest request) {
         RpcUtils.nettyRPCAndLog(LOG, new RpcUtils.NettyRPCCallable<Void>() {
 
-            @Override
-            public Void call() throws Exception {
-                if (mSessionId == INVALID_SESSION_ID) {
-                    LOG.debug("gogogo");
-                    System.out.println("gogogo");
-                    mSessionId = IdUtils.createSessionId();
-                    long transferByte = request.getTranferByte();
-                    List<String> availableWorkers = request.getAvailableWorkerAddressList();
-                    System.out.println("deleting worker " + availableWorkers.toString() + " " + transferByte);
-                    mBlockWorker.deleteWorker(mSessionId, availableWorkers, transferByte);
-                    mSessionId = INVALID_SESSION_ID;
-                    System.out.println("deleted worker");
-                } else {
-                    LOG.warn("Delete worker without closing the previous session {}.", mSessionId);
-                    throw new InvalidWorkerStateException(
-                            ExceptionMessage.SESSION_NOT_CLOSED.getMessage(mSessionId));
-                }
-                return null;
-            }
+      @Override
+      public Void call() throws Exception {
+        if (mSessionId == INVALID_SESSION_ID) {
+          LOG.debug("gogogo");
+          System.out.println("gogogo");
+          mSessionId = IdUtils.createSessionId();
+          List<Long> nonPersistList = request.getNonPersistList();
+          System.out.println("deleting worker " + nonPersistList);
+          mBlockWorker.deleteWorker(mSessionId, nonPersistList);
+          mSessionId = INVALID_SESSION_ID;
+          System.out.println("deleted worker");
+        } else {
+          LOG.warn("Delete worker without closing the previous session {}.", mSessionId);
+          throw new InvalidWorkerStateException(
+              ExceptionMessage.SESSION_NOT_CLOSED.getMessage(mSessionId));
+        }
+        return null;
+      }
 
             @Override
             public void exceptionCaught(Throwable throwable) {

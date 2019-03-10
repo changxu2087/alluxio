@@ -73,6 +73,13 @@ public class BlockMasterClientService {
     public GetWorkerInfoListTResponse getWorkerInfoList(GetWorkerInfoListTOptions options) throws alluxio.thrift.AlluxioTException, org.apache.thrift.TException;
 
     /**
+     * Returns a list of workers information for write
+     * 
+     * @param options the method options
+     */
+    public GetWorkerInfoListforWriteTResponse getWorkerInfoListforWrite(GetWorkerInfoListforWriteTOptions options) throws alluxio.thrift.AlluxioTException, org.apache.thrift.TException;
+
+    /**
      * Remove Worker from the cluster.
      * 
      * @param address The address of the worker to remove
@@ -87,11 +94,11 @@ public class BlockMasterClientService {
     /**
      * Delete Workers from the cluster.
      * 
-     * @param hosts the address of the delete worker
+     * @param hosts the address of the delete worker and non-persist file
      * 
      * @param options the method options
      */
-    public DeleteWorkerTResponse deleteWorker(List<String> hosts, DeleteWorkerTOptions options) throws alluxio.thrift.AlluxioTException, org.apache.thrift.TException;
+    public DeleteWorkerTResponse deleteWorker(Map<String,List<Long>> hosts, DeleteWorkerTOptions options) throws alluxio.thrift.AlluxioTException, org.apache.thrift.TException;
 
     /**
      * Validate whether the worker of this address can be used as block store, and if it could,
@@ -117,9 +124,11 @@ public class BlockMasterClientService {
 
     public void getWorkerInfoList(GetWorkerInfoListTOptions options, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
+    public void getWorkerInfoListforWrite(GetWorkerInfoListforWriteTOptions options, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+
     public void removeWorker(alluxio.thrift.WorkerNetAddress address, RemoveWorkerTOptions options, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
-    public void deleteWorker(List<String> hosts, DeleteWorkerTOptions options, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+    public void deleteWorker(Map<String,List<Long>> hosts, DeleteWorkerTOptions options, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
     public void validateAndReserve(alluxio.thrift.WorkerNetAddress address, long preReserveBytes, ValidateAndReserveTOptions options, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
@@ -250,6 +259,32 @@ public class BlockMasterClientService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "getWorkerInfoList failed: unknown result");
     }
 
+    public GetWorkerInfoListforWriteTResponse getWorkerInfoListforWrite(GetWorkerInfoListforWriteTOptions options) throws alluxio.thrift.AlluxioTException, org.apache.thrift.TException
+    {
+      send_getWorkerInfoListforWrite(options);
+      return recv_getWorkerInfoListforWrite();
+    }
+
+    public void send_getWorkerInfoListforWrite(GetWorkerInfoListforWriteTOptions options) throws org.apache.thrift.TException
+    {
+      getWorkerInfoListforWrite_args args = new getWorkerInfoListforWrite_args();
+      args.setOptions(options);
+      sendBase("getWorkerInfoListforWrite", args);
+    }
+
+    public GetWorkerInfoListforWriteTResponse recv_getWorkerInfoListforWrite() throws alluxio.thrift.AlluxioTException, org.apache.thrift.TException
+    {
+      getWorkerInfoListforWrite_result result = new getWorkerInfoListforWrite_result();
+      receiveBase(result, "getWorkerInfoListforWrite");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      if (result.e != null) {
+        throw result.e;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "getWorkerInfoListforWrite failed: unknown result");
+    }
+
     public RemoveWorkerTResponse removeWorker(alluxio.thrift.WorkerNetAddress address, RemoveWorkerTOptions options) throws alluxio.thrift.AlluxioTException, org.apache.thrift.TException
     {
       send_removeWorker(address, options);
@@ -277,13 +312,13 @@ public class BlockMasterClientService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "removeWorker failed: unknown result");
     }
 
-    public DeleteWorkerTResponse deleteWorker(List<String> hosts, DeleteWorkerTOptions options) throws alluxio.thrift.AlluxioTException, org.apache.thrift.TException
+    public DeleteWorkerTResponse deleteWorker(Map<String,List<Long>> hosts, DeleteWorkerTOptions options) throws alluxio.thrift.AlluxioTException, org.apache.thrift.TException
     {
       send_deleteWorker(hosts, options);
       return recv_deleteWorker();
     }
 
-    public void send_deleteWorker(List<String> hosts, DeleteWorkerTOptions options) throws org.apache.thrift.TException
+    public void send_deleteWorker(Map<String,List<Long>> hosts, DeleteWorkerTOptions options) throws org.apache.thrift.TException
     {
       deleteWorker_args args = new deleteWorker_args();
       args.setHosts(hosts);
@@ -481,6 +516,38 @@ public class BlockMasterClientService {
       }
     }
 
+    public void getWorkerInfoListforWrite(GetWorkerInfoListforWriteTOptions options, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      getWorkerInfoListforWrite_call method_call = new getWorkerInfoListforWrite_call(options, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class getWorkerInfoListforWrite_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private GetWorkerInfoListforWriteTOptions options;
+      public getWorkerInfoListforWrite_call(GetWorkerInfoListforWriteTOptions options, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.options = options;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("getWorkerInfoListforWrite", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        getWorkerInfoListforWrite_args args = new getWorkerInfoListforWrite_args();
+        args.setOptions(options);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public GetWorkerInfoListforWriteTResponse getResult() throws alluxio.thrift.AlluxioTException, org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getWorkerInfoListforWrite();
+      }
+    }
+
     public void removeWorker(alluxio.thrift.WorkerNetAddress address, RemoveWorkerTOptions options, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
       removeWorker_call method_call = new removeWorker_call(address, options, resultHandler, this, ___protocolFactory, ___transport);
@@ -516,7 +583,7 @@ public class BlockMasterClientService {
       }
     }
 
-    public void deleteWorker(List<String> hosts, DeleteWorkerTOptions options, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+    public void deleteWorker(Map<String,List<Long>> hosts, DeleteWorkerTOptions options, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
       deleteWorker_call method_call = new deleteWorker_call(hosts, options, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
@@ -524,9 +591,9 @@ public class BlockMasterClientService {
     }
 
     public static class deleteWorker_call extends org.apache.thrift.async.TAsyncMethodCall {
-      private List<String> hosts;
+      private Map<String,List<Long>> hosts;
       private DeleteWorkerTOptions options;
-      public deleteWorker_call(List<String> hosts, DeleteWorkerTOptions options, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      public deleteWorker_call(Map<String,List<Long>> hosts, DeleteWorkerTOptions options, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.hosts = hosts;
         this.options = options;
@@ -606,6 +673,7 @@ public class BlockMasterClientService {
       processMap.put("getCapacityBytes", new getCapacityBytes());
       processMap.put("getUsedBytes", new getUsedBytes());
       processMap.put("getWorkerInfoList", new getWorkerInfoList());
+      processMap.put("getWorkerInfoListforWrite", new getWorkerInfoListforWrite());
       processMap.put("removeWorker", new removeWorker());
       processMap.put("deleteWorker", new deleteWorker());
       processMap.put("validateAndReserve", new validateAndReserve());
@@ -708,6 +776,30 @@ public class BlockMasterClientService {
       }
     }
 
+    public static class getWorkerInfoListforWrite<I extends Iface> extends org.apache.thrift.ProcessFunction<I, getWorkerInfoListforWrite_args> {
+      public getWorkerInfoListforWrite() {
+        super("getWorkerInfoListforWrite");
+      }
+
+      public getWorkerInfoListforWrite_args getEmptyArgsInstance() {
+        return new getWorkerInfoListforWrite_args();
+      }
+
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public getWorkerInfoListforWrite_result getResult(I iface, getWorkerInfoListforWrite_args args) throws org.apache.thrift.TException {
+        getWorkerInfoListforWrite_result result = new getWorkerInfoListforWrite_result();
+        try {
+          result.success = iface.getWorkerInfoListforWrite(args.options);
+        } catch (alluxio.thrift.AlluxioTException e) {
+          result.e = e;
+        }
+        return result;
+      }
+    }
+
     public static class removeWorker<I extends Iface> extends org.apache.thrift.ProcessFunction<I, removeWorker_args> {
       public removeWorker() {
         super("removeWorker");
@@ -797,6 +889,7 @@ public class BlockMasterClientService {
       processMap.put("getCapacityBytes", new getCapacityBytes());
       processMap.put("getUsedBytes", new getUsedBytes());
       processMap.put("getWorkerInfoList", new getWorkerInfoList());
+      processMap.put("getWorkerInfoListforWrite", new getWorkerInfoListforWrite());
       processMap.put("removeWorker", new removeWorker());
       processMap.put("deleteWorker", new deleteWorker());
       processMap.put("validateAndReserve", new validateAndReserve());
@@ -1028,6 +1121,63 @@ public class BlockMasterClientService {
 
       public void start(I iface, getWorkerInfoList_args args, org.apache.thrift.async.AsyncMethodCallback<GetWorkerInfoListTResponse> resultHandler) throws TException {
         iface.getWorkerInfoList(args.options,resultHandler);
+      }
+    }
+
+    public static class getWorkerInfoListforWrite<I extends AsyncIface> extends org.apache.thrift.AsyncProcessFunction<I, getWorkerInfoListforWrite_args, GetWorkerInfoListforWriteTResponse> {
+      public getWorkerInfoListforWrite() {
+        super("getWorkerInfoListforWrite");
+      }
+
+      public getWorkerInfoListforWrite_args getEmptyArgsInstance() {
+        return new getWorkerInfoListforWrite_args();
+      }
+
+      public AsyncMethodCallback<GetWorkerInfoListforWriteTResponse> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
+        final org.apache.thrift.AsyncProcessFunction fcall = this;
+        return new AsyncMethodCallback<GetWorkerInfoListforWriteTResponse>() { 
+          public void onComplete(GetWorkerInfoListforWriteTResponse o) {
+            getWorkerInfoListforWrite_result result = new getWorkerInfoListforWrite_result();
+            result.success = o;
+            try {
+              fcall.sendResponse(fb,result, org.apache.thrift.protocol.TMessageType.REPLY,seqid);
+              return;
+            } catch (Exception e) {
+              LOGGER.error("Exception writing to internal frame buffer", e);
+            }
+            fb.close();
+          }
+          public void onError(Exception e) {
+            byte msgType = org.apache.thrift.protocol.TMessageType.REPLY;
+            org.apache.thrift.TBase msg;
+            getWorkerInfoListforWrite_result result = new getWorkerInfoListforWrite_result();
+            if (e instanceof alluxio.thrift.AlluxioTException) {
+                        result.e = (alluxio.thrift.AlluxioTException) e;
+                        result.setEIsSet(true);
+                        msg = result;
+            }
+             else 
+            {
+              msgType = org.apache.thrift.protocol.TMessageType.EXCEPTION;
+              msg = (org.apache.thrift.TBase)new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.INTERNAL_ERROR, e.getMessage());
+            }
+            try {
+              fcall.sendResponse(fb,msg,msgType,seqid);
+              return;
+            } catch (Exception ex) {
+              LOGGER.error("Exception writing to internal frame buffer", ex);
+            }
+            fb.close();
+          }
+        };
+      }
+
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public void start(I iface, getWorkerInfoListforWrite_args args, org.apache.thrift.async.AsyncMethodCallback<GetWorkerInfoListforWriteTResponse> resultHandler) throws TException {
+        iface.getWorkerInfoListforWrite(args.options,resultHandler);
       }
     }
 
@@ -4708,6 +4858,854 @@ public class BlockMasterClientService {
 
   }
 
+  public static class getWorkerInfoListforWrite_args implements org.apache.thrift.TBase<getWorkerInfoListforWrite_args, getWorkerInfoListforWrite_args._Fields>, java.io.Serializable, Cloneable, Comparable<getWorkerInfoListforWrite_args>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("getWorkerInfoListforWrite_args");
+
+    private static final org.apache.thrift.protocol.TField OPTIONS_FIELD_DESC = new org.apache.thrift.protocol.TField("options", org.apache.thrift.protocol.TType.STRUCT, (short)1);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new getWorkerInfoListforWrite_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new getWorkerInfoListforWrite_argsTupleSchemeFactory());
+    }
+
+    private GetWorkerInfoListforWriteTOptions options; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      /**
+       * the method options
+       */
+      OPTIONS((short)1, "options");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // OPTIONS
+            return OPTIONS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.OPTIONS, new org.apache.thrift.meta_data.FieldMetaData("options", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, GetWorkerInfoListforWriteTOptions.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(getWorkerInfoListforWrite_args.class, metaDataMap);
+    }
+
+    public getWorkerInfoListforWrite_args() {
+    }
+
+    public getWorkerInfoListforWrite_args(
+      GetWorkerInfoListforWriteTOptions options)
+    {
+      this();
+      this.options = options;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public getWorkerInfoListforWrite_args(getWorkerInfoListforWrite_args other) {
+      if (other.isSetOptions()) {
+        this.options = new GetWorkerInfoListforWriteTOptions(other.options);
+      }
+    }
+
+    public getWorkerInfoListforWrite_args deepCopy() {
+      return new getWorkerInfoListforWrite_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.options = null;
+    }
+
+    /**
+     * the method options
+     */
+    public GetWorkerInfoListforWriteTOptions getOptions() {
+      return this.options;
+    }
+
+    /**
+     * the method options
+     */
+    public getWorkerInfoListforWrite_args setOptions(GetWorkerInfoListforWriteTOptions options) {
+      this.options = options;
+      return this;
+    }
+
+    public void unsetOptions() {
+      this.options = null;
+    }
+
+    /** Returns true if field options is set (has been assigned a value) and false otherwise */
+    public boolean isSetOptions() {
+      return this.options != null;
+    }
+
+    public void setOptionsIsSet(boolean value) {
+      if (!value) {
+        this.options = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case OPTIONS:
+        if (value == null) {
+          unsetOptions();
+        } else {
+          setOptions((GetWorkerInfoListforWriteTOptions)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case OPTIONS:
+        return getOptions();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case OPTIONS:
+        return isSetOptions();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof getWorkerInfoListforWrite_args)
+        return this.equals((getWorkerInfoListforWrite_args)that);
+      return false;
+    }
+
+    public boolean equals(getWorkerInfoListforWrite_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_options = true && this.isSetOptions();
+      boolean that_present_options = true && that.isSetOptions();
+      if (this_present_options || that_present_options) {
+        if (!(this_present_options && that_present_options))
+          return false;
+        if (!this.options.equals(that.options))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      List<Object> list = new ArrayList<Object>();
+
+      boolean present_options = true && (isSetOptions());
+      list.add(present_options);
+      if (present_options)
+        list.add(options);
+
+      return list.hashCode();
+    }
+
+    @Override
+    public int compareTo(getWorkerInfoListforWrite_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+
+      lastComparison = Boolean.valueOf(isSetOptions()).compareTo(other.isSetOptions());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetOptions()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.options, other.options);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("getWorkerInfoListforWrite_args(");
+      boolean first = true;
+
+      sb.append("options:");
+      if (this.options == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.options);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+      if (options != null) {
+        options.validate();
+      }
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class getWorkerInfoListforWrite_argsStandardSchemeFactory implements SchemeFactory {
+      public getWorkerInfoListforWrite_argsStandardScheme getScheme() {
+        return new getWorkerInfoListforWrite_argsStandardScheme();
+      }
+    }
+
+    private static class getWorkerInfoListforWrite_argsStandardScheme extends StandardScheme<getWorkerInfoListforWrite_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, getWorkerInfoListforWrite_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // OPTIONS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+                struct.options = new GetWorkerInfoListforWriteTOptions();
+                struct.options.read(iprot);
+                struct.setOptionsIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, getWorkerInfoListforWrite_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.options != null) {
+          oprot.writeFieldBegin(OPTIONS_FIELD_DESC);
+          struct.options.write(oprot);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class getWorkerInfoListforWrite_argsTupleSchemeFactory implements SchemeFactory {
+      public getWorkerInfoListforWrite_argsTupleScheme getScheme() {
+        return new getWorkerInfoListforWrite_argsTupleScheme();
+      }
+    }
+
+    private static class getWorkerInfoListforWrite_argsTupleScheme extends TupleScheme<getWorkerInfoListforWrite_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, getWorkerInfoListforWrite_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetOptions()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetOptions()) {
+          struct.options.write(oprot);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, getWorkerInfoListforWrite_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.options = new GetWorkerInfoListforWriteTOptions();
+          struct.options.read(iprot);
+          struct.setOptionsIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class getWorkerInfoListforWrite_result implements org.apache.thrift.TBase<getWorkerInfoListforWrite_result, getWorkerInfoListforWrite_result._Fields>, java.io.Serializable, Cloneable, Comparable<getWorkerInfoListforWrite_result>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("getWorkerInfoListforWrite_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRUCT, (short)0);
+    private static final org.apache.thrift.protocol.TField E_FIELD_DESC = new org.apache.thrift.protocol.TField("e", org.apache.thrift.protocol.TType.STRUCT, (short)1);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new getWorkerInfoListforWrite_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new getWorkerInfoListforWrite_resultTupleSchemeFactory());
+    }
+
+    private GetWorkerInfoListforWriteTResponse success; // required
+    private alluxio.thrift.AlluxioTException e; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success"),
+      E((short)1, "e");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // E
+            return E;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, GetWorkerInfoListforWriteTResponse.class)));
+      tmpMap.put(_Fields.E, new org.apache.thrift.meta_data.FieldMetaData("e", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(getWorkerInfoListforWrite_result.class, metaDataMap);
+    }
+
+    public getWorkerInfoListforWrite_result() {
+    }
+
+    public getWorkerInfoListforWrite_result(
+      GetWorkerInfoListforWriteTResponse success,
+      alluxio.thrift.AlluxioTException e)
+    {
+      this();
+      this.success = success;
+      this.e = e;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public getWorkerInfoListforWrite_result(getWorkerInfoListforWrite_result other) {
+      if (other.isSetSuccess()) {
+        this.success = new GetWorkerInfoListforWriteTResponse(other.success);
+      }
+      if (other.isSetE()) {
+        this.e = new alluxio.thrift.AlluxioTException(other.e);
+      }
+    }
+
+    public getWorkerInfoListforWrite_result deepCopy() {
+      return new getWorkerInfoListforWrite_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+      this.e = null;
+    }
+
+    public GetWorkerInfoListforWriteTResponse getSuccess() {
+      return this.success;
+    }
+
+    public getWorkerInfoListforWrite_result setSuccess(GetWorkerInfoListforWriteTResponse success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public alluxio.thrift.AlluxioTException getE() {
+      return this.e;
+    }
+
+    public getWorkerInfoListforWrite_result setE(alluxio.thrift.AlluxioTException e) {
+      this.e = e;
+      return this;
+    }
+
+    public void unsetE() {
+      this.e = null;
+    }
+
+    /** Returns true if field e is set (has been assigned a value) and false otherwise */
+    public boolean isSetE() {
+      return this.e != null;
+    }
+
+    public void setEIsSet(boolean value) {
+      if (!value) {
+        this.e = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((GetWorkerInfoListforWriteTResponse)value);
+        }
+        break;
+
+      case E:
+        if (value == null) {
+          unsetE();
+        } else {
+          setE((alluxio.thrift.AlluxioTException)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      case E:
+        return getE();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      case E:
+        return isSetE();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof getWorkerInfoListforWrite_result)
+        return this.equals((getWorkerInfoListforWrite_result)that);
+      return false;
+    }
+
+    public boolean equals(getWorkerInfoListforWrite_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      boolean this_present_e = true && this.isSetE();
+      boolean that_present_e = true && that.isSetE();
+      if (this_present_e || that_present_e) {
+        if (!(this_present_e && that_present_e))
+          return false;
+        if (!this.e.equals(that.e))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      List<Object> list = new ArrayList<Object>();
+
+      boolean present_success = true && (isSetSuccess());
+      list.add(present_success);
+      if (present_success)
+        list.add(success);
+
+      boolean present_e = true && (isSetE());
+      list.add(present_e);
+      if (present_e)
+        list.add(e);
+
+      return list.hashCode();
+    }
+
+    @Override
+    public int compareTo(getWorkerInfoListforWrite_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(other.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, other.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetE()).compareTo(other.isSetE());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetE()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.e, other.e);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("getWorkerInfoListforWrite_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("e:");
+      if (this.e == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.e);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+      if (success != null) {
+        success.validate();
+      }
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class getWorkerInfoListforWrite_resultStandardSchemeFactory implements SchemeFactory {
+      public getWorkerInfoListforWrite_resultStandardScheme getScheme() {
+        return new getWorkerInfoListforWrite_resultStandardScheme();
+      }
+    }
+
+    private static class getWorkerInfoListforWrite_resultStandardScheme extends StandardScheme<getWorkerInfoListforWrite_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, getWorkerInfoListforWrite_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+                struct.success = new GetWorkerInfoListforWriteTResponse();
+                struct.success.read(iprot);
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 1: // E
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+                struct.e = new alluxio.thrift.AlluxioTException();
+                struct.e.read(iprot);
+                struct.setEIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, getWorkerInfoListforWrite_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          struct.success.write(oprot);
+          oprot.writeFieldEnd();
+        }
+        if (struct.e != null) {
+          oprot.writeFieldBegin(E_FIELD_DESC);
+          struct.e.write(oprot);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class getWorkerInfoListforWrite_resultTupleSchemeFactory implements SchemeFactory {
+      public getWorkerInfoListforWrite_resultTupleScheme getScheme() {
+        return new getWorkerInfoListforWrite_resultTupleScheme();
+      }
+    }
+
+    private static class getWorkerInfoListforWrite_resultTupleScheme extends TupleScheme<getWorkerInfoListforWrite_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, getWorkerInfoListforWrite_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        if (struct.isSetE()) {
+          optionals.set(1);
+        }
+        oprot.writeBitSet(optionals, 2);
+        if (struct.isSetSuccess()) {
+          struct.success.write(oprot);
+        }
+        if (struct.isSetE()) {
+          struct.e.write(oprot);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, getWorkerInfoListforWrite_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(2);
+        if (incoming.get(0)) {
+          struct.success = new GetWorkerInfoListforWriteTResponse();
+          struct.success.read(iprot);
+          struct.setSuccessIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.e = new alluxio.thrift.AlluxioTException();
+          struct.e.read(iprot);
+          struct.setEIsSet(true);
+        }
+      }
+    }
+
+  }
+
   public static class removeWorker_args implements org.apache.thrift.TBase<removeWorker_args, removeWorker_args._Fields>, java.io.Serializable, Cloneable, Comparable<removeWorker_args>   {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("removeWorker_args");
 
@@ -5678,7 +6676,7 @@ public class BlockMasterClientService {
   public static class deleteWorker_args implements org.apache.thrift.TBase<deleteWorker_args, deleteWorker_args._Fields>, java.io.Serializable, Cloneable, Comparable<deleteWorker_args>   {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("deleteWorker_args");
 
-    private static final org.apache.thrift.protocol.TField HOSTS_FIELD_DESC = new org.apache.thrift.protocol.TField("hosts", org.apache.thrift.protocol.TType.LIST, (short)1);
+    private static final org.apache.thrift.protocol.TField HOSTS_FIELD_DESC = new org.apache.thrift.protocol.TField("hosts", org.apache.thrift.protocol.TType.MAP, (short)1);
     private static final org.apache.thrift.protocol.TField OPTIONS_FIELD_DESC = new org.apache.thrift.protocol.TField("options", org.apache.thrift.protocol.TType.STRUCT, (short)2);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
@@ -5687,13 +6685,13 @@ public class BlockMasterClientService {
       schemes.put(TupleScheme.class, new deleteWorker_argsTupleSchemeFactory());
     }
 
-    private List<String> hosts; // required
+    private Map<String,List<Long>> hosts; // required
     private DeleteWorkerTOptions options; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       /**
-       * the address of the delete worker
+       * the address of the delete worker and non-persist file
        */
       HOSTS((short)1, "hosts"),
       /**
@@ -5762,8 +6760,10 @@ public class BlockMasterClientService {
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
       tmpMap.put(_Fields.HOSTS, new org.apache.thrift.meta_data.FieldMetaData("hosts", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
-              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
+          new org.apache.thrift.meta_data.MapMetaData(org.apache.thrift.protocol.TType.MAP, 
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING), 
+              new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
+                  new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)))));
       tmpMap.put(_Fields.OPTIONS, new org.apache.thrift.meta_data.FieldMetaData("options", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, DeleteWorkerTOptions.class)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -5774,7 +6774,7 @@ public class BlockMasterClientService {
     }
 
     public deleteWorker_args(
-      List<String> hosts,
+      Map<String,List<Long>> hosts,
       DeleteWorkerTOptions options)
     {
       this();
@@ -5787,7 +6787,18 @@ public class BlockMasterClientService {
      */
     public deleteWorker_args(deleteWorker_args other) {
       if (other.isSetHosts()) {
-        List<String> __this__hosts = new ArrayList<String>(other.hosts);
+        Map<String,List<Long>> __this__hosts = new HashMap<String,List<Long>>(other.hosts.size());
+        for (Map.Entry<String, List<Long>> other_element : other.hosts.entrySet()) {
+
+          String other_element_key = other_element.getKey();
+          List<Long> other_element_value = other_element.getValue();
+
+          String __this__hosts_copy_key = other_element_key;
+
+          List<Long> __this__hosts_copy_value = new ArrayList<Long>(other_element_value);
+
+          __this__hosts.put(__this__hosts_copy_key, __this__hosts_copy_value);
+        }
         this.hosts = __this__hosts;
       }
       if (other.isSetOptions()) {
@@ -5809,28 +6820,24 @@ public class BlockMasterClientService {
       return (this.hosts == null) ? 0 : this.hosts.size();
     }
 
-    public java.util.Iterator<String> getHostsIterator() {
-      return (this.hosts == null) ? null : this.hosts.iterator();
-    }
-
-    public void addToHosts(String elem) {
+    public void putToHosts(String key, List<Long> val) {
       if (this.hosts == null) {
-        this.hosts = new ArrayList<String>();
+        this.hosts = new HashMap<String,List<Long>>();
       }
-      this.hosts.add(elem);
+      this.hosts.put(key, val);
     }
 
     /**
-     * the address of the delete worker
+     * the address of the delete worker and non-persist file
      */
-    public List<String> getHosts() {
+    public Map<String,List<Long>> getHosts() {
       return this.hosts;
     }
 
     /**
-     * the address of the delete worker
+     * the address of the delete worker and non-persist file
      */
-    public deleteWorker_args setHosts(List<String> hosts) {
+    public deleteWorker_args setHosts(Map<String,List<Long>> hosts) {
       this.hosts = hosts;
       return this;
     }
@@ -5886,7 +6893,7 @@ public class BlockMasterClientService {
         if (value == null) {
           unsetHosts();
         } else {
-          setHosts((List<String>)value);
+          setHosts((Map<String,List<Long>>)value);
         }
         break;
 
@@ -6089,17 +7096,29 @@ public class BlockMasterClientService {
           }
           switch (schemeField.id) {
             case 1: // HOSTS
-              if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
+              if (schemeField.type == org.apache.thrift.protocol.TType.MAP) {
                 {
-                  org.apache.thrift.protocol.TList _list16 = iprot.readListBegin();
-                  struct.hosts = new ArrayList<String>(_list16.size);
-                  String _elem17;
-                  for (int _i18 = 0; _i18 < _list16.size; ++_i18)
+                  org.apache.thrift.protocol.TMap _map24 = iprot.readMapBegin();
+                  struct.hosts = new HashMap<String,List<Long>>(2*_map24.size);
+                  String _key25;
+                  List<Long> _val26;
+                  for (int _i27 = 0; _i27 < _map24.size; ++_i27)
                   {
-                    _elem17 = iprot.readString();
-                    struct.hosts.add(_elem17);
+                    _key25 = iprot.readString();
+                    {
+                      org.apache.thrift.protocol.TList _list28 = iprot.readListBegin();
+                      _val26 = new ArrayList<Long>(_list28.size);
+                      long _elem29;
+                      for (int _i30 = 0; _i30 < _list28.size; ++_i30)
+                      {
+                        _elem29 = iprot.readI64();
+                        _val26.add(_elem29);
+                      }
+                      iprot.readListEnd();
+                    }
+                    struct.hosts.put(_key25, _val26);
                   }
-                  iprot.readListEnd();
+                  iprot.readMapEnd();
                 }
                 struct.setHostsIsSet(true);
               } else { 
@@ -6133,12 +7152,20 @@ public class BlockMasterClientService {
         if (struct.hosts != null) {
           oprot.writeFieldBegin(HOSTS_FIELD_DESC);
           {
-            oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.hosts.size()));
-            for (String _iter19 : struct.hosts)
+            oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.LIST, struct.hosts.size()));
+            for (Map.Entry<String, List<Long>> _iter31 : struct.hosts.entrySet())
             {
-              oprot.writeString(_iter19);
+              oprot.writeString(_iter31.getKey());
+              {
+                oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.I64, _iter31.getValue().size()));
+                for (long _iter32 : _iter31.getValue())
+                {
+                  oprot.writeI64(_iter32);
+                }
+                oprot.writeListEnd();
+              }
             }
-            oprot.writeListEnd();
+            oprot.writeMapEnd();
           }
           oprot.writeFieldEnd();
         }
@@ -6175,9 +7202,16 @@ public class BlockMasterClientService {
         if (struct.isSetHosts()) {
           {
             oprot.writeI32(struct.hosts.size());
-            for (String _iter20 : struct.hosts)
+            for (Map.Entry<String, List<Long>> _iter33 : struct.hosts.entrySet())
             {
-              oprot.writeString(_iter20);
+              oprot.writeString(_iter33.getKey());
+              {
+                oprot.writeI32(_iter33.getValue().size());
+                for (long _iter34 : _iter33.getValue())
+                {
+                  oprot.writeI64(_iter34);
+                }
+              }
             }
           }
         }
@@ -6192,13 +7226,24 @@ public class BlockMasterClientService {
         BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {
           {
-            org.apache.thrift.protocol.TList _list21 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-            struct.hosts = new ArrayList<String>(_list21.size);
-            String _elem22;
-            for (int _i23 = 0; _i23 < _list21.size; ++_i23)
+            org.apache.thrift.protocol.TMap _map35 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.LIST, iprot.readI32());
+            struct.hosts = new HashMap<String,List<Long>>(2*_map35.size);
+            String _key36;
+            List<Long> _val37;
+            for (int _i38 = 0; _i38 < _map35.size; ++_i38)
             {
-              _elem22 = iprot.readString();
-              struct.hosts.add(_elem22);
+              _key36 = iprot.readString();
+              {
+                org.apache.thrift.protocol.TList _list39 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.I64, iprot.readI32());
+                _val37 = new ArrayList<Long>(_list39.size);
+                long _elem40;
+                for (int _i41 = 0; _i41 < _list39.size; ++_i41)
+                {
+                  _elem40 = iprot.readI64();
+                  _val37.add(_elem40);
+                }
+              }
+              struct.hosts.put(_key36, _val37);
             }
           }
           struct.setHostsIsSet(true);

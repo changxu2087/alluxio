@@ -10219,35 +10219,19 @@ public final class Protocol {
   public interface DeleteWorkerRequestOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // repeated string available_worker_address = 1;
+    // repeated int64 nonPersist = 1;
     /**
-     * <code>repeated string available_worker_address = 1;</code>
+     * <code>repeated int64 nonPersist = 1;</code>
      */
-    java.util.List<java.lang.String>
-    getAvailableWorkerAddressList();
+    java.util.List<java.lang.Long> getNonPersistList();
     /**
-     * <code>repeated string available_worker_address = 1;</code>
+     * <code>repeated int64 nonPersist = 1;</code>
      */
-    int getAvailableWorkerAddressCount();
+    int getNonPersistCount();
     /**
-     * <code>repeated string available_worker_address = 1;</code>
+     * <code>repeated int64 nonPersist = 1;</code>
      */
-    java.lang.String getAvailableWorkerAddress(int index);
-    /**
-     * <code>repeated string available_worker_address = 1;</code>
-     */
-    com.google.protobuf.ByteString
-        getAvailableWorkerAddressBytes(int index);
-
-    // optional int64 tranferByte = 2;
-    /**
-     * <code>optional int64 tranferByte = 2;</code>
-     */
-    boolean hasTranferByte();
-    /**
-     * <code>optional int64 tranferByte = 2;</code>
-     */
-    long getTranferByte();
+    long getNonPersist(int index);
   }
   /**
    * Protobuf type {@code alluxio.proto.dataserver.DeleteWorkerRequest}
@@ -10304,17 +10288,25 @@ public final class Protocol {
               }
               break;
             }
-            case 10: {
+            case 8: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-                availableWorkerAddress_ = new com.google.protobuf.LazyStringArrayList();
+                nonPersist_ = new java.util.ArrayList<java.lang.Long>();
                 mutable_bitField0_ |= 0x00000001;
               }
-              availableWorkerAddress_.add(input.readBytes());
+              nonPersist_.add(input.readInt64());
               break;
             }
-            case 16: {
-              bitField0_ |= 0x00000001;
-              tranferByte_ = input.readInt64();
+            case 10: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001) && input.getBytesUntilLimit() > 0) {
+                nonPersist_ = new java.util.ArrayList<java.lang.Long>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              while (input.getBytesUntilLimit() > 0) {
+                nonPersist_.add(input.readInt64());
+              }
+              input.popLimit(limit);
               break;
             }
           }
@@ -10326,7 +10318,7 @@ public final class Protocol {
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-          availableWorkerAddress_ = new com.google.protobuf.UnmodifiableLazyStringList(availableWorkerAddress_);
+          nonPersist_ = java.util.Collections.unmodifiableList(nonPersist_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -10359,56 +10351,31 @@ public final class Protocol {
       return PARSER;
     }
 
-    private int bitField0_;
-    // repeated string available_worker_address = 1;
-    public static final int AVAILABLE_WORKER_ADDRESS_FIELD_NUMBER = 1;
-    private com.google.protobuf.LazyStringList availableWorkerAddress_;
+    // repeated int64 nonPersist = 1;
+    public static final int NONPERSIST_FIELD_NUMBER = 1;
+    private java.util.List<java.lang.Long> nonPersist_;
     /**
-     * <code>repeated string available_worker_address = 1;</code>
+     * <code>repeated int64 nonPersist = 1;</code>
      */
-    public java.util.List<java.lang.String>
-        getAvailableWorkerAddressList() {
-      return availableWorkerAddress_;
+    public java.util.List<java.lang.Long>
+        getNonPersistList() {
+      return nonPersist_;
     }
     /**
-     * <code>repeated string available_worker_address = 1;</code>
+     * <code>repeated int64 nonPersist = 1;</code>
      */
-    public int getAvailableWorkerAddressCount() {
-      return availableWorkerAddress_.size();
+    public int getNonPersistCount() {
+      return nonPersist_.size();
     }
     /**
-     * <code>repeated string available_worker_address = 1;</code>
+     * <code>repeated int64 nonPersist = 1;</code>
      */
-    public java.lang.String getAvailableWorkerAddress(int index) {
-      return availableWorkerAddress_.get(index);
-    }
-    /**
-     * <code>repeated string available_worker_address = 1;</code>
-     */
-    public com.google.protobuf.ByteString
-        getAvailableWorkerAddressBytes(int index) {
-      return availableWorkerAddress_.getByteString(index);
-    }
-
-    // optional int64 tranferByte = 2;
-    public static final int TRANFERBYTE_FIELD_NUMBER = 2;
-    private long tranferByte_;
-    /**
-     * <code>optional int64 tranferByte = 2;</code>
-     */
-    public boolean hasTranferByte() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    /**
-     * <code>optional int64 tranferByte = 2;</code>
-     */
-    public long getTranferByte() {
-      return tranferByte_;
+    public long getNonPersist(int index) {
+      return nonPersist_.get(index);
     }
 
     private void initFields() {
-      availableWorkerAddress_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      tranferByte_ = 0L;
+      nonPersist_ = java.util.Collections.emptyList();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -10422,11 +10389,8 @@ public final class Protocol {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
-      for (int i = 0; i < availableWorkerAddress_.size(); i++) {
-        output.writeBytes(1, availableWorkerAddress_.getByteString(i));
-      }
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt64(2, tranferByte_);
+      for (int i = 0; i < nonPersist_.size(); i++) {
+        output.writeInt64(1, nonPersist_.get(i));
       }
       getUnknownFields().writeTo(output);
     }
@@ -10439,16 +10403,12 @@ public final class Protocol {
       size = 0;
       {
         int dataSize = 0;
-        for (int i = 0; i < availableWorkerAddress_.size(); i++) {
+        for (int i = 0; i < nonPersist_.size(); i++) {
           dataSize += com.google.protobuf.CodedOutputStream
-            .computeBytesSizeNoTag(availableWorkerAddress_.getByteString(i));
+            .computeInt64SizeNoTag(nonPersist_.get(i));
         }
         size += dataSize;
-        size += 1 * getAvailableWorkerAddressList().size();
-      }
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(2, tranferByte_);
+        size += 1 * getNonPersistList().size();
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -10570,10 +10530,8 @@ public final class Protocol {
 
       public Builder clear() {
         super.clear();
-        availableWorkerAddress_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        nonPersist_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000001);
-        tranferByte_ = 0L;
-        bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
 
@@ -10601,18 +10559,11 @@ public final class Protocol {
       public alluxio.proto.dataserver.Protocol.DeleteWorkerRequest buildPartial() {
         alluxio.proto.dataserver.Protocol.DeleteWorkerRequest result = new alluxio.proto.dataserver.Protocol.DeleteWorkerRequest(this);
         int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          availableWorkerAddress_ = new com.google.protobuf.UnmodifiableLazyStringList(
-              availableWorkerAddress_);
+          nonPersist_ = java.util.Collections.unmodifiableList(nonPersist_);
           bitField0_ = (bitField0_ & ~0x00000001);
         }
-        result.availableWorkerAddress_ = availableWorkerAddress_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000001;
-        }
-        result.tranferByte_ = tranferByte_;
-        result.bitField0_ = to_bitField0_;
+        result.nonPersist_ = nonPersist_;
         onBuilt();
         return result;
       }
@@ -10628,18 +10579,15 @@ public final class Protocol {
 
       public Builder mergeFrom(alluxio.proto.dataserver.Protocol.DeleteWorkerRequest other) {
         if (other == alluxio.proto.dataserver.Protocol.DeleteWorkerRequest.getDefaultInstance()) return this;
-        if (!other.availableWorkerAddress_.isEmpty()) {
-          if (availableWorkerAddress_.isEmpty()) {
-            availableWorkerAddress_ = other.availableWorkerAddress_;
+        if (!other.nonPersist_.isEmpty()) {
+          if (nonPersist_.isEmpty()) {
+            nonPersist_ = other.nonPersist_;
             bitField0_ = (bitField0_ & ~0x00000001);
           } else {
-            ensureAvailableWorkerAddressIsMutable();
-            availableWorkerAddress_.addAll(other.availableWorkerAddress_);
+            ensureNonPersistIsMutable();
+            nonPersist_.addAll(other.nonPersist_);
           }
           onChanged();
-        }
-        if (other.hasTranferByte()) {
-          setTranferByte(other.getTranferByte());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -10668,128 +10616,68 @@ public final class Protocol {
       }
       private int bitField0_;
 
-      // repeated string available_worker_address = 1;
-      private com.google.protobuf.LazyStringList availableWorkerAddress_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      private void ensureAvailableWorkerAddressIsMutable() {
+      // repeated int64 nonPersist = 1;
+      private java.util.List<java.lang.Long> nonPersist_ = java.util.Collections.emptyList();
+      private void ensureNonPersistIsMutable() {
         if (!((bitField0_ & 0x00000001) == 0x00000001)) {
-          availableWorkerAddress_ = new com.google.protobuf.LazyStringArrayList(availableWorkerAddress_);
+          nonPersist_ = new java.util.ArrayList<java.lang.Long>(nonPersist_);
           bitField0_ |= 0x00000001;
          }
       }
       /**
-       * <code>repeated string available_worker_address = 1;</code>
+       * <code>repeated int64 nonPersist = 1;</code>
        */
-      public java.util.List<java.lang.String>
-          getAvailableWorkerAddressList() {
-        return java.util.Collections.unmodifiableList(availableWorkerAddress_);
+      public java.util.List<java.lang.Long>
+          getNonPersistList() {
+        return java.util.Collections.unmodifiableList(nonPersist_);
       }
       /**
-       * <code>repeated string available_worker_address = 1;</code>
+       * <code>repeated int64 nonPersist = 1;</code>
        */
-      public int getAvailableWorkerAddressCount() {
-        return availableWorkerAddress_.size();
+      public int getNonPersistCount() {
+        return nonPersist_.size();
       }
       /**
-       * <code>repeated string available_worker_address = 1;</code>
+       * <code>repeated int64 nonPersist = 1;</code>
        */
-      public java.lang.String getAvailableWorkerAddress(int index) {
-        return availableWorkerAddress_.get(index);
+      public long getNonPersist(int index) {
+        return nonPersist_.get(index);
       }
       /**
-       * <code>repeated string available_worker_address = 1;</code>
+       * <code>repeated int64 nonPersist = 1;</code>
        */
-      public com.google.protobuf.ByteString
-          getAvailableWorkerAddressBytes(int index) {
-        return availableWorkerAddress_.getByteString(index);
-      }
-      /**
-       * <code>repeated string available_worker_address = 1;</code>
-       */
-      public Builder setAvailableWorkerAddress(
-          int index, java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  ensureAvailableWorkerAddressIsMutable();
-        availableWorkerAddress_.set(index, value);
+      public Builder setNonPersist(
+          int index, long value) {
+        ensureNonPersistIsMutable();
+        nonPersist_.set(index, value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string available_worker_address = 1;</code>
+       * <code>repeated int64 nonPersist = 1;</code>
        */
-      public Builder addAvailableWorkerAddress(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  ensureAvailableWorkerAddressIsMutable();
-        availableWorkerAddress_.add(value);
+      public Builder addNonPersist(long value) {
+        ensureNonPersistIsMutable();
+        nonPersist_.add(value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string available_worker_address = 1;</code>
+       * <code>repeated int64 nonPersist = 1;</code>
        */
-      public Builder addAllAvailableWorkerAddress(
-          java.lang.Iterable<java.lang.String> values) {
-        ensureAvailableWorkerAddressIsMutable();
-        super.addAll(values, availableWorkerAddress_);
+      public Builder addAllNonPersist(
+          java.lang.Iterable<? extends java.lang.Long> values) {
+        ensureNonPersistIsMutable();
+        super.addAll(values, nonPersist_);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string available_worker_address = 1;</code>
+       * <code>repeated int64 nonPersist = 1;</code>
        */
-      public Builder clearAvailableWorkerAddress() {
-        availableWorkerAddress_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      public Builder clearNonPersist() {
+        nonPersist_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000001);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated string available_worker_address = 1;</code>
-       */
-      public Builder addAvailableWorkerAddressBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  ensureAvailableWorkerAddressIsMutable();
-        availableWorkerAddress_.add(value);
-        onChanged();
-        return this;
-      }
-
-      // optional int64 tranferByte = 2;
-      private long tranferByte_ ;
-      /**
-       * <code>optional int64 tranferByte = 2;</code>
-       */
-      public boolean hasTranferByte() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
-      }
-      /**
-       * <code>optional int64 tranferByte = 2;</code>
-       */
-      public long getTranferByte() {
-        return tranferByte_;
-      }
-      /**
-       * <code>optional int64 tranferByte = 2;</code>
-       */
-      public Builder setTranferByte(long value) {
-        bitField0_ |= 0x00000002;
-        tranferByte_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional int64 tranferByte = 2;</code>
-       */
-      public Builder clearTranferByte() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        tranferByte_ = 0L;
         onChanged();
         return this;
       }
@@ -10928,11 +10816,10 @@ public final class Protocol {
       "\030\005 \001(\010\022\023\n\013mustReserve\030\006 \001(\010\022\027\n\017preReserv" +
       "eBytes\030\007 \001(\003\"(\n\030LocalBlockCreateResponse" +
       "\022\014\n\004path\030\001 \001(\t\"=\n\031LocalBlockCompleteRequ" +
-      "est\022\020\n\010block_id\030\001 \001(\003\022\016\n\006cancel\030\002 \001(\010\"L\n",
-      "\023DeleteWorkerRequest\022 \n\030available_worker" +
-      "_address\030\001 \003(\t\022\023\n\013tranferByte\030\002 \001(\003*.\n\013R" +
-      "equestType\022\021\n\rALLUXIO_BLOCK\020\000\022\014\n\010UFS_FIL" +
-      "E\020\001"
+      "est\022\020\n\010block_id\030\001 \001(\003\022\016\n\006cancel\030\002 \001(\010\")\n",
+      "\023DeleteWorkerRequest\022\022\n\nnonPersist\030\001 \003(\003" +
+      "*.\n\013RequestType\022\021\n\rALLUXIO_BLOCK\020\000\022\014\n\010UF" +
+      "S_FILE\020\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -11028,7 +10915,7 @@ public final class Protocol {
           internal_static_alluxio_proto_dataserver_DeleteWorkerRequest_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_alluxio_proto_dataserver_DeleteWorkerRequest_descriptor,
-              new java.lang.String[] { "AvailableWorkerAddress", "TranferByte", });
+              new java.lang.String[] { "NonPersist", });
           return null;
         }
       };

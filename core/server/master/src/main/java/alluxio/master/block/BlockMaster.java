@@ -1,7 +1,7 @@
 /*
- * The Alluxio Open Foundation licenses this work under the Apache License, version 2.0
- * (the "License"). You may not use this work except in compliance with the License, which is
- * available at www.apache.org/licenses/LICENSE-2.0
+ * The Alluxio Open Foundation licenses this work under the Apache License, version 2.0 (the
+ * "License"). You may not use this work except in compliance with the License, which is available
+ * at www.apache.org/licenses/LICENSE-2.0
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied, as more fully set forth in the License.
@@ -42,6 +42,11 @@ public interface BlockMaster extends Master, ContainerIdGenerable {
    * @return a list of {@link WorkerInfo} objects representing the workers in Alluxio
    */
   List<WorkerInfo> getWorkerInfoList() throws UnavailableException;
+
+  /**
+   * @return a list of {@link WorkerInfo} objects representing the workers for write in Alluxio
+   */
+  List<WorkerInfo> getWorkerInfoListforWrite() throws UnavailableException;
 
   /**
    * @return the total capacity (in bytes) on all tiers, on all workers of Alluxio
@@ -133,9 +138,9 @@ public interface BlockMaster extends Master, ContainerIdGenerable {
   /**
    * Delete Workers from the cluster.
    *
-   * @param hosts The list of delete worker's host
+   * @param nonPersisted The map of delete worker's host to non-persist file ids.
    */
-  void deleteWorker(List<String> hosts) throws IOException;
+  void deleteWorker(Map<String, List<Long>> nonPersisted) throws IOException;
 
   /**
    * Validate whether the worker of this address can be used as block store, and if it could,

@@ -117,6 +117,19 @@ public final class AlluxioBlockStore {
   }
 
   /**
+   * @return the info of all block workers eligible for writes
+   */
+  public List<BlockWorkerInfo> getEligibleWorkersforWrite() throws IOException {
+    try (CloseableResource<BlockMasterClient> masterClientResource =
+        mContext.acquireBlockMasterClientResource()) {
+      return masterClientResource.get().getWorkerInfoListforWrite().stream()
+          .map(w -> new BlockWorkerInfo(w.getAddress(), w.getCapacityBytes(), w.getUsedBytes(),
+              w.getUnavailableBytes()))
+          .collect(toList());
+    }
+  }
+
+  /**
    * @return the info of all block workers
    */
   public List<BlockWorkerInfo> getAllWorkers() throws IOException {
@@ -279,7 +292,7 @@ public final class AlluxioBlockStore {
     FileWriteLocationPolicy locationPolicy = Preconditions.checkNotNull(options.getLocationPolicy(),
         PreconditionMessage.FILE_WRITE_LOCATION_POLICY_UNSPECIFIED);
     RetryPolicy retry = new CountingRetry(3);
-    List<BlockWorkerInfo> currentWorkers = getEligibleWorkers();
+    List<BlockWorkerInfo> currentWorkers = getEligibleWorkersforWrite();
     while (retry.attemptRetry()) {
       address = locationPolicy.getWorkerForNextBlock(currentWorkers, blockSize);
       if (address == null) {

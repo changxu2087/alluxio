@@ -151,6 +151,5 @@ message LocalBlockCompleteRequest {
 
 // next available id: 3
 message DeleteWorkerRequest {
-  repeated string available_worker_address = 1;
-  optional int64 tranferByte = 2;
+  repeated int64 nonPersist = 1;
 }

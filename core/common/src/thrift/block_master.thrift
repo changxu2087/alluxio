@@ -34,6 +34,11 @@ struct GetWorkerInfoListTResponse {
   1: list<WorkerInfo> workerInfoList
 }
 
+struct GetWorkerInfoListforWriteTOptions {}
+struct GetWorkerInfoListforWriteTResponse {
+  1: list<WorkerInfo> workerInfoListforWrite
+}
+
 struct RemoveWorkerTOptions {
   1: optional bool transferCache
   2: optional bool persist
@@ -83,6 +88,13 @@ service BlockMasterClientService extends common.AlluxioService {
     /** the method options */ 1: GetWorkerInfoListTOptions options,
   ) throws (1: exception.AlluxioTException e)
 
+    /**
+     * Returns a list of workers information for write
+     */
+    GetWorkerInfoListforWriteTResponse getWorkerInfoListforWrite(
+      /** the method options */ 1: GetWorkerInfoListforWriteTOptions options,
+    ) throws (1: exception.AlluxioTException e)
+
   /**
    * Remove Worker from the cluster.
    *
@@ -98,7 +110,7 @@ service BlockMasterClientService extends common.AlluxioService {
    * Delete Workers from the cluster.
    */
   DeleteWorkerTResponse deleteWorker(
-    /** the address of the delete worker */ 1: list<string> hosts,
+    /** the address of the delete worker and non-persist file */ 1: map<string, list<i64>> hosts,
     /** the method options */ 2: DeleteWorkerTOptions options,
   ) throws (1: exception.AlluxioTException e)
 

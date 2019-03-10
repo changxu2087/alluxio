@@ -101,7 +101,8 @@ public class FileOutStream extends AbstractOutStream {
       mUnderStorageOutputStream = null;
     } else { // Write is through to the under storage, create mUnderStorageOutputStream
       WorkerNetAddress workerNetAddress = // not storing data to Alluxio, so block size is 0
-          options.getLocationPolicy().getWorkerForNextBlock(mBlockStore.getEligibleWorkers(), 0);
+          options.getLocationPolicy()
+              .getWorkerForNextBlock(mBlockStore.getEligibleWorkersforWrite(), 0);
       if (workerNetAddress == null) {
         // Assume no worker is available because block size is 0
         throw new UnavailableException(ExceptionMessage.NO_WORKER_AVAILABLE.getMessage());
@@ -291,7 +292,8 @@ public class FileOutStream extends AbstractOutStream {
         masterClient.get().createFile(mUri, mOptions.toCreateFileOptions());
       }
       WorkerNetAddress workerNetAddress = // not storing data to Alluxio, so block size is 0
-              mOptions.getLocationPolicy().getWorkerForNextBlock(mBlockStore.getEligibleWorkers(), 0);
+          mOptions.getLocationPolicy()
+              .getWorkerForNextBlock(mBlockStore.getEligibleWorkersforWrite(), 0);
       if (workerNetAddress == null) {
         // Assume no worker is available because block size is 0
         throw new UnavailableException(ExceptionMessage.NO_WORKER_AVAILABLE.getMessage());

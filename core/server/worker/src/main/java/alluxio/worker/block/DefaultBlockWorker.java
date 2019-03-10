@@ -1,7 +1,7 @@
 /*
- * The Alluxio Open Foundation licenses this work under the Apache License, version 2.0
- * (the "License"). You may not use this work except in compliance with the License, which is
- * available at www.apache.org/licenses/LICENSE-2.0
+ * The Alluxio Open Foundation licenses this work under the Apache License, version 2.0 (the
+ * "License"). You may not use this work except in compliance with the License, which is available
+ * at www.apache.org/licenses/LICENSE-2.0
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied, as more fully set forth in the License.
@@ -22,7 +22,9 @@ import alluxio.client.block.AlluxioBlockStore;
 import alluxio.client.block.BlockWorkerInfo;
 import alluxio.client.block.options.RemoveWorkerOptions;
 import alluxio.client.block.stream.BlockOutStream;
+import alluxio.client.file.FileSystem;
 import alluxio.client.file.FileSystemContext;
+import alluxio.client.file.FileSystemUtils;
 import alluxio.client.file.URIStatus;
 import alluxio.client.file.options.CreateFileOptions;
 import alluxio.client.file.options.GetStatusOptions;
@@ -47,6 +49,7 @@ import alluxio.underfs.UfsManager;
 import alluxio.util.CommonUtils;
 import alluxio.util.IdUtils;
 import alluxio.util.ThreadFactoryUtils;
+import alluxio.wire.FileBlockInfo;
 import alluxio.wire.FileInfo;
 import alluxio.wire.LoadMetadataType;
 import alluxio.wire.WorkerNetAddress;
@@ -143,10 +146,11 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
   /**
    * Transfer the block of the worker
    */
-  private BlockOutStream currentBlockOutStream;
-  private List<BlockOutStream> previousBlockOutStream;
-  private List<BlockWorkerInfo> availableWorkerInfos;
-  private FileWriteLocationPolicy locationPolicy;
+  // private
+  // private BlockOutStream currentBlockOutStream;
+  // private List<BlockOutStream> previousBlockOutStream;
+  // private List<BlockWorkerInfo> availableWorkerInfos;
+  // private FileWriteLocationPolicy locationPolicy;
   private AlluxioBlockStore mAlluxioBlockStore;
 
   /**
@@ -181,7 +185,7 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
     mSessions = sessions;
     mBlockStore = blockStore;
     mWorkerId = new AtomicReference<>(-1L);
-
+    mAlluxioBlockStore = AlluxioBlockStore.create();
     mBlockStore.registerBlockStoreEventListener(mHeartbeatReporter);
     mBlockStore.registerBlockStoreEventListener(mMetricsReporter);
     mUnderFileSystemBlockStore = new UnderFileSystemBlockStore(mBlockStore, ufsManager);
@@ -541,46 +545,53 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
     }
   }
 
-    @Override
-    public void deleteWorker(long sessionId, List<String> availableWorker, long transferByte) throws IOException {
-        currentBlockOutStream = null;
-        previousBlockOutStream = new ArrayList<>();
-        availableWorkerInfos = new ArrayList<>();
-        try {
-            locationPolicy =
-                    CommonUtils.createNewClassInstance(Configuration.<FileWriteLocationPolicy>getClass(
-                            PropertyKey.USER_FILE_WRITE_LOCATION_POLICY), new Class[] {}, new Object[] {});
-        } catch (Exception e) {
-            throw Throwables.propagate(e);
-        }
-        BlockStoreMeta storeMeta = getStoreMetaFull();
+  @Override
+  public void deleteWorker(long sessionId, List<Long> nonPersisted) throws IOException {
+    // currentBlockOutStream = null;
+    // previousBlockOutStream = new ArrayList<>();
+    // availableWorkerInfos = new ArrayList<>();
 
-        List<BlockWorkerInfo> allBlockWorkerInfos = mAlluxioBlockStore.getAllWorkers();
-        for (BlockWorkerInfo workerInfo : allBlockWorkerInfos) {
-            if (availableWorker.contains(workerInfo.getNetAddress().getHost())) {
-                availableWorkerInfos.add(workerInfo);
-            }
-        }
+    // try {
+    // locationPolicy =
+    // CommonUtils.createNewClassInstance(Configuration.<FileWriteLocationPolicy>getClass(
+    // PropertyKey.USER_FILE_WRITE_LOCATION_POLICY), new Class[] {}, new Object[] {});
+    // } catch (Exception e) {
+    // throw Throwables.propagate(e);
+    // }
+    // BlockStoreMeta storeMeta = getStoreMetaFull();
 
-        Map<String, List<Long>> blocks = storeMeta.getBlockList();
-        List<Long> memBlocks = blocks.get(Configuration.get(PropertyKey.MASTER_TIERED_STORE_GLOBAL_LEVEL0_ALIAS));
-        try {
-            System.out.println(memBlocks + " " + transferByte + " transferring block");
-            transferBlock(sessionId, memBlocks, transferByte);
-            System.out.println(memBlocks + " " + transferByte + " transferred block");
-        } finally {
-            LOG.debug("stopping the worker");
-            System.out.println("stopping the worker");
-            stop();
-            LOG.debug("stopped the worker");
-            System.out.println("stopped the worker");
-            LOG.debug("removing the worker");
-            System.out.println("removing the worker");
-            removeWorker(sessionId, mAddress);
-            LOG.debug("removed the worker");
-            System.out.println("removed the worker");
-        }
+
+
+    // List<BlockWorkerInfo> allBlockWorkerInfos = mAlluxioBlockStore.getAllWorkers();
+    // for (BlockWorkerInfo workerInfo : allBlockWorkerInfos) {
+    // if (availableWorker.contains(workerInfo.getNetAddress().getHost())) {
+    // availableWorkerInfos.add(workerInfo);
+    // }
+    // }
+
+    // Map<String, List<Long>> blocks = storeMeta.getBlockList();
+    // List<Long> Blocks = new ArrayList<>();
+    // for (List b : blocks.values()) {
+    // Blocks.addAll(b);
+    // }
+    try {
+      System.out.println("transferring block " + nonPersisted);
+      // transferBlock(sessionId, Blocks, transferByte);
+      handleNonPersistedFile(sessionId, nonPersisted);
+      System.out.println("transferred block");
+    } finally {
+      LOG.debug("stopping the worker");
+      System.out.println("stopping the worker");
+      stop();
+      LOG.debug("stopped the worker");
+      System.out.println("stopped the worker");
+      LOG.debug("removing the worker");
+      System.out.println("removing the worker");
+      removeWorker(sessionId, mAddress);
+      LOG.debug("removed the worker");
+      System.out.println("removed the worker");
     }
+  }
 
     @Override
     public void removeWorker(long sessionId, WorkerNetAddress address) throws IOException {
@@ -591,154 +602,192 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
         }
     }
 
-    private void transferBlock(long sessionId, List<Long> blockIds, long transferByte) throws IOException {
-        List<Throwable> errors = new ArrayList<>();
-        Map<Long, Long> blockIdToLockId = lockBlocks(sessionId, blockIds);
-        long haveTransferByte = 0;
-        ByteBuffer buf = ByteBuffer.allocate(8 * Constants.MB);
-        try (Closer closer = Closer.create()) {
-            for (long blockId : blockIds) {
-                long lockId = blockIdToLockId.get(blockId);
-                long blockSize = getBlockMeta(sessionId, blockId, lockId).getBlockSize();
-                if (blockSize + haveTransferByte > transferByte) {
-                    unlockBlock(lockId);
-                    continue;
-                }
-                BlockReader blockReader = readBlockRemote(sessionId, blockId, lockId);
-                ReadableByteChannel readableByteChannel = closer.register(blockReader.getChannel());
-                while (readableByteChannel.read(buf) != -1) {
-                    buf.flip();
-                    writeRemote(blockId, blockSize, buf.array(), 0, buf.limit());
-                }
-                haveTransferByte += blockSize;
-            }
-            transforClose();
-        } catch (Exception e) {
-            errors.add(e);
-            for (long lockId : blockIdToLockId.values()) {
-                try {
-                    unlockBlock(lockId);
-                } catch (BlockDoesNotExistException e1) {
-                    errors.add(e1);
-                }
-            }
-            System.out.println("have error");
-            handleErrors(errors);
+  private void handleNonPersistedFile(long sessionId, List<Long> nonPersisted) throws IOException {
+    List<FileInfo> persistFIle = new ArrayList<>();
+    BlockOutStream blockOutStream = null;
+    boolean transfer = true;
+    for (long fileId : nonPersisted) {
+      FileInfo fileInfo = mFileSystemMasterClient.getFileInfo(fileId);
+      if (transfer) {
+        List<Long> blockIds = fileInfo.getBlockIds();
+        if (blockIds.size() == 1) {
+          blockOutStream = getNextBlock(fileInfo, blockIds.get(0));
+          if (blockOutStream != null) {
+            transferBlock(sessionId, blockOutStream, fileInfo, blockIds);
+          } else {
+            transfer = false;
+            persistFIle.add(fileInfo);
+          }
+        } else {
+          persistFIle.add(fileInfo);
         }
+      } else {
+        persistFIle.add(fileInfo);
+      }
     }
+    FileSystem fileSystem = FileSystem.Factory.get();
+    for (FileInfo file : persistFIle) {
+      FileSystemUtils.persistFile(fileSystem, new AlluxioURI(file.getPath()));
+    }
+  }
 
-    private Map<Long, Long> lockBlocks(long sessionId, List<Long> blockIds) throws IOException {
-        List<Throwable> errors = new ArrayList<>();
-        Map<Long, Long> blockIdToLockId = new HashMap<>();
+  private void transferBlock(long sessionId, BlockOutStream blockOutStream, FileInfo fileInfo,
+      List<Long> blockIds) throws IOException {
+    List<Throwable> errors = new ArrayList<>();
+    Map<Long, Long> blockIdToLockId = lockBlocks(sessionId, blockIds);
+    ByteBuffer buf = ByteBuffer.allocate(8 * Constants.MB);
+    try (Closer closer = Closer.create()) {
+      for (long blockId : blockIds) {
+        long lockId = blockIdToLockId.get(blockId);
+        // long blockSize = getBlockMeta(sessionId, blockId, lockId).getBlockSize();
+        BlockReader blockReader = readBlockRemote(sessionId, blockId, lockId);
+        ReadableByteChannel readableByteChannel = closer.register(blockReader.getChannel());
+        while (readableByteChannel.read(buf) != -1) {
+          buf.flip();
+          writeRemote(blockOutStream, buf.array(), 0, buf.limit());
+        }
+      }
+      blockOutStream.close();
+    } catch (Exception e) {
+      errors.add(e);
+      for (long lockId : blockIdToLockId.values()) {
         try {
-            // lock all the blocks
-            for (long blockId : blockIds) {
-                long lockId = lockBlock(sessionId, blockId);
-                blockIdToLockId.put(blockId, lockId);
-            }
-        } catch (BlockDoesNotExistException e) {
-            errors.add(e);
-            // make sure all the locks are released
-            for (long lockId : blockIdToLockId.values()) {
-                try {
-                    unlockBlock(lockId);
-                } catch (BlockDoesNotExistException e1) {
-                    errors.add(e1);
-                }
-            }
-            handleErrors(errors);
+          unlockBlock(lockId);
+        } catch (BlockDoesNotExistException e1) {
+          errors.add(e1);
         }
-        return blockIdToLockId;
+      }
+      System.out.println("have error");
+      handleErrors(errors);
     }
+  }
 
-    private void handleErrors(List<Throwable> errors) throws IOException {
-        if (!errors.isEmpty()) {
-            StringBuilder errorStr = new StringBuilder();
-            errorStr.append("failed to lock all blocks of worker ").append("host").append("\n");
-            for (Throwable error : errors) {
-                errorStr.append(error).append("\n");
-            }
-            throw new IOException(errorStr.toString());
-        }
-    }
-
-    private void writeRemote(long blockId, long blockSize, byte[] b, int off, int len) throws IOException {
-        Preconditions.checkArgument(b != null, PreconditionMessage.ERR_WRITE_BUFFER_NULL);
-        Preconditions.checkArgument(off >= 0 && len >= 0 && len + off <= b.length,
-                PreconditionMessage.ERR_BUFFER_STATE.toString(), b.length, off, len);
+  private Map<Long, Long> lockBlocks(long sessionId, List<Long> blockIds) throws IOException {
+    List<Throwable> errors = new ArrayList<>();
+    Map<Long, Long> blockIdToLockId = new HashMap<>();
+    try {
+      // lock all the blocks
+      for (long blockId : blockIds) {
+        long lockId = lockBlock(sessionId, blockId);
+        blockIdToLockId.put(blockId, lockId);
+      }
+    } catch (BlockDoesNotExistException e) {
+      errors.add(e);
+      // make sure all the locks are released
+      for (long lockId : blockIdToLockId.values()) {
         try {
-            int tLen = len;
-            int tOff = off;
-            while (tLen > 0) {
-                if (currentBlockOutStream == null || currentBlockOutStream.remaining() == 0) {
-                    getNextBlock(blockId, blockSize);
-                    if (currentBlockOutStream == null) {
-                        System.out.println("blockOutStream is null");
-                    } else {
-                        System.out.println("blockOutStream is 0");
-                    }
-                }
-                long currentBlockLeftBytes = currentBlockOutStream.remaining();
-                if (currentBlockLeftBytes >= tLen) {
-                    currentBlockOutStream.write(b, tOff, tLen);
-                    tLen = 0;
-                } else {
-                    currentBlockOutStream.write(b, tOff, (int) currentBlockLeftBytes);
-                    tLen -= currentBlockLeftBytes;
-                    tOff += currentBlockLeftBytes;
-                }
-            }
-        } catch (Exception e) {
-            handleCacheWriteException(e);
+          unlockBlock(lockId);
+        } catch (BlockDoesNotExistException e1) {
+          errors.add(e1);
         }
+      }
+      handleErrors(errors);
     }
+    return blockIdToLockId;
+  }
+
+  private void handleErrors(List<Throwable> errors) throws IOException {
+    if (!errors.isEmpty()) {
+      StringBuilder errorStr = new StringBuilder();
+      errorStr.append("failed to lock all blocks of worker ").append("host").append("\n");
+      for (Throwable error : errors) {
+        errorStr.append(error).append("\n");
+      }
+      throw new IOException(errorStr.toString());
+    }
+  }
+
+  private void writeRemote(BlockOutStream blockOutStream, byte[] b, int off, int len)
+      throws IOException {
+    Preconditions.checkArgument(b != null, PreconditionMessage.ERR_WRITE_BUFFER_NULL);
+    Preconditions.checkArgument(off >= 0 && len >= 0 && len + off <= b.length,
+        PreconditionMessage.ERR_BUFFER_STATE.toString(), b.length, off, len);
+    try {
+      long currentBlockLeftBytes = blockOutStream.remaining();
+      if (currentBlockLeftBytes >= len) {
+        blockOutStream.write(b, off, len);
+      } else {
+        blockOutStream.write(b, off, (int) currentBlockLeftBytes);
+      }
+      // while (tLen > 0) {
+      // if (currentBlockOutStream == null || currentBlockOutStream.remaining() == 0) {
+      // getNextBlock(blockId, blockSize);
+      // if (currentBlockOutStream == null) {
+      // System.out.println("blockOutStream is null");
+      // } else {
+      // System.out.println("blockOutStream is 0");
+      // }
+      // }
+      // long currentBlockLeftBytes = blockOutStream.remaining();
+      // if (currentBlockLeftBytes >= tLen) {
+      // blockOutStream.write(b, tOff, tLen);
+      // tLen = 0;
+      // } else {
+      // blockOutStream.write(b, tOff, (int) currentBlockLeftBytes);
+      // tLen -= currentBlockLeftBytes;
+      // tOff += currentBlockLeftBytes;
+      // }
+      // }
+    } catch (Exception e) {
+      // handleCacheWriteException(e);
+      if (blockOutStream != null) {
+        blockOutStream.cancel();
+      }
+    }
+  }
 
 
-    private void getNextBlock(long blockId, long blockSize) throws IOException {
-        FileSystemContext context = FileSystemContext.INSTANCE;
-        alluxio.client.file.FileSystemMasterClient masterClient = context.acquireMasterClient();
-        URIStatus status;
-        WorkerNetAddress address;
-        CreateFileOptions options = CreateFileOptions.defaults();
-        OutStreamOptions outStreamOptions = options.toOutStreamOptions();
-        outStreamOptions.setLocationPolicy(locationPolicy);
-        status = masterClient.getStatus(pathFromBlockid(blockId), GetStatusOptions.defaults().setLoadMetadataType(LoadMetadataType.Never));
-        context.releaseMasterClient(masterClient);
-        if (currentBlockOutStream != null) {
-            Preconditions.checkState(currentBlockOutStream.remaining() <= 0, PreconditionMessage.ERR_BLOCK_REMAINING);
-            currentBlockOutStream.flush();
-            previousBlockOutStream.add(currentBlockOutStream);
-        }
-        address = locationPolicy.getWorkerForNextBlock(availableWorkerInfos, blockSize);
-        outStreamOptions.setUfsPath(status.getUfsPath());
-        outStreamOptions.setMountId(status.getMountId());
-        currentBlockOutStream = mAlluxioBlockStore.getOutStream(blockId, blockSize, address, outStreamOptions);
-    }
+  private BlockOutStream getNextBlock(FileInfo fileInfo, long blockId) throws IOException {
+    // FileSystemContext context = FileSystemContext.INSTANCE;
+    // alluxio.client.file.FileSystemMasterClient masterClient = context.acquireMasterClient();
+    // URIStatus status;
+    // WorkerNetAddress address;
 
-    private AlluxioURI pathFromBlockid(long blockId) throws IOException {
-        long fileId = IdUtils.fileIdFromBlockId(blockId);
-        FileInfo fileInfo = getFileInfo(fileId);
-        return new AlluxioURI(fileInfo.getPath());
-    }
+    // outStreamOptions.setLocationPolicy(locationPolicy);
+    // status = masterClient.getStatus(pathFromBlockid(blockId),
+    // GetStatusOptions.defaults().setLoadMetadataType(LoadMetadataType.Never));
+    // context.releaseMasterClient(masterClient);
+    // if (currentBlockOutStream != null) {
+    // Preconditions.checkState(currentBlockOutStream.remaining() <= 0,
+    // PreconditionMessage.ERR_BLOCK_REMAINING);
+    // currentBlockOutStream.flush();
+    // previousBlockOutStream.add(currentBlockOutStream);
+    // }
+    // address =
+    // locationPolicy.getWorkerForNextBlock(mAlluxioBlockStore.getEligibleWorkersforWrite(),
+    // blockSize);
+    long blockSize = fileInfo.getBlockSizeBytes();
+    CreateFileOptions options = CreateFileOptions.defaults();
+    OutStreamOptions outStreamOptions = options.toOutStreamOptions();
+    outStreamOptions.setUfsPath(fileInfo.getUfsPath());
+    outStreamOptions.setMountId(fileInfo.getMountId());
+    return mAlluxioBlockStore.getOutStream(blockId, blockSize, outStreamOptions);
+  }
 
-    private void handleCacheWriteException(Exception e) throws IOException {
-        if (currentBlockOutStream != null) {
-            currentBlockOutStream.cancel();
-        }
-    }
+  // private AlluxioURI pathFromBlockid(long blockId) throws IOException {
+  // long fileId = IdUtils.fileIdFromBlockId(blockId);
+  // FileInfo fileInfo = getFileInfo(fileId);
+  // return new AlluxioURI(fileInfo.getPath());
+  // }
 
-    private void transforClose() throws IOException {
-        try {
-            if (currentBlockOutStream != null) {
-                previousBlockOutStream.add(currentBlockOutStream);
-            }
-            for (BlockOutStream blockOutStream : previousBlockOutStream) {
-                blockOutStream.close();
-            }
-        } catch (Throwable e) {
-            throw new IOException(e.getMessage());
-        }
-    }
+  // private void handleCacheWriteException(Exception e) throws IOException {
+  // if (currentBlockOutStream != null) {
+  // currentBlockOutStream.cancel();
+  // }
+  // }
+  //
+  // private void transforClose() throws IOException {
+  // try {
+  // if (currentBlockOutStream != null) {
+  // previousBlockOutStream.add(currentBlockOutStream);
+  // }
+  // for (BlockOutStream blockOutStream : previousBlockOutStream) {
+  // blockOutStream.close();
+  // }
+  // } catch (Throwable e) {
+  // throw new IOException(e.getMessage());
+  // }
+  // }
 
   @Override
   public void cleanupSession(long sessionId) {
@@ -747,9 +796,8 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
   }
 
   /**
-   * This class contains some metrics related to the block worker.
-   * This class is public because the metric names are referenced in
-   * {@link alluxio.web.WebInterfaceWorkerMetricsServlet}.
+   * This class contains some metrics related to the block worker. This class is public because the
+   * metric names are referenced in {@link alluxio.web.WebInterfaceWorkerMetricsServlet}.
    */
   @ThreadSafe
   public static final class Metrics {

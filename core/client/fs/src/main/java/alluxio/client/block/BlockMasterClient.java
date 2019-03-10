@@ -20,6 +20,7 @@ import alluxio.wire.WorkerNetAddress;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -55,6 +56,13 @@ public interface BlockMasterClient extends Client {
   List<WorkerInfo> getWorkerInfoList() throws IOException;
 
   /**
+   * Gets the info of a list of workers for write.
+   *
+   * @return A list of worker info for write returned by master
+   */
+  List<WorkerInfo> getWorkerInfoListforWrite() throws IOException;
+
+  /**
    * Returns the {@link BlockInfo} for a block id.
    *
    * @param blockId the block id to get the BlockInfo for
@@ -87,9 +95,9 @@ public interface BlockMasterClient extends Client {
   /**
    * Delete Workers from the cluster.
    *
-   * @param hosts The list of the delete worker host
+   * @param nonPersisted The map of the delete worker host to the non-persist file ids.
    */
-  void deleteWorker(final List<String> hosts) throws IOException;
+  void deleteWorker(final Map<String, List<Long>> nonPersisted) throws IOException;
 
   /**
    * Validate whether the worker of this address can be used as block store, and if it could,

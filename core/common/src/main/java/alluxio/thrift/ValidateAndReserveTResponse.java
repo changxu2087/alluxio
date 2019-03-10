@@ -351,14 +351,14 @@ public class ValidateAndReserveTResponse implements org.apache.thrift.TBase<Vali
           case 1: // WORKER_INFO_LIST
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list8 = iprot.readListBegin();
-                struct.workerInfoList = new ArrayList<WorkerInfo>(_list8.size);
-                WorkerInfo _elem9;
-                for (int _i10 = 0; _i10 < _list8.size; ++_i10)
+                org.apache.thrift.protocol.TList _list16 = iprot.readListBegin();
+                struct.workerInfoList = new ArrayList<WorkerInfo>(_list16.size);
+                WorkerInfo _elem17;
+                for (int _i18 = 0; _i18 < _list16.size; ++_i18)
                 {
-                  _elem9 = new WorkerInfo();
-                  _elem9.read(iprot);
-                  struct.workerInfoList.add(_elem9);
+                  _elem17 = new WorkerInfo();
+                  _elem17.read(iprot);
+                  struct.workerInfoList.add(_elem17);
                 }
                 iprot.readListEnd();
               }
@@ -386,9 +386,9 @@ public class ValidateAndReserveTResponse implements org.apache.thrift.TBase<Vali
         oprot.writeFieldBegin(WORKER_INFO_LIST_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.workerInfoList.size()));
-          for (WorkerInfo _iter11 : struct.workerInfoList)
+          for (WorkerInfo _iter19 : struct.workerInfoList)
           {
-            _iter11.write(oprot);
+            _iter19.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -419,9 +419,9 @@ public class ValidateAndReserveTResponse implements org.apache.thrift.TBase<Vali
       if (struct.isSetWorkerInfoList()) {
         {
           oprot.writeI32(struct.workerInfoList.size());
-          for (WorkerInfo _iter12 : struct.workerInfoList)
+          for (WorkerInfo _iter20 : struct.workerInfoList)
           {
-            _iter12.write(oprot);
+            _iter20.write(oprot);
           }
         }
       }
@@ -433,14 +433,14 @@ public class ValidateAndReserveTResponse implements org.apache.thrift.TBase<Vali
       BitSet incoming = iprot.readBitSet(1);
       if (incoming.get(0)) {
         {
-          org.apache.thrift.protocol.TList _list13 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-          struct.workerInfoList = new ArrayList<WorkerInfo>(_list13.size);
-          WorkerInfo _elem14;
-          for (int _i15 = 0; _i15 < _list13.size; ++_i15)
+          org.apache.thrift.protocol.TList _list21 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+          struct.workerInfoList = new ArrayList<WorkerInfo>(_list21.size);
+          WorkerInfo _elem22;
+          for (int _i23 = 0; _i23 < _list21.size; ++_i23)
           {
-            _elem14 = new WorkerInfo();
-            _elem14.read(iprot);
-            struct.workerInfoList.add(_elem14);
+            _elem22 = new WorkerInfo();
+            _elem22.read(iprot);
+            struct.workerInfoList.add(_elem22);
           }
         }
         struct.setWorkerInfoListIsSet(true);
