@@ -1390,6 +1390,12 @@ public final class PropertyKey implements Comparable<PropertyKey> {
           .setDescription("The max entries in the UFS instream cache.")
           .build();
 
+  public static final PropertyKey WORKER_DECOMMISSION_DATA_TRANSFER =
+      new Builder(Name.WORKER_DECOMMISSION_DATA_TRANSFER).setDefaultValue("true")
+          .setDescription(
+              "Whether transfer data of decommissioning workers to other workers when decommission")
+          .build();
+
   //
   // Proxy related properties
   //
@@ -2441,6 +2447,7 @@ public final class PropertyKey implements Comparable<PropertyKey> {
         "alluxio.worker.ufs.instream.cache.enabled";
     public static final String WORKER_UFS_INSTREAM_CACHE_MAX_SIZE =
         "alluxio.worker.ufs.instream.cache.max.size";
+    public static final String WORKER_DECOMMISSION_DATA_TRANSFER = "alluxio.worker.decommission.data.transfer";
 
     //
     // Proxy related properties

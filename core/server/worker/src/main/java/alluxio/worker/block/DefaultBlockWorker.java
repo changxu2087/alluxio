@@ -19,17 +19,13 @@ import alluxio.RuntimeConstants;
 import alluxio.Server;
 import alluxio.Sessions;
 import alluxio.client.block.AlluxioBlockStore;
-import alluxio.client.block.BlockWorkerInfo;
 import alluxio.client.block.options.RemoveWorkerOptions;
 import alluxio.client.block.stream.BlockOutStream;
 import alluxio.client.file.FileSystem;
 import alluxio.client.file.FileSystemContext;
 import alluxio.client.file.FileSystemUtils;
-import alluxio.client.file.URIStatus;
 import alluxio.client.file.options.CreateFileOptions;
-import alluxio.client.file.options.GetStatusOptions;
 import alluxio.client.file.options.OutStreamOptions;
-import alluxio.client.file.policy.FileWriteLocationPolicy;
 import alluxio.exception.BlockAlreadyExistsException;
 import alluxio.exception.BlockDoesNotExistException;
 import alluxio.exception.ExceptionMessage;
@@ -47,11 +43,8 @@ import alluxio.retry.ExponentialTimeBoundedRetry;
 import alluxio.thrift.BlockWorkerClientService;
 import alluxio.underfs.UfsManager;
 import alluxio.util.CommonUtils;
-import alluxio.util.IdUtils;
 import alluxio.util.ThreadFactoryUtils;
-import alluxio.wire.FileBlockInfo;
 import alluxio.wire.FileInfo;
-import alluxio.wire.LoadMetadataType;
 import alluxio.wire.WorkerNetAddress;
 import alluxio.worker.AbstractWorker;
 import alluxio.worker.SessionCleaner;
@@ -64,7 +57,6 @@ import alluxio.worker.file.FileSystemMasterClient;
 import com.codahale.metrics.Gauge;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.google.common.io.Closer;
 import org.apache.thrift.TProcessor;
 import org.slf4j.Logger;
@@ -142,15 +134,7 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
    * be updated by the block sync thread if the master requests re-registration.
    */
   private AtomicReference<Long> mWorkerId;
-
-  /**
-   * Transfer the block of the worker
-   */
-  // private
-  // private BlockOutStream currentBlockOutStream;
-  // private List<BlockOutStream> previousBlockOutStream;
-  // private List<BlockWorkerInfo> availableWorkerInfos;
-  // private FileWriteLocationPolicy locationPolicy;
+  
   private AlluxioBlockStore mAlluxioBlockStore;
 
   /**
@@ -547,36 +531,8 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
 
   @Override
   public void deleteWorker(long sessionId, List<Long> nonPersisted) throws IOException {
-    // currentBlockOutStream = null;
-    // previousBlockOutStream = new ArrayList<>();
-    // availableWorkerInfos = new ArrayList<>();
-
-    // try {
-    // locationPolicy =
-    // CommonUtils.createNewClassInstance(Configuration.<FileWriteLocationPolicy>getClass(
-    // PropertyKey.USER_FILE_WRITE_LOCATION_POLICY), new Class[] {}, new Object[] {});
-    // } catch (Exception e) {
-    // throw Throwables.propagate(e);
-    // }
-    // BlockStoreMeta storeMeta = getStoreMetaFull();
-
-
-
-    // List<BlockWorkerInfo> allBlockWorkerInfos = mAlluxioBlockStore.getAllWorkers();
-    // for (BlockWorkerInfo workerInfo : allBlockWorkerInfos) {
-    // if (availableWorker.contains(workerInfo.getNetAddress().getHost())) {
-    // availableWorkerInfos.add(workerInfo);
-    // }
-    // }
-
-    // Map<String, List<Long>> blocks = storeMeta.getBlockList();
-    // List<Long> Blocks = new ArrayList<>();
-    // for (List b : blocks.values()) {
-    // Blocks.addAll(b);
-    // }
     try {
       System.out.println("transferring block " + nonPersisted);
-      // transferBlock(sessionId, Blocks, transferByte);
       handleNonPersistedFile(sessionId, nonPersisted);
       System.out.println("transferred block");
     } finally {
@@ -604,8 +560,8 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
 
   private void handleNonPersistedFile(long sessionId, List<Long> nonPersisted) throws IOException {
     List<FileInfo> persistFIle = new ArrayList<>();
-    BlockOutStream blockOutStream = null;
-    boolean transfer = true;
+    BlockOutStream blockOutStream;
+    boolean transfer = Configuration.getBoolean(PropertyKey.WORKER_DECOMMISSION_DATA_TRANSFER);
     for (long fileId : nonPersisted) {
       FileInfo fileInfo = mFileSystemMasterClient.getFileInfo(fileId);
       if (transfer) {
@@ -709,27 +665,7 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
       } else {
         blockOutStream.write(b, off, (int) currentBlockLeftBytes);
       }
-      // while (tLen > 0) {
-      // if (currentBlockOutStream == null || currentBlockOutStream.remaining() == 0) {
-      // getNextBlock(blockId, blockSize);
-      // if (currentBlockOutStream == null) {
-      // System.out.println("blockOutStream is null");
-      // } else {
-      // System.out.println("blockOutStream is 0");
-      // }
-      // }
-      // long currentBlockLeftBytes = blockOutStream.remaining();
-      // if (currentBlockLeftBytes >= tLen) {
-      // blockOutStream.write(b, tOff, tLen);
-      // tLen = 0;
-      // } else {
-      // blockOutStream.write(b, tOff, (int) currentBlockLeftBytes);
-      // tLen -= currentBlockLeftBytes;
-      // tOff += currentBlockLeftBytes;
-      // }
-      // }
     } catch (Exception e) {
-      // handleCacheWriteException(e);
       if (blockOutStream != null) {
         blockOutStream.cancel();
       }
@@ -738,24 +674,6 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
 
 
   private BlockOutStream getNextBlock(FileInfo fileInfo, long blockId) throws IOException {
-    // FileSystemContext context = FileSystemContext.INSTANCE;
-    // alluxio.client.file.FileSystemMasterClient masterClient = context.acquireMasterClient();
-    // URIStatus status;
-    // WorkerNetAddress address;
-
-    // outStreamOptions.setLocationPolicy(locationPolicy);
-    // status = masterClient.getStatus(pathFromBlockid(blockId),
-    // GetStatusOptions.defaults().setLoadMetadataType(LoadMetadataType.Never));
-    // context.releaseMasterClient(masterClient);
-    // if (currentBlockOutStream != null) {
-    // Preconditions.checkState(currentBlockOutStream.remaining() <= 0,
-    // PreconditionMessage.ERR_BLOCK_REMAINING);
-    // currentBlockOutStream.flush();
-    // previousBlockOutStream.add(currentBlockOutStream);
-    // }
-    // address =
-    // locationPolicy.getWorkerForNextBlock(mAlluxioBlockStore.getEligibleWorkersforWrite(),
-    // blockSize);
     long blockSize = fileInfo.getBlockSizeBytes();
     CreateFileOptions options = CreateFileOptions.defaults();
     OutStreamOptions outStreamOptions = options.toOutStreamOptions();
@@ -763,31 +681,6 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
     outStreamOptions.setMountId(fileInfo.getMountId());
     return mAlluxioBlockStore.getOutStream(blockId, blockSize, outStreamOptions);
   }
-
-  // private AlluxioURI pathFromBlockid(long blockId) throws IOException {
-  // long fileId = IdUtils.fileIdFromBlockId(blockId);
-  // FileInfo fileInfo = getFileInfo(fileId);
-  // return new AlluxioURI(fileInfo.getPath());
-  // }
-
-  // private void handleCacheWriteException(Exception e) throws IOException {
-  // if (currentBlockOutStream != null) {
-  // currentBlockOutStream.cancel();
-  // }
-  // }
-  //
-  // private void transforClose() throws IOException {
-  // try {
-  // if (currentBlockOutStream != null) {
-  // previousBlockOutStream.add(currentBlockOutStream);
-  // }
-  // for (BlockOutStream blockOutStream : previousBlockOutStream) {
-  // blockOutStream.close();
-  // }
-  // } catch (Throwable e) {
-  // throw new IOException(e.getMessage());
-  // }
-  // }
 
   @Override
   public void cleanupSession(long sessionId) {

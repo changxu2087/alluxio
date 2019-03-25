@@ -598,6 +598,7 @@ public final class DefaultBlockMaster extends AbstractMaster implements BlockMas
     synchronized (worker) {
       mWorkers.remove(worker);
       processWorkerRemovedBlocks(worker, worker.getBlocks());
+      mDecomWorkers.remove(worker);
       LOG.info("The worker {} has been removed by user", worker);
     }
     System.out.println("RPC is call");
