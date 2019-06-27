@@ -134,7 +134,7 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
    * be updated by the block sync thread if the master requests re-registration.
    */
   private AtomicReference<Long> mWorkerId;
-  
+
   private AlluxioBlockStore mAlluxioBlockStore;
 
   /**
@@ -549,14 +549,14 @@ public final class DefaultBlockWorker extends AbstractWorker implements BlockWor
     }
   }
 
-    @Override
-    public void removeWorker(long sessionId, WorkerNetAddress address) throws IOException {
-        FileSystemContext context = FileSystemContext.INSTANCE;
-        try (CloseableResource<alluxio.client.block.BlockMasterClient> blockMasterClient =
-                     context.acquireBlockMasterClientResource()) {
-            blockMasterClient.get().removeWorker(address, RemoveWorkerOptions.defaults());
-        }
+  @Override
+  public void removeWorker(long sessionId, WorkerNetAddress address) throws IOException {
+    FileSystemContext context = FileSystemContext.INSTANCE;
+    try (CloseableResource<alluxio.client.block.BlockMasterClient> blockMasterClient =
+        context.acquireBlockMasterClientResource()) {
+      blockMasterClient.get().removeWorker(address, RemoveWorkerOptions.defaults());
     }
+  }
 
   private void handleNonPersistedFile(long sessionId, List<Long> nonPersisted) throws IOException {
     List<FileInfo> persistFIle = new ArrayList<>();
